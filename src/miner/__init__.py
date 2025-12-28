@@ -227,13 +227,16 @@ async def _process_template(
         source_url=template.source_url,
     )
 
-    # Save to cache
+    # Save to cache with source info
     cache.save_architecture(
         arch_id=arch.id,
         main_tf=arch.main_tf,
         variables_tf=arch.variables_tf,
         outputs_tf=arch.outputs_tf,
         metadata=arch.metadata.to_dict() if arch.metadata else None,
+        source_type=arch.source_type.value,
+        source_name=arch.source_name,
+        source_url=arch.source_url,
     )
 
     return arch
@@ -324,13 +327,16 @@ async def _process_diagram(
             ),
         )
 
-        # Save to cache
+        # Save to cache with source info
         cache.save_architecture(
             arch_id=arch.id,
             main_tf=arch.main_tf,
             variables_tf=arch.variables_tf,
             outputs_tf=arch.outputs_tf,
             metadata=arch.metadata.to_dict() if arch.metadata else None,
+            source_type=arch.source_type.value,
+            source_name=arch.source_name,
+            source_url=arch.source_url,
         )
 
         return arch

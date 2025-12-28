@@ -255,6 +255,9 @@ class ArchitectureCache(FileCache):
         variables_tf: Optional[str] = None,
         outputs_tf: Optional[str] = None,
         metadata: Optional[dict] = None,
+        source_type: Optional[str] = None,
+        source_name: Optional[str] = None,
+        source_url: Optional[str] = None,
     ) -> str:
         """
         Save architecture files to cache.
@@ -265,6 +268,9 @@ class ArchitectureCache(FileCache):
             variables_tf: Optional variables.tf content
             outputs_tf: Optional outputs.tf content
             metadata: Optional metadata dict
+            source_type: Source type (template/diagram)
+            source_name: Source name
+            source_url: Original source URL
 
         Returns:
             Content hash
@@ -284,11 +290,19 @@ class ArchitectureCache(FileCache):
 
         content_hash = get_content_hash(main_tf)
 
-        if metadata:
-            metadata["content_hash"] = content_hash
-            (arch_dir / "metadata.json").write_text(
-                json.dumps(metadata, indent=2), encoding="utf-8"
-            )
+        # Build metadata with source info
+        full_metadata = metadata.copy() if metadata else {}
+        full_metadata["content_hash"] = content_hash
+        if source_type:
+            full_metadata["source_type"] = source_type
+        if source_name:
+            full_metadata["source_name"] = source_name
+        if source_url:
+            full_metadata["source_url"] = source_url
+
+        (arch_dir / "metadata.json").write_text(
+            json.dumps(full_metadata, indent=2), encoding="utf-8"
+        )
 
         logger.debug("architecture_cached", arch_id=arch_id, content_hash=content_hash)
         return content_hash
@@ -301,7 +315,8 @@ class ArchitectureCache(FileCache):
             arch_id: Architecture identifier
 
         Returns:
-            Dict with main_tf, variables_tf, outputs_tf, metadata
+            Dict with main_tf, variables_tf, outputs_tf, metadata,
+            source_type, source_name, source_url
         """
         arch_dir = self.cache_dir / arch_id
         if not arch_dir.exists():
@@ -316,6 +331,9 @@ class ArchitectureCache(FileCache):
             "variables_tf": None,
             "outputs_tf": None,
             "metadata": None,
+            "source_type": None,
+            "source_name": None,
+            "source_url": None,
         }
 
         variables_path = arch_dir / "variables.tf"
@@ -328,7 +346,12 @@ class ArchitectureCache(FileCache):
 
         metadata_path = arch_dir / "metadata.json"
         if metadata_path.exists():
-            result["metadata"] = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            result["metadata"] = metadata
+            # Extract source info from metadata for convenience
+            result["source_type"] = metadata.get("source_type")
+            result["source_name"] = metadata.get("source_name")
+            result["source_url"] = metadata.get("source_url")
 
         return result
 
