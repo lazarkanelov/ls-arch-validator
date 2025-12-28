@@ -35,8 +35,13 @@ on:
 
 env:
   PYTHON_VERSION: '3.11'
-  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   validate:
