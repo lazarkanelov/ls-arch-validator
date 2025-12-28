@@ -370,6 +370,9 @@ def validate(
     skip_cleanup: bool,
 ) -> None:
     """Run validation pipeline."""
+    import asyncio
+    from src.runner import run_validations
+
     ctx.logger.info(
         "validate_started",
         architectures=list(architectures) if architectures else "all",
@@ -388,11 +391,40 @@ def validate(
         })
         return
 
-    # TODO: Implement validation logic in Phase 6 (US2)
-    output_json({
-        "status": "not_implemented",
-        "message": "Validation will be implemented in Phase 6",
-    })
+    try:
+        result = asyncio.run(
+            run_validations(
+                cache_dir=ctx.cache_dir,
+                output_dir=ctx.output_dir,
+                architectures=list(architectures) if architectures else None,
+                excludes=list(excludes) if excludes else None,
+                parallelism=parallelism,
+                localstack_version=localstack_version,
+                timeout=timeout,
+                skip_cleanup=skip_cleanup,
+            )
+        )
+
+        if result.success:
+            output_json({
+                "status": "success",
+                "message": f"Validation completed: {result.run.id}",
+                **result.to_dict(),
+            })
+        else:
+            output_json({
+                "status": "error",
+                "message": "Validation failed",
+                "errors": result.errors,
+                **result.to_dict(),
+            })
+
+    except Exception as e:
+        ctx.logger.error("validation_failed", error=str(e))
+        output_json({
+            "status": "error",
+            "message": f"Validation failed: {e}",
+        })
 
 
 @cli.command()
@@ -408,6 +440,23 @@ def validate(
     help="Create GitHub issues for failures",
 )
 @click.option(
+    "--github-token",
+    envvar="GITHUB_TOKEN",
+    default=None,
+    help="GitHub API token (or set GITHUB_TOKEN env var)",
+)
+@click.option(
+    "--github-repo",
+    envvar="GITHUB_REPOSITORY",
+    default=None,
+    help="GitHub repository (owner/repo) (or set GITHUB_REPOSITORY env var)",
+)
+@click.option(
+    "--dashboard-url",
+    default="",
+    help="Base URL for dashboard links in issues",
+)
+@click.option(
     "--skip-deploy",
     is_flag=True,
     default=False,
@@ -418,10 +467,15 @@ def report(
     ctx: Context,
     run_id: Optional[str],
     create_issues: bool,
+    github_token: Optional[str],
+    github_repo: Optional[str],
+    dashboard_url: str,
     skip_deploy: bool,
 ) -> None:
     """Generate dashboard report."""
-    from src.reporter import SiteGenerator
+    import json as json_module
+    from src.reporter import SiteGenerator, process_results_for_issues
+    from src.models import ArchitectureResult, ValidationRun
 
     ctx.logger.info(
         "report_started",
@@ -452,19 +506,52 @@ def report(
     )
 
     try:
-        index_path = generator.generate(data_dir=ctx.output_dir / "data")
+        data_dir = ctx.output_dir / "data"
+        index_path = generator.generate(data_dir=data_dir)
         ctx.logger.info("report_generated", output_path=str(index_path))
+
+        issue_stats = {"created": 0, "closed": 0, "skipped": 0}
+
+        # Process issues if requested
+        if create_issues:
+            # Load latest run results
+            latest_file = data_dir / "latest.json"
+            if latest_file.exists():
+                run_data = json_module.loads(latest_file.read_text())
+                run = ValidationRun.from_dict(run_data)
+
+                # Get results as ArchitectureResult objects
+                results = []
+                for r in run.results:
+                    if isinstance(r, ArchitectureResult):
+                        results.append(r)
+                    elif isinstance(r, dict):
+                        results.append(ArchitectureResult.from_dict(r))
+
+                if results:
+                    issue_stats = process_results_for_issues(
+                        results=results,
+                        data_dir=data_dir,
+                        github_token=github_token,
+                        github_repo=github_repo,
+                        dashboard_url=dashboard_url,
+                        dry_run=ctx.dry_run,
+                    )
+                    ctx.logger.info(
+                        "issues_processed",
+                        created=issue_stats["created"],
+                        closed=issue_stats["closed"],
+                    )
+            else:
+                ctx.logger.warning("no_latest_run_for_issues")
 
         output_json({
             "status": "success",
             "message": "Dashboard generated successfully",
             "output_path": str(index_path),
             "run_id": run_id or "latest",
+            "issues": issue_stats if create_issues else None,
         })
-
-        # TODO: Implement issue creation in Phase 7 (US5)
-        if create_issues:
-            ctx.logger.warning("issue_creation_not_implemented")
 
         # TODO: Implement gh-pages deployment in Phase 8 (US6)
         if not skip_deploy:
@@ -498,6 +585,23 @@ def report(
     help="Create GitHub issues for failures",
 )
 @click.option(
+    "--github-token",
+    envvar="GITHUB_TOKEN",
+    default=None,
+    help="GitHub API token (or set GITHUB_TOKEN env var)",
+)
+@click.option(
+    "--github-repo",
+    envvar="GITHUB_REPOSITORY",
+    default=None,
+    help="GitHub repository (owner/repo) (or set GITHUB_REPOSITORY env var)",
+)
+@click.option(
+    "--dashboard-url",
+    default="",
+    help="Base URL for dashboard links in issues",
+)
+@click.option(
     "--parallelism",
     type=int,
     default=4,
@@ -514,10 +618,18 @@ def run(
     skip_mining: bool,
     skip_generation: bool,
     create_issues: bool,
+    github_token: Optional[str],
+    github_repo: Optional[str],
+    dashboard_url: str,
     parallelism: int,
     localstack_version: str,
 ) -> None:
     """Run full pipeline (mine -> generate -> validate -> report)."""
+    import asyncio
+    from datetime import datetime
+
+    from src.models import StageTiming
+
     ctx.logger.info(
         "run_started",
         skip_mining=skip_mining,
@@ -538,11 +650,169 @@ def run(
         })
         return
 
-    # TODO: Implement full pipeline in Phase 6 (US2)
-    output_json({
-        "status": "not_implemented",
-        "message": "Full pipeline will be implemented in Phase 6",
-    })
+    pipeline_start = datetime.utcnow()
+    timing = StageTiming()
+    errors = []
+
+    try:
+        # Stage 1: Mining
+        if not skip_mining:
+            from src.miner import mine_all
+
+            ctx.logger.info("pipeline_stage", stage="mining")
+            mining_start = datetime.utcnow()
+
+            mining_result = asyncio.run(
+                mine_all(
+                    cache_dir=ctx.cache_dir,
+                    include_diagrams=True,
+                )
+            )
+
+            timing.mining_seconds = (datetime.utcnow() - mining_start).total_seconds()
+
+            if not mining_result.success:
+                errors.extend(mining_result.errors)
+
+        # Stage 2: Generation
+        if not skip_generation:
+            from src.generator import generate_all
+            from src.utils.cache import ArchitectureCache
+            from src.models import Architecture, ArchitectureMetadata, ArchitectureSourceType
+
+            ctx.logger.info("pipeline_stage", stage="generation")
+            gen_start = datetime.utcnow()
+
+            # Load architectures
+            arch_cache = ArchitectureCache(ctx.cache_dir)
+            arch_ids = arch_cache.list_keys()
+
+            arch_list = []
+            for arch_id in arch_ids:
+                cached = arch_cache.load_architecture(arch_id)
+                if cached:
+                    metadata = None
+                    if cached.get("metadata"):
+                        metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+
+                    arch = Architecture(
+                        id=arch_id,
+                        source_type=ArchitectureSourceType.TEMPLATE,
+                        source_name="cached",
+                        source_url="",
+                        main_tf=cached.get("main_tf", ""),
+                        variables_tf=cached.get("variables_tf"),
+                        outputs_tf=cached.get("outputs_tf"),
+                        metadata=metadata,
+                    )
+                    arch_list.append(arch)
+
+            if arch_list:
+                gen_result = asyncio.run(
+                    generate_all(
+                        architectures=arch_list,
+                        cache_dir=ctx.cache_dir,
+                    )
+                )
+                if not gen_result.success:
+                    errors.extend(gen_result.errors)
+
+            timing.generation_seconds = (datetime.utcnow() - gen_start).total_seconds()
+
+        # Stage 3: Validation
+        from src.runner import run_validations
+
+        ctx.logger.info("pipeline_stage", stage="validation")
+        validation_start = datetime.utcnow()
+
+        validation_result = asyncio.run(
+            run_validations(
+                cache_dir=ctx.cache_dir,
+                output_dir=ctx.output_dir,
+                parallelism=parallelism,
+                localstack_version=localstack_version,
+            )
+        )
+
+        timing.running_seconds = (datetime.utcnow() - validation_start).total_seconds()
+
+        if not validation_result.success:
+            errors.extend(validation_result.errors)
+
+        # Stage 4: Reporting
+        from src.reporter import SiteGenerator
+
+        ctx.logger.info("pipeline_stage", stage="reporting")
+        reporting_start = datetime.utcnow()
+
+        templates_dir = Path(__file__).parent.parent / "templates"
+        if not templates_dir.exists():
+            templates_dir = Path("templates")
+
+        generator = SiteGenerator(
+            templates_dir=templates_dir,
+            output_dir=ctx.output_dir,
+            base_url="",
+        )
+
+        generator.generate(
+            run=validation_result.run,
+            data_dir=ctx.output_dir / "data",
+        )
+
+        timing.reporting_seconds = (datetime.utcnow() - reporting_start).total_seconds()
+        timing.total_seconds = (datetime.utcnow() - pipeline_start).total_seconds()
+
+        # Stage 5: Issue Creation (optional)
+        issue_stats = {"created": 0, "closed": 0, "skipped": 0}
+
+        if create_issues and validation_result.run:
+            from src.reporter import process_results_for_issues
+            from src.models import ArchitectureResult
+
+            ctx.logger.info("pipeline_stage", stage="issues")
+
+            # Get results as ArchitectureResult objects
+            results = []
+            for r in validation_result.run.results:
+                if isinstance(r, ArchitectureResult):
+                    results.append(r)
+
+            if results:
+                issue_stats = process_results_for_issues(
+                    results=results,
+                    data_dir=ctx.output_dir / "data",
+                    github_token=github_token,
+                    github_repo=github_repo,
+                    dashboard_url=dashboard_url,
+                    dry_run=ctx.dry_run,
+                )
+                ctx.logger.info(
+                    "issues_processed",
+                    created=issue_stats["created"],
+                    closed=issue_stats["closed"],
+                )
+
+        # Output results
+        output_json({
+            "status": "success" if not errors else "partial",
+            "message": "Pipeline completed",
+            "run_id": validation_result.run.id if validation_result.run else None,
+            "timing": timing.to_dict(),
+            "statistics": validation_result.run.statistics.to_dict()
+                if validation_result.run and validation_result.run.statistics
+                else {},
+            "issues": issue_stats if create_issues else None,
+            "errors": errors,
+        })
+
+    except Exception as e:
+        ctx.logger.error("pipeline_failed", error=str(e))
+        output_json({
+            "status": "error",
+            "message": f"Pipeline failed: {e}",
+            "errors": errors + [str(e)],
+        })
 
 
 @cli.command()
@@ -608,8 +878,20 @@ def status(ctx: Context, output_format: str) -> None:
 @cli.command()
 @click.option("--architectures", is_flag=True, help="Clean cached architectures")
 @click.option("--apps", is_flag=True, help="Clean cached sample apps")
-@click.option("--runs", is_flag=True, help="Clean old run results (keeps last 7 days)")
+@click.option("--runs", is_flag=True, help="Clean old run results")
 @click.option("--all", "clean_all", is_flag=True, help="Clean everything")
+@click.option(
+    "--retention-days",
+    type=int,
+    default=90,
+    help="Days of run history to keep (default: 90 per FR-052)",
+)
+@click.option(
+    "--max-size-gb",
+    type=float,
+    default=10.0,
+    help="Maximum cache size in GB (default: 10 per FR-052)",
+)
 @pass_context
 def clean(
     ctx: Context,
@@ -617,8 +899,12 @@ def clean(
     apps: bool,
     runs: bool,
     clean_all: bool,
+    retention_days: int,
+    max_size_gb: float,
 ) -> None:
-    """Clean cache and state."""
+    """Clean cache and state with retention policies."""
+    import shutil
+    from datetime import datetime, timedelta
     from src.utils.cache import ArchitectureCache, AppCache
 
     if ctx.dry_run:
@@ -628,43 +914,86 @@ def clean(
             "architectures": architectures or clean_all,
             "apps": apps or clean_all,
             "runs": runs or clean_all,
+            "retention_days": retention_days,
+            "max_size_gb": max_size_gb,
         })
         return
 
-    cleaned = {"architectures": 0, "apps": 0, "runs": 0}
+    cleaned = {"architectures": 0, "apps": 0, "runs": 0, "bytes_freed": 0}
 
-    if architectures or clean_all:
-        arch_cache = ArchitectureCache(ctx.cache_dir)
-        cleaned["architectures"] = arch_cache.clear()
-
-    if apps or clean_all:
-        app_cache = AppCache(ctx.cache_dir)
-        cleaned["apps"] = app_cache.clear()
-
+    # Clean runs based on retention period
     if runs or clean_all:
         runs_dir = ctx.output_dir / "data" / "runs"
         if runs_dir.exists():
-            import shutil
-            from datetime import datetime, timedelta
+            cutoff = datetime.now() - timedelta(days=retention_days)
+            for run_item in runs_dir.iterdir():
+                # Handle both directories and JSON files
+                try:
+                    name = run_item.stem if run_item.is_file() else run_item.name
+                    parts = name.split("-")
+                    if len(parts) >= 2:
+                        date_str = parts[1]
+                        run_date = datetime.strptime(date_str, "%Y%m%d")
+                        if run_date < cutoff:
+                            size = run_item.stat().st_size if run_item.is_file() else sum(
+                                f.stat().st_size for f in run_item.rglob("*") if f.is_file()
+                            )
+                            if run_item.is_dir():
+                                shutil.rmtree(run_item)
+                            else:
+                                run_item.unlink()
+                            cleaned["runs"] += 1
+                            cleaned["bytes_freed"] += size
+                except (ValueError, IndexError, OSError):
+                    pass
 
-            cutoff = datetime.now() - timedelta(days=7)
-            for run_dir in runs_dir.iterdir():
-                if run_dir.is_dir():
-                    # Parse run date from name
-                    try:
-                        parts = run_dir.name.split("-")
-                        if len(parts) >= 2:
-                            date_str = parts[1]
-                            run_date = datetime.strptime(date_str, "%Y%m%d")
-                            if run_date < cutoff:
-                                shutil.rmtree(run_dir)
-                                cleaned["runs"] += 1
-                    except (ValueError, IndexError):
-                        pass
+    # Clean caches
+    if architectures or clean_all:
+        arch_cache = ArchitectureCache(ctx.cache_dir)
+        count = arch_cache.clear()
+        cleaned["architectures"] = count
+
+    if apps or clean_all:
+        app_cache = AppCache(ctx.cache_dir)
+        count = app_cache.clear()
+        cleaned["apps"] = count
+
+    # Enforce storage cap
+    arch_cache = ArchitectureCache(ctx.cache_dir)
+    app_cache = AppCache(ctx.cache_dir)
+    total_size = arch_cache.get_size() + app_cache.get_size()
+    max_bytes = int(max_size_gb * 1024 * 1024 * 1024)
+
+    if total_size > max_bytes:
+        ctx.logger.warning(
+            "storage_cap_exceeded",
+            current_gb=round(total_size / (1024**3), 2),
+            max_gb=max_size_gb,
+        )
+        # Clear older items until under cap
+        # Start with apps, then architectures
+        while total_size > max_bytes:
+            # Try to evict oldest app first
+            evicted = app_cache.evict_oldest()
+            if evicted:
+                cleaned["apps"] += 1
+                total_size = arch_cache.get_size() + app_cache.get_size()
+                continue
+
+            # Then try architectures
+            evicted = arch_cache.evict_oldest()
+            if evicted:
+                cleaned["architectures"] += 1
+                total_size = arch_cache.get_size() + app_cache.get_size()
+                continue
+
+            # Nothing more to evict
+            break
 
     output_json({
         "status": "success",
         "cleaned": cleaned,
+        "current_size_mb": round((arch_cache.get_size() + app_cache.get_size()) / (1024 * 1024), 2),
     })
 
 

@@ -332,6 +332,38 @@ class ArchitectureCache(FileCache):
 
         return result
 
+    def evict_oldest(self) -> bool:
+        """
+        Evict the oldest architecture from cache.
+
+        Returns:
+            True if an entry was evicted
+        """
+        import shutil
+
+        oldest_path = None
+        oldest_time = None
+
+        for path in self.cache_dir.iterdir():
+            if path.is_dir():
+                try:
+                    mtime = path.stat().st_mtime
+                    if oldest_time is None or mtime < oldest_time:
+                        oldest_time = mtime
+                        oldest_path = path
+                except OSError:
+                    continue
+
+        if oldest_path:
+            try:
+                shutil.rmtree(oldest_path)
+                logger.debug("architecture_evicted", arch_id=oldest_path.name)
+                return True
+            except OSError as e:
+                logger.warning("eviction_failed", path=str(oldest_path), error=str(e))
+
+        return False
+
 
 class AppCache(FileCache):
     """Specialized cache for generated sample apps."""
@@ -444,3 +476,35 @@ class AppCache(FileCache):
             result["metadata"] = json.loads(meta_path.read_text(encoding="utf-8"))
 
         return result
+
+    def evict_oldest(self) -> bool:
+        """
+        Evict the oldest app from cache.
+
+        Returns:
+            True if an entry was evicted
+        """
+        import shutil
+
+        oldest_path = None
+        oldest_time = None
+
+        for path in self.cache_dir.iterdir():
+            if path.is_dir():
+                try:
+                    mtime = path.stat().st_mtime
+                    if oldest_time is None or mtime < oldest_time:
+                        oldest_time = mtime
+                        oldest_path = path
+                except OSError:
+                    continue
+
+        if oldest_path:
+            try:
+                shutil.rmtree(oldest_path)
+                logger.debug("app_evicted", content_hash=oldest_path.name)
+                return True
+            except OSError as e:
+                logger.warning("eviction_failed", path=str(oldest_path), error=str(e))
+
+        return False

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LocalStack Architecture Validator</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="header-title">LocalStack Architecture Validator</h1>
+            <p class="header-subtitle">Automated AWS compatibility testing for real-world architecture patterns</p>
+            <p class="header-updated">Last updated: 2025-12-28 18:36 UTC</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+<section class="summary-cards" aria-label="Validation Summary">
+    <div class="card card-total">
+        <div class="card-value">25</div>
+        <div class="card-label">Total Architectures</div>
+    </div>
+    <div class="card card-passed">
+        <div class="card-value">18</div>
+        <div class="card-label">Passed</div>
+    </div>
+    <div class="card card-partial">
+        <div class="card-value">3</div>
+        <div class="card-label">Partial</div>
+    </div>
+    <div class="card card-failed">
+        <div class="card-value">4</div>
+        <div class="card-label">Failed</div>
+    </div>
+    <div class="card card-rate">
+        <div class="card-value">72.0%</div>
+        <div class="card-label">Pass Rate</div>
+        <div class="card-change positive">
++4.0%
+        </div>
+    </div>
+</section>
+<section class="source-filter" aria-label="Source Type Filter">
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All Sources</button>
+        <button class="filter-tab" data-filter="template">Templates (20)</button>
+        <button class="filter-tab" data-filter="diagram">Diagrams (5)</button>
+    </div>
+</section>
+
+<section class="trend-section" aria-label="7-Day Trend">
+    <h2>Pass Rate Trend (7 Days)</h2>
+    <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    const trendData = {"labels": ["Dec 22", "Dec 23", "Dec 24", "Dec 25", "Dec 26", "Dec 27", "Dec 28"], "pass_rates": [68, 64, 70, 65, 71, 68, 72], "totals": [22, 22, 23, 23, 24, 24, 25]};
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: trendData.labels,
+            datasets: [{
+                label: 'Pass Rate (%)',
+                data: trendData.pass_rates,
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toFixed(1) + '%';
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+<div class="two-column">
+    <div class="column">
+<section class="failure-section" aria-label="Failed Architectures">
+    <h2>Failed Architectures (7)</h2>
+
+    <div class="failure-list">
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">aws-solutions-serverless-image</span>
+                <span class="failure-source">template</span>
+                <span class="failure-services">
+                    <span class="service-tag">lambda</span>
+                    <span class="service-tag">s3</span>
+                    <span class="service-tag">rekognition</span>
+                    <span class="service-tag more">+1</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>Rekognition service not fully supported</pre>
+                </div>
+                <div class="failure-tests">
+                    <strong>Test Failures:</strong>
+                    <ul>
+                        <li>test_rekognition_integration</li>
+                        <li>test_large_image_processing</li>
+                    </ul>
+                </div>
+                <div class="failure-links">
+                </div>
+            </div>
+        </details>
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">terraform-aws-eks-cluster</span>
+                <span class="failure-source">template</span>
+                <span class="failure-services">
+                    <span class="service-tag">eks</span>
+                    <span class="service-tag">ec2</span>
+                    <span class="service-tag">iam</span>
+                    <span class="service-tag more">+1</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>EKS cluster creation failed</pre>
+                </div>
+                <div class="failure-infra">
+                    <strong>Infrastructure Error:</strong>
+                    <pre>Error creating EKS cluster: operation not supported in LocalStack Community</pre>
+                </div>
+                <div class="failure-links">
+                    <a href="https://github.com/localstack/localstack/issues/12345" class="btn btn-small btn-github" target="_blank">GitHub Issue</a>
+                </div>
+            </div>
+        </details>
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">aws-quickstart-aurora-serverless</span>
+                <span class="failure-source">template</span>
+                <span class="failure-services">
+                    <span class="service-tag">rds</span>
+                    <span class="service-tag">secretsmanager</span>
+                    <span class="service-tag">lambda</span>
+                    <span class="service-tag more">+1</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>Aurora Serverless v2 scaling not supported</pre>
+                </div>
+                <div class="failure-tests">
+                    <strong>Test Failures:</strong>
+                    <ul>
+                        <li>test_aurora_serverless_scaling</li>
+                    </ul>
+                </div>
+                <div class="failure-links">
+                </div>
+            </div>
+        </details>
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">aws-diagram-data-lake</span>
+                <span class="failure-source">diagram</span>
+                <span class="failure-services">
+                    <span class="service-tag">s3</span>
+                    <span class="service-tag">glue</span>
+                    <span class="service-tag">athena</span>
+                    <span class="service-tag more">+1</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>Lake Formation service not available</pre>
+                </div>
+                <div class="failure-infra">
+                    <strong>Infrastructure Error:</strong>
+                    <pre>Lake Formation not supported in LocalStack</pre>
+                </div>
+                <div class="failure-links">
+                </div>
+            </div>
+        </details>
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">aws-quickstart-redshift</span>
+                <span class="failure-source">template</span>
+                <span class="failure-services">
+                    <span class="service-tag">redshift</span>
+                    <span class="service-tag">s3</span>
+                    <span class="service-tag">iam</span>
+                    <span class="service-tag more">+1</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>Redshift cluster failed to initialize</pre>
+                </div>
+                <div class="failure-infra">
+                    <strong>Infrastructure Error:</strong>
+                    <pre>Redshift cluster creation timeout</pre>
+                </div>
+                <div class="failure-links">
+                </div>
+            </div>
+        </details>
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">aws-diagram-event-driven</span>
+                <span class="failure-source">diagram</span>
+                <span class="failure-services">
+                    <span class="service-tag">eventbridge</span>
+                    <span class="service-tag">lambda</span>
+                    <span class="service-tag">sqs</span>
+                    <span class="service-tag more">+2</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>Some Kinesis features not supported</pre>
+                </div>
+                <div class="failure-tests">
+                    <strong>Test Failures:</strong>
+                    <ul>
+                        <li>test_kinesis_firehose</li>
+                        <li>test_eventbridge_archive</li>
+                        <li>test_kinesis_analytics</li>
+                    </ul>
+                </div>
+                <div class="failure-links">
+                </div>
+            </div>
+        </details>
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">aws-solutions-iot-analytics</span>
+                <span class="failure-source">template</span>
+                <span class="failure-services">
+                    <span class="service-tag">iot</span>
+                    <span class="service-tag">iotanalytics</span>
+                    <span class="service-tag">s3</span>
+                    <span class="service-tag more">+1</span>
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>IoT Analytics not supported</pre>
+                </div>
+                <div class="failure-infra">
+                    <strong>Infrastructure Error:</strong>
+                    <pre>IoT Analytics channel creation failed</pre>
+                </div>
+                <div class="failure-links">
+                </div>
+            </div>
+        </details>
+    </div>
+</section>    </div>
+    <div class="column">
+<section class="passing-section" aria-label="Passing Architectures">
+    <h2>Passing Architectures (18)</h2>
+
+    <details class="passing-details">
+        <summary class="passing-summary">
+            Show 18 passing architectures        </summary>
+        <div class="passing-list">
+            <div class="passing-entry">
+                <span class="passing-name">aws-quickstart-vpc-3tier</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">vpc</span>
+                    <span class="service-tag service-tag-small">ec2</span>
+                    <span class="service-tag service-tag-small">elb</span>
+                    <span class="service-tag service-tag-small">rds</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">terraform-aws-lambda-api</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">apigateway</span>
+                    <span class="service-tag service-tag-small">dynamodb</span>
+                    <span class="service-tag service-tag-small">iam</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">serverless-rest-api</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">apigateway</span>
+                    <span class="service-tag service-tag-small">s3</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">aws-diagram-microservices</span>
+                <span class="passing-source">diagram</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">ecs</span>
+                    <span class="service-tag service-tag-small">ecr</span>
+                    <span class="service-tag service-tag-small">elb</span>
+                    <span class="service-tag service-tag-small">rds</span>
+                    <span class="service-tag service-tag-small">elasticache</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">azure-diagram-web-app</span>
+                <span class="passing-source">diagram</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">apigateway</span>
+                    <span class="service-tag service-tag-small">rds</span>
+                    <span class="service-tag service-tag-small">elasticache</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">serverless-graphql-api</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">appsync</span>
+                    <span class="service-tag service-tag-small">dynamodb</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">terraform-aws-sqs-sns</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">sqs</span>
+                    <span class="service-tag service-tag-small">sns</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">serverless-websocket</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">apigateway</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">dynamodb</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">terraform-aws-step-functions</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">stepfunctions</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">sns</span>
+                    <span class="service-tag service-tag-small">sqs</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">terraform-aws-cognito-auth</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">cognito</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">apigateway</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">serverless-image-resize</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">s3</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">aws-quickstart-vpc-peering</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">vpc</span>
+                    <span class="service-tag service-tag-small">ec2</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">terraform-aws-cloudwatch-alarms</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">cloudwatch</span>
+                    <span class="service-tag service-tag-small">sns</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">azure-diagram-api-management</span>
+                <span class="passing-source">diagram</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">apigateway</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">waf</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">serverless-dynamodb-streams</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">dynamodb</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">sns</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">aws-solutions-document-processing</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">s3</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">textract</span>
+                    <span class="service-tag service-tag-small">comprehend</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">terraform-aws-ecr-ecs</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">ecr</span>
+                    <span class="service-tag service-tag-small">ecs</span>
+                    <span class="service-tag service-tag-small">elb</span>
+                    <span class="service-tag service-tag-small">cloudwatch</span>
+                </span>
+            </div>
+            <div class="passing-entry">
+                <span class="passing-name">aws-quickstart-secrets-manager</span>
+                <span class="passing-source">template</span>
+                <span class="passing-services">
+                    <span class="service-tag service-tag-small">secretsmanager</span>
+                    <span class="service-tag service-tag-small">lambda</span>
+                    <span class="service-tag service-tag-small">rds</span>
+                </span>
+            </div>
+        </div>
+    </details>
+</section>    </div>
+</div>
+
+<section class="service-section" aria-label="Service Coverage">
+    <h2>AWS Service Coverage</h2>
+
+    <div class="service-table-container">
+        <table class="service-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Tested</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>Pass Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="service-name">lambda</td>
+                    <td class="service-tested">18</td>
+                    <td class="service-passed">16</td>
+                    <td class="service-failed">2</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 88.9%"></div>
+                            <span class="rate-text">89%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">s3</td>
+                    <td class="service-tested">12</td>
+                    <td class="service-passed">11</td>
+                    <td class="service-failed">1</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 91.7%"></div>
+                            <span class="rate-text">92%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">dynamodb</td>
+                    <td class="service-tested">8</td>
+                    <td class="service-passed">8</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">apigateway</td>
+                    <td class="service-tested">8</td>
+                    <td class="service-passed">8</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">sqs</td>
+                    <td class="service-tested">5</td>
+                    <td class="service-passed">5</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">sns</td>
+                    <td class="service-tested">6</td>
+                    <td class="service-passed">6</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">rds</td>
+                    <td class="service-tested">5</td>
+                    <td class="service-passed">4</td>
+                    <td class="service-failed">1</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 80.0%"></div>
+                            <span class="rate-text">80%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">iam</td>
+                    <td class="service-tested">6</td>
+                    <td class="service-passed">5</td>
+                    <td class="service-failed">1</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 83.3%"></div>
+                            <span class="rate-text">83%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">vpc</td>
+                    <td class="service-tested">5</td>
+                    <td class="service-passed">4</td>
+                    <td class="service-failed">1</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 80.0%"></div>
+                            <span class="rate-text">80%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">ec2</td>
+                    <td class="service-tested">4</td>
+                    <td class="service-passed">3</td>
+                    <td class="service-failed">1</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 75.0%"></div>
+                            <span class="rate-text">75%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">ecs</td>
+                    <td class="service-tested">3</td>
+                    <td class="service-passed">3</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">cloudwatch</td>
+                    <td class="service-tested">3</td>
+                    <td class="service-passed">3</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">cognito</td>
+                    <td class="service-tested">1</td>
+                    <td class="service-passed">1</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">stepfunctions</td>
+                    <td class="service-tested">1</td>
+                    <td class="service-passed">1</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="service-name">secretsmanager</td>
+                    <td class="service-tested">2</td>
+                    <td class="service-passed">2</td>
+                    <td class="service-failed">0</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: 100.0%"></div>
+                            <span class="rate-text">100%</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="unsupported-section">
+        <h3>Unsupported Services Detected</h3>
+        <p class="unsupported-note">These AWS services were found in templates but are not supported by LocalStack:</p>
+        <div class="unsupported-list">
+            <span class="unsupported-tag">lakeformation</span>
+            <span class="unsupported-tag">iotanalytics</span>
+            <span class="unsupported-tag">redshift</span>
+            <span class="unsupported-tag">eks</span>
+        </div>
+    </div>
+</section>
+<section class="history-section" aria-label="Run History">
+    <h2>Recent Runs</h2>
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th>Run ID</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Passed</th>
+                <th>Failed</th>
+                <th>Pass Rate</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="/data/runs/run-20241228-001.json">run-2024...</a></td>
+                <td>2024-12-28</td>
+                <td>25</td>
+                <td>18</td>
+                <td>4</td>
+                <td>72.0%</td>
+                <td>41m 16s</td>
+            </tr>
+            <tr>
+                <td><a href="/data/runs/run-20241227-001.json">run-2024...</a></td>
+                <td>2024-12-27</td>
+                <td>24</td>
+                <td>16</td>
+                <td>4</td>
+                <td>68.0%</td>
+                <td>39m 40s</td>
+            </tr>
+            <tr>
+                <td><a href="/data/runs/run-20241226-001.json">run-2024...</a></td>
+                <td>2024-12-26</td>
+                <td>24</td>
+                <td>17</td>
+                <td>4</td>
+                <td>71.0%</td>
+                <td>40m 12s</td>
+            </tr>
+            <tr>
+                <td><a href="/data/runs/run-20241225-001.json">run-2024...</a></td>
+                <td>2024-12-25</td>
+                <td>23</td>
+                <td>15</td>
+                <td>4</td>
+                <td>65.0%</td>
+                <td>38m 10s</td>
+            </tr>
+            <tr>
+                <td><a href="/data/runs/run-20241224-001.json">run-2024...</a></td>
+                <td>2024-12-24</td>
+                <td>23</td>
+                <td>16</td>
+                <td>4</td>
+                <td>70.0%</td>
+                <td>39m 5s</td>
+            </tr>
+            <tr>
+                <td><a href="/data/runs/run-20241223-001.json">run-2024...</a></td>
+                <td>2024-12-23</td>
+                <td>22</td>
+                <td>14</td>
+                <td>4</td>
+                <td>64.0%</td>
+                <td>36m 38s</td>
+            </tr>
+            <tr>
+                <td><a href="/data/runs/run-20241222-001.json">run-2024...</a></td>
+                <td>2024-12-22</td>
+                <td>22</td>
+                <td>15</td>
+                <td>4</td>
+                <td>68.0%</td>
+                <td>37m 36s</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>
+                <a href="/data/latest.json" download>Download JSON</a> |
+                <a href="/data/history.json" download>Download History</a> |
+                <a href="https://github.com/localstack/localstack" target="_blank">LocalStack GitHub</a>
+            </p>
+            <p class="footer-note">Generated by ls-arch-validator v0.1.0</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Source type filter functionality
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const failureEntries = document.querySelectorAll('.failure-entry');
+    const passingEntries = document.querySelectorAll('.passing-entry');
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+
+            // Update active tab
+            filterTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter failure entries
+            failureEntries.forEach(entry => {
+                const source = entry.querySelector('.failure-source').textContent.toLowerCase();
+                if (filter === 'all') {
+                    entry.style.display = '';
+                } else if (filter === 'template' && source.includes('template')) {
+                    entry.style.display = '';
+                } else if (filter === 'diagram' && source.includes('diagram')) {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+
+            // Filter passing entries
+            passingEntries.forEach(entry => {
+                const source = entry.querySelector('.passing-source').textContent.toLowerCase();
+                if (filter === 'all') {
+                    entry.style.display = '';
+                } else if (filter === 'template' && source.includes('template')) {
+                    entry.style.display = '';
+                } else if (filter === 'diagram' && source.includes('diagram')) {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+name: Architecture Validation Pipeline
+
+on:
+  # Scheduled run at 3 AM UTC daily
+  schedule:
+    - cron: '0 3 * * *'
+
+  # Manual trigger with options
+  workflow_dispatch:
+    inputs:
+      skip_mining:
+        description: 'Skip mining (use cached architectures)'
+        type: boolean
+        default: false
+      skip_generation:
+        description: 'Skip generation (use cached sample apps)'
+        type: boolean
+        default: false
+      parallelism:
+        description: 'Number of concurrent validations'
+        type: number
+        default: 4
+      localstack_version:
+        description: 'LocalStack image tag'
+        type: string
+        default: 'latest'
+      specific_architectures:
+        description: 'Specific architecture IDs (comma-separated, empty for all)'
+        type: string
+        default: ''
+      create_issues:
+        description: 'Create GitHub issues for failures'
+        type: boolean
+        default: true
+
+env:
+  PYTHON_VERSION: '3.11'
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  validate:
+    name: Run Validation Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.0'
+
+      - name: Install tflocal
+        run: pip install terraform-local
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./cache
+          key: arch-validator-cache-${{ github.run_id }}
+          restore-keys: |
+            arch-validator-cache-
+
+      - name: Start Docker service
+        run: |
+          sudo systemctl start docker
+          docker info
+
+      - name: Run validation pipeline
+        id: validate
+        run: |
+          # Build command arguments
+          ARGS="--parallelism ${{ inputs.parallelism || 4 }}"
+          ARGS="$ARGS --localstack-version ${{ inputs.localstack_version || 'latest' }}"
+
+          if [ "${{ inputs.skip_mining }}" = "true" ]; then
+            ARGS="$ARGS --skip-mining"
+          fi
+
+          if [ "${{ inputs.skip_generation }}" = "true" ]; then
+            ARGS="$ARGS --skip-generation"
+          fi
+
+          if [ "${{ inputs.create_issues }}" = "true" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="$ARGS --create-issues"
+            ARGS="$ARGS --github-repo ${{ github.repository }}"
+            ARGS="$ARGS --dashboard-url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          fi
+
+          # Run the pipeline
+          ls-arch-validator run $ARGS | tee run_output.json
+
+          # Extract status for workflow outcome
+          STATUS=$(cat run_output.json | jq -r '.status')
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+
+      - name: Save cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./cache
+          key: arch-validator-cache-${{ github.run_id }}
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-results
+          path: |
+            docs/data/
+            run_output.json
+          retention-days: 30
+
+      - name: Deploy to GitHub Pages
+        if: success() || failure()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy validation dashboard - ${{ github.run_id }}'
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f run_output.json ]; then
+            STATUS=$(cat run_output.json | jq -r '.status // "unknown"')
+            RUN_ID=$(cat run_output.json | jq -r '.run_id // "N/A"')
+
+            echo "**Status**: $STATUS" >> $GITHUB_STEP_SUMMARY
+            echo "**Run ID**: $RUN_ID" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Extract statistics if available
+            if cat run_output.json | jq -e '.statistics' > /dev/null 2>&1; then
+              PASSED=$(cat run_output.json | jq -r '.statistics.passed // 0')
+              FAILED=$(cat run_output.json | jq -r '.statistics.failed // 0')
+              PARTIAL=$(cat run_output.json | jq -r '.statistics.partial // 0')
+              PASS_RATE=$(cat run_output.json | jq -r '.statistics.pass_rate // 0')
+
+              echo "### Statistics" >> $GITHUB_STEP_SUMMARY
+              echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+              echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+              echo "| Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+              echo "| Partial | $PARTIAL |" >> $GITHUB_STEP_SUMMARY
+              echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+              echo "| Pass Rate | ${PASS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            # Extract timing if available
+            if cat run_output.json | jq -e '.timing' > /dev/null 2>&1; then
+              TOTAL=$(cat run_output.json | jq -r '.timing.total_seconds // 0')
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Total Duration**: ${TOTAL}s" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            # Extract issues if available
+            if cat run_output.json | jq -e '.issues' > /dev/null 2>&1; then
+              CREATED=$(cat run_output.json | jq -r '.issues.created // 0')
+              CLOSED=$(cat run_output.json | jq -r '.issues.closed // 0')
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Issues" >> $GITHUB_STEP_SUMMARY
+              echo "- Created: $CREATED" >> $GITHUB_STEP_SUMMARY
+              echo "- Closed: $CLOSED" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "**Status**: No output available" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Dashboard](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for failures
+        if: steps.validate.outputs.status == 'error'
+        run: exit 1
+
+  notify:
+    name: Send Notifications
+    needs: validate
+    runs-on: ubuntu-latest
+    if: always() && (needs.validate.result == 'failure' || needs.validate.result == 'success')
+
+    steps:
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: validation-results
+          path: ./results
+
+      - name: Send Slack notification (optional)
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          STATUS="${{ needs.validate.result }}"
+          COLOR="good"
+          if [ "$STATUS" = "failure" ]; then
+            COLOR="danger"
+          fi
+
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"attachments\": [{
+                \"color\": \"$COLOR\",
+                \"title\": \"LocalStack Architecture Validation\",
+                \"text\": \"Pipeline completed with status: $STATUS\",
+                \"fields\": [
+                  {\"title\": \"Run\", \"value\": \"${{ github.run_id }}\", \"short\": true},
+                  {\"title\": \"Trigger\", \"value\": \"${{ github.event_name }}\", \"short\": true}
+                ],
+                \"actions\": [{
+                  \"type\": \"button\",
+                  \"text\": \"View Dashboard\",
+                  \"url\": \"https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/\"
+                }]
+              }]
+            }"
