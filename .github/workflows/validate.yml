@@ -1,6 +1,15 @@
 name: Architecture Validation Pipeline
 
 on:
+  # Run on push to main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'templates/**'
+      - '.github/workflows/validate.yml'
+
   # Scheduled run at 3 AM UTC daily
   schedule:
     - cron: '0 3 * * *'
