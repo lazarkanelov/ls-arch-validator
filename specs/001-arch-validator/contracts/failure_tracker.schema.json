@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ls-arch-validator/schemas/failure_tracker.json",
+  "title": "FailureTracker",
+  "description": "Tracks consecutive failures per architecture for issue creation",
+  "type": "object",
+  "properties": {
+    "entries": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/FailureEntry"
+      },
+      "description": "Map of architecture_id to FailureEntry"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["entries", "updated_at"],
+  "definitions": {
+    "FailureEntry": {
+      "type": "object",
+      "required": ["architecture_id", "consecutive_failures", "first_failure_run", "last_failure_run"],
+      "properties": {
+        "architecture_id": {
+          "type": "string"
+        },
+        "consecutive_failures": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "first_failure_run": {
+          "type": "string",
+          "pattern": "^run-[0-9]{8}-[0-9]{6}$",
+          "description": "Run ID of first failure in current streak"
+        },
+        "last_failure_run": {
+          "type": "string",
+          "pattern": "^run-[0-9]{8}-[0-9]{6}$",
+          "description": "Run ID of most recent failure"
+        },
+        "issue_number": {
+          "type": ["integer", "null"],
+          "description": "GitHub issue number if created"
+        },
+        "issue_created_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

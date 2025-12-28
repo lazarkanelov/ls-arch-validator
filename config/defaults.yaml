@@ -1,0 +1,39 @@
+# Default configuration for ls-arch-validator
+# These values can be overridden via CLI options or environment variables
+
+# Parallel execution settings
+parallelism: 4
+
+# Claude API token budget per run
+token_budget: 500000
+
+# Data retention settings
+retention_days: 90
+max_storage_gb: 10
+
+# LocalStack settings
+localstack:
+  image: "localstack/localstack:latest"
+  services: "lambda,s3,dynamodb,sqs,sns,apigateway,events,stepfunctions"
+  debug: true
+  lambda_executor: "docker"
+
+# Container resource limits
+container_limits:
+  mem_limit: "2g"
+  memswap_limit: "2g"
+  cpu_period: 100000
+  cpu_quota: 100000
+  pids_limit: 256
+
+# Timeouts (seconds)
+timeouts:
+  localstack_start: 120
+  terraform_apply: 300
+  test_execution: 180
+  per_architecture: 600
+
+# Logging
+logging:
+  level: "info"
+  format: "json"

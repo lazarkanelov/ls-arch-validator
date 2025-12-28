@@ -1,0 +1,48 @@
+# Template source configuration
+# Each source defines where to mine infrastructure templates from
+
+sources:
+  - id: aws-quickstart
+    name: AWS Quick Starts
+    type: github_repo
+    url: https://github.com/aws-quickstart
+    enabled: true
+    patterns:
+      - "**/*.template.yaml"
+      - "**/*.template.json"
+      - "**/template.yaml"
+      - "**/template.json"
+
+  - id: terraform-registry
+    name: Terraform Registry
+    type: terraform_registry
+    url: https://registry.terraform.io
+    enabled: true
+    modules:
+      - terraform-aws-modules/vpc/aws
+      - terraform-aws-modules/lambda/aws
+      - terraform-aws-modules/s3-bucket/aws
+      - terraform-aws-modules/dynamodb-table/aws
+      - terraform-aws-modules/sqs/aws
+      - terraform-aws-modules/sns/aws
+      - terraform-aws-modules/apigateway-v2/aws
+      - terraform-aws-modules/step-functions/aws
+
+  - id: aws-solutions
+    name: AWS Solutions Library
+    type: github_repo
+    url: https://github.com/aws-solutions
+    enabled: true
+    patterns:
+      - "**/template.yaml"
+      - "**/template.json"
+      - "**/*.template.yaml"
+
+  - id: serverless-examples
+    name: Serverless Framework Examples
+    type: github_repo
+    url: https://github.com/serverless/examples
+    enabled: true
+    patterns:
+      - "**/serverless.yml"
+      - "**/serverless.yaml"

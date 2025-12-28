@@ -1,0 +1,50 @@
+{# Service coverage matrix showing per-service pass rates #}
+<section class="service-section" aria-label="Service Coverage">
+    <h2>AWS Service Coverage</h2>
+
+    {% if service_coverage %}
+    <div class="service-table-container">
+        <table class="service-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Tested</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>Pass Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in service_coverage %}
+                <tr>
+                    <td class="service-name">{{ service.name }}</td>
+                    <td class="service-tested">{{ service.total }}</td>
+                    <td class="service-passed">{{ service.passed }}</td>
+                    <td class="service-failed">{{ service.failed }}</td>
+                    <td class="service-rate">
+                        <div class="rate-bar">
+                            <div class="rate-fill" style="width: {{ service.pass_rate * 100 }}%"></div>
+                            <span class="rate-text">{{ "%.0f"|format(service.pass_rate * 100) }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="no-services">No service coverage data available.</p>
+    {% endif %}
+
+    {% if unsupported_services %}
+    <div class="unsupported-section">
+        <h3>Unsupported Services Detected</h3>
+        <p class="unsupported-note">These AWS services were found in templates but are not supported by LocalStack:</p>
+        <div class="unsupported-list">
+            {% for service in unsupported_services %}
+            <span class="unsupported-tag">{{ service }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>

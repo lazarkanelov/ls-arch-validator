@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ls-arch-validator/schemas/architecture_result.json",
+  "title": "ArchitectureResult",
+  "description": "Outcome of validating a single architecture within a run",
+  "type": "object",
+  "required": ["id", "run_id", "architecture_id", "status", "duration_seconds"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Format: {run_id}/{architecture_id}"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^run-[0-9]{8}-[0-9]{6}$"
+    },
+    "architecture_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["passed", "partial", "failed", "skipped", "timeout"]
+    },
+    "infrastructure": {
+      "type": ["object", "null"],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "resources_created": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "errors": {
+          "type": ["string", "null"]
+        },
+        "terraform_output": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["success", "duration_seconds", "resources_created"]
+    },
+    "tests": {
+      "type": ["object", "null"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duration_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "traceback": {
+                "type": ["string", "null"]
+              }
+            },
+            "required": ["name", "message"]
+          }
+        }
+      },
+      "required": ["total", "passed", "failed", "skipped", "duration_seconds"]
+    },
+    "logs": {
+      "type": ["object", "null"],
+      "properties": {
+        "terraform_log": {
+          "type": "string"
+        },
+        "localstack_log": {
+          "type": "string"
+        },
+        "app_log": {
+          "type": "string"
+        },
+        "test_output": {
+          "type": "string"
+        }
+      },
+      "required": ["terraform_log", "localstack_log", "app_log", "test_output"]
+    },
+    "duration_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "issue_number": {
+      "type": ["integer", "null"],
+      "description": "GitHub issue number if created"
+    },
+    "suggested_issue_title": {
+      "type": ["string", "null"],
+      "description": "LLM-generated issue title for failures"
+    }
+  }
+}

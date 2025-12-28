@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ls-arch-validator/schemas/architecture.json",
+  "title": "Architecture",
+  "description": "A normalized infrastructure template ready for validation",
+  "type": "object",
+  "required": ["id", "source_id", "template_path", "source_type", "status", "terraform_content", "created_at", "updated_at", "content_hash"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier derived from source_id/template_path_slug",
+      "pattern": "^[a-z0-9-]+/[a-z0-9-/_]+$"
+    },
+    "source_id": {
+      "type": "string",
+      "description": "Reference to TemplateSource.id",
+      "pattern": "^[a-z0-9-]{3,50}$"
+    },
+    "template_path": {
+      "type": "string",
+      "description": "Path within source or diagram URL"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["template", "diagram"],
+      "description": "Whether this came from code template or architecture diagram"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "normalized", "conversion_failed", "generation_failed", "ready"],
+      "description": "Current processing status"
+    },
+    "terraform_content": {
+      "type": "string",
+      "description": "Normalized main.tf content"
+    },
+    "variables_content": {
+      "type": ["string", "null"],
+      "description": "Optional variables.tf content"
+    },
+    "outputs_content": {
+      "type": ["string", "null"],
+      "description": "Optional outputs.tf content"
+    },
+    "metadata": {
+      "type": ["object", "null"],
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "description": "AWS services used"
+        },
+        "resource_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of Terraform resources"
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "original_format": {
+          "type": "string",
+          "enum": ["cloudformation", "terraform", "sam", "serverless", "diagram"]
+        },
+        "diagram_confidence": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score for diagram parsing (0.0-1.0)"
+        }
+      },
+      "required": ["services", "resource_count", "complexity", "original_format"]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16,64}$",
+      "description": "SHA256 hash of terraform_content for cache invalidation"
+    },
+    "synthesis_notes": {
+      "type": ["string", "null"],
+      "description": "For diagram-sourced: assumptions made during TF synthesis"
+    }
+  }
+}

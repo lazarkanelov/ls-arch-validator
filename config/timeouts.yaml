@@ -1,0 +1,35 @@
+# Timeout configuration for pipeline stages
+# All values are in seconds
+
+timeouts:
+  # LocalStack container startup
+  localstack_start: 120
+
+  # Terraform operations
+  terraform_init: 60
+  terraform_apply: 300
+  terraform_destroy: 120
+
+  # Test execution
+  test_execution: 180
+
+  # Total time allowed per architecture validation
+  per_architecture: 600
+
+  # Diagram scraping and parsing
+  diagram_scrape: 60
+  diagram_parse: 30
+
+  # Mining operations
+  git_clone: 120
+  template_conversion: 60
+
+  # Claude API calls
+  generation_request: 120
+  vision_request: 60
+
+# Retry configuration
+retries:
+  max_attempts: 3
+  backoff_factor: 2
+  max_backoff: 60
