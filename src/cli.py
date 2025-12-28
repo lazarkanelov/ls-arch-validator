@@ -508,8 +508,12 @@ def report(
         cached = arch_cache.load_architecture(arch_id)
         if cached:
             metadata = None
-            if cached.get("metadata"):
-                metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+            meta_dict = cached.get("metadata", {})
+            if meta_dict:
+                metadata = ArchitectureMetadata.from_dict(meta_dict)
+
+            # Get content_hash from metadata
+            content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
 
             arch = Architecture(
                 id=arch_id,
@@ -520,6 +524,7 @@ def report(
                 variables_tf=cached.get("variables_tf"),
                 outputs_tf=cached.get("outputs_tf"),
                 metadata=metadata,
+                content_hash=content_hash,
             )
             architectures[arch_id] = arch
 
@@ -788,8 +793,12 @@ def run(
             cached = arch_cache.load_architecture(arch_id)
             if cached:
                 metadata = None
-                if cached.get("metadata"):
-                    metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+                meta_dict = cached.get("metadata", {})
+                if meta_dict:
+                    metadata = ArchitectureMetadata.from_dict(meta_dict)
+
+                # Get content_hash from metadata
+                content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
 
                 arch = Architecture(
                     id=arch_id,
@@ -800,6 +809,7 @@ def run(
                     variables_tf=cached.get("variables_tf"),
                     outputs_tf=cached.get("outputs_tf"),
                     metadata=metadata,
+                    content_hash=content_hash,
                 )
                 architectures[arch_id] = arch
 
