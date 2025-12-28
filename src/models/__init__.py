@@ -23,6 +23,7 @@ from src.models.results import (
     ResultStatus,
     RunStatistics,
     StageTiming,
+    TestFailure,
     TestResult,
     ValidationRun,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "StageTiming",
     "ValidationRun",
     "InfrastructureResult",
+    "TestFailure",
     "TestResult",
     "LogBundle",
     "ResultStatus",

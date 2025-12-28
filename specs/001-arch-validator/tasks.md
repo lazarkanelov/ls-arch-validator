@@ -153,23 +153,23 @@
 
 ### Implementation for User Story 2
 
-- [ ] T070 [US2] Implement LocalStack container lifecycle manager in src/runner/container.py (start, health check, get port, stop, cleanup)
-- [ ] T071 [US2] Implement container resource limits in src/runner/container.py per plan.md CONTAINER_LIMITS (2GB mem, 1 CPU)
-- [ ] T072 [US2] Implement Terraform executor in src/runner/executor.py (tflocal init, tflocal apply, capture output)
-- [ ] T073 [US2] Implement pytest executor in src/runner/executor.py (run tests, capture JSON results via pytest-json-report)
-- [ ] T074 [US2] Implement log capture in src/runner/executor.py (terraform.log, localstack.log, app.log, test_output)
-- [ ] T075 [US2] Implement parallel orchestrator in src/runner/orchestrator.py using asyncio.Semaphore per research.md
-- [ ] T076 [US2] Implement graceful degradation in orchestrator (continue on individual failures, capture partial results)
-- [ ] T077 [US2] Implement timeout enforcement per architecture in src/runner/orchestrator.py
-- [ ] T078 [US2] Implement container cleanup in finally block regardless of success/failure
-- [ ] T079 [US2] Create src/runner/__init__.py with run_validations() function
-- [ ] T080 [US2] Implement result recording in src/runner/orchestrator.py (determine status: passed/partial/failed/timeout)
-- [ ] T081 [US2] Implement ArchitectureResult creation with all fields (infrastructure, tests, logs, suggested_issue_title)
-- [ ] T082 [US2] Implement ValidationRun creation with timing and statistics
-- [ ] T083 [US2] Implement result persistence to docs/data/runs/{run_id}/ as JSON files
-- [ ] T084 [US2] Implement `validate` command in src/cli.py per contracts/cli.md (--architecture, --parallelism, --localstack-version, --timeout, --skip-cleanup)
-- [ ] T085 [US2] Implement `run` command in src/cli.py as full pipeline orchestrator (mine → generate → validate → report)
-- [ ] T086 [US2] Implement stage timing collection in `run` command (mining_seconds, generation_seconds, running_seconds, reporting_seconds)
+- [x] T070 [US2] Implement LocalStack container lifecycle manager in src/runner/container.py (start, health check, get port, stop, cleanup)
+- [x] T071 [US2] Implement container resource limits in src/runner/container.py per plan.md CONTAINER_LIMITS (2GB mem, 1 CPU)
+- [x] T072 [US2] Implement Terraform executor in src/runner/executor.py (tflocal init, tflocal apply, capture output)
+- [x] T073 [US2] Implement pytest executor in src/runner/executor.py (run tests, capture JSON results via pytest-json-report)
+- [x] T074 [US2] Implement log capture in src/runner/executor.py (terraform.log, localstack.log, app.log, test_output)
+- [x] T075 [US2] Implement parallel orchestrator in src/runner/orchestrator.py using asyncio.Semaphore per research.md
+- [x] T076 [US2] Implement graceful degradation in orchestrator (continue on individual failures, capture partial results)
+- [x] T077 [US2] Implement timeout enforcement per architecture in src/runner/orchestrator.py
+- [x] T078 [US2] Implement container cleanup in finally block regardless of success/failure
+- [x] T079 [US2] Create src/runner/__init__.py with run_validations() function
+- [x] T080 [US2] Implement result recording in src/runner/orchestrator.py (determine status: passed/partial/failed/timeout)
+- [x] T081 [US2] Implement ArchitectureResult creation with all fields (infrastructure, tests, logs, suggested_issue_title)
+- [x] T082 [US2] Implement ValidationRun creation with timing and statistics
+- [x] T083 [US2] Implement result persistence to docs/data/runs/{run_id}/ as JSON files
+- [x] T084 [US2] Implement `validate` command in src/cli.py per contracts/cli.md (--architecture, --parallelism, --localstack-version, --timeout, --skip-cleanup)
+- [x] T085 [US2] Implement `run` command in src/cli.py as full pipeline orchestrator (mine → generate → validate → report)
+- [x] T086 [US2] Implement stage timing collection in `run` command (mining_seconds, generation_seconds, running_seconds, reporting_seconds)
 
 **Checkpoint**: Full pipeline runs end-to-end; produces dashboard with real validation results
 
@@ -183,16 +183,16 @@
 
 ### Implementation for User Story 5
 
-- [ ] T087 [US5] Implement failure tracker persistence in src/reporter/issues.py (load/save docs/data/failure_tracker.json)
-- [ ] T088 [US5] Implement failure tracking logic (increment on failure, reset on success) per data-model.md state machine
-- [ ] T089 [US5] Implement GitHub issue creation using PyGithub in src/reporter/issues.py
-- [ ] T090 [US5] Implement issue content formatter (architecture name, source, services, error details, logs, reproduction steps, dashboard link) per FR-041
-- [ ] T091 [US5] Implement label application (arch-validator, bug, service/<service-name>) per FR-040
-- [ ] T092 [US5] Implement duplicate issue prevention (check issue_number exists and issue is open) per FR-039
-- [ ] T093 [US5] Implement issue auto-close when architecture passes per FR-042 (add comment, close issue)
-- [ ] T094 [US5] Implement GitHub API rate limit handling (queue for next run if rate limited) per edge case
-- [ ] T095 [US5] Add --create-issues flag to `report` command in src/cli.py
-- [ ] T096 [US5] Integrate issue creation into `run` command when --create-issues is passed
+- [x] T087 [US5] Implement failure tracker persistence in src/reporter/issues.py (load/save docs/data/failure_tracker.json)
+- [x] T088 [US5] Implement failure tracking logic (increment on failure, reset on success) per data-model.md state machine
+- [x] T089 [US5] Implement GitHub issue creation using PyGithub in src/reporter/issues.py
+- [x] T090 [US5] Implement issue content formatter (architecture name, source, services, error details, logs, reproduction steps, dashboard link) per FR-041
+- [x] T091 [US5] Implement label application (arch-validator, bug, service/<service-name>) per FR-040
+- [x] T092 [US5] Implement duplicate issue prevention (check issue_number exists and issue is open) per FR-039
+- [x] T093 [US5] Implement issue auto-close when architecture passes per FR-042 (add comment, close issue)
+- [x] T094 [US5] Implement GitHub API rate limit handling (queue for next run if rate limited) per edge case
+- [x] T095 [US5] Add --create-issues flag to `report` command in src/cli.py
+- [x] T096 [US5] Integrate issue creation into `run` command when --create-issues is passed
 
 **Checkpoint**: Issues are created for 2+ consecutive failures; closed automatically when fixed
 
@@ -206,15 +206,15 @@
 
 ### Implementation for User Story 6
 
-- [ ] T097 [US6] Implement --skip-mining flag in `run` command (use cached architectures only)
-- [ ] T098 [US6] Implement --skip-generation flag in `run` command (use cached sample apps only)
-- [ ] T099 [US6] Implement architecture filtering in `validate` command (--architecture ID can be repeated)
-- [ ] T100 [US6] Implement architecture exclusion patterns in `validate` command (--exclude PATTERN) per FR-045
-- [ ] T101 [US6] Create GitHub Actions workflow in .github/workflows/validate.yml with scheduled trigger (3 AM UTC)
-- [ ] T102 [US6] Add workflow_dispatch trigger with inputs (skip_mining, parallelism, localstack_version, specific_architectures)
-- [ ] T103 [US6] Implement gh-pages deployment step in workflow (push docs/ to gh-pages branch)
-- [ ] T104 [US6] Implement `status` command in src/cli.py per contracts/cli.md (show cached architectures, apps, latest run, failure tracker)
-- [ ] T105 [US6] Implement `clean` command in src/cli.py per contracts/cli.md (--architectures, --apps, --runs, --all)
+- [x] T097 [US6] Implement --skip-mining flag in `run` command (use cached architectures only)
+- [x] T098 [US6] Implement --skip-generation flag in `run` command (use cached sample apps only)
+- [x] T099 [US6] Implement architecture filtering in `validate` command (--architecture ID can be repeated)
+- [x] T100 [US6] Implement architecture exclusion patterns in `validate` command (--exclude PATTERN) per FR-045
+- [x] T101 [US6] Create GitHub Actions workflow in .github/workflows/validate.yml with scheduled trigger (3 AM UTC)
+- [x] T102 [US6] Add workflow_dispatch trigger with inputs (skip_mining, parallelism, localstack_version, specific_architectures)
+- [x] T103 [US6] Implement gh-pages deployment step in workflow (push docs/ to gh-pages branch)
+- [x] T104 [US6] Implement `status` command in src/cli.py per contracts/cli.md (show cached architectures, apps, latest run, failure tracker)
+- [x] T105 [US6] Implement `clean` command in src/cli.py per contracts/cli.md (--architectures, --apps, --runs, --all)
 
 **Checkpoint**: Pipeline can be triggered manually via CLI and GitHub Actions with custom options
 
@@ -224,16 +224,16 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T106 [P] Implement Slack notification webhook in src/reporter/notifications.py (optional, per FR-047)
-- [ ] T107 [P] Add unsupported service detection and tracking in src/miner/normalizer.py per FR-053
-- [ ] T108 [P] Add unsupported services section to dashboard per FR-053
-- [ ] T109 [P] Implement 90-day data retention cleanup in `clean` command per FR-052
-- [ ] T110 [P] Implement 10GB storage cap enforcement in `clean` command per FR-052
-- [ ] T111 [P] Add observability metrics (timing, success/failure counts per stage) to all pipeline stages per FR-048-051
-- [ ] T112 [P] Add correlation ID propagation through all logging per FR-051
-- [ ] T113 Validate quickstart.md scenarios work end-to-end
-- [ ] T114 Code cleanup and type hint verification across all modules
-- [ ] T115 Final CLI help text review and documentation
+- [x] T106 [P] Implement Slack notification webhook in src/reporter/notifications.py (optional, per FR-047)
+- [x] T107 [P] Add unsupported service detection and tracking in src/miner/normalizer.py per FR-053
+- [x] T108 [P] Add unsupported services section to dashboard per FR-053
+- [x] T109 [P] Implement 90-day data retention cleanup in `clean` command per FR-052
+- [x] T110 [P] Implement 10GB storage cap enforcement in `clean` command per FR-052
+- [x] T111 [P] Add observability metrics (timing, success/failure counts per stage) to all pipeline stages per FR-048-051
+- [x] T112 [P] Add correlation ID propagation through all logging per FR-051
+- [x] T113 Validate quickstart.md scenarios work end-to-end
+- [x] T114 Code cleanup and type hint verification across all modules
+- [x] T115 Final CLI help text review and documentation
 
 ---
 

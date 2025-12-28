@@ -88,11 +88,11 @@ class StageTiming:
         total_seconds: Total pipeline duration
     """
 
-    mining_seconds: float
-    generation_seconds: float
-    running_seconds: float
-    reporting_seconds: float
-    total_seconds: float
+    mining_seconds: float = 0.0
+    generation_seconds: float = 0.0
+    running_seconds: float = 0.0
+    reporting_seconds: float = 0.0
+    total_seconds: float = 0.0
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
@@ -145,7 +145,7 @@ class ValidationRun:
     localstack_version: str = "latest"
     statistics: Optional[RunStatistics] = None
     timing: Optional[StageTiming] = None
-    results: list[str] = field(default_factory=list)
+    results: list["ArchitectureResult"] = field(default_factory=list)
     token_usage: int = 0
     token_budget: int = 500000
 
@@ -170,12 +170,27 @@ class ValidationRun:
             token_budget=token_budget,
         )
 
-    def complete(self, statistics: RunStatistics, timing: StageTiming) -> None:
+    def complete(
+        self,
+        statistics: Optional[RunStatistics] = None,
+        timing: Optional[StageTiming] = None,
+    ) -> None:
         """Mark the run as completed with final statistics."""
         self.completed_at = datetime.now(timezone.utc)
         self.status = "completed"
-        self.statistics = statistics
-        self.timing = timing
+
+        # Calculate statistics from results if not provided
+        if statistics:
+            self.statistics = statistics
+        elif self.results:
+            passed = sum(1 for r in self.results if r.status == ResultStatus.PASSED)
+            partial = sum(1 for r in self.results if r.status == ResultStatus.PARTIAL)
+            failed = sum(1 for r in self.results if r.status == ResultStatus.FAILED)
+            skipped = sum(1 for r in self.results if r.status == ResultStatus.SKIPPED)
+            self.statistics = RunStatistics.calculate(passed, partial, failed, skipped)
+
+        if timing:
+            self.timing = timing
 
     def fail(self, error: str) -> None:
         """Mark the run as failed."""
@@ -184,6 +199,14 @@ class ValidationRun:
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
+        # Handle both ArchitectureResult objects and plain IDs
+        results_data = []
+        for r in self.results:
+            if hasattr(r, 'to_dict'):
+                results_data.append(r.to_dict())
+            else:
+                results_data.append(r)
+
         return {
             "id": self.id,
             "started_at": self.started_at.isoformat(),
@@ -194,7 +217,7 @@ class ValidationRun:
             "localstack_version": self.localstack_version,
             "statistics": self.statistics.to_dict() if self.statistics else None,
             "timing": self.timing.to_dict() if self.timing else None,
-            "results": self.results,
+            "results": results_data,
             "token_usage": self.token_usage,
             "token_budget": self.token_budget,
         }
@@ -202,6 +225,14 @@ class ValidationRun:
     @classmethod
     def from_dict(cls, data: dict) -> "ValidationRun":
         """Create from dictionary."""
+        # Handle both serialized ArchitectureResult dicts and plain IDs
+        results = []
+        for r in data.get("results", []):
+            if isinstance(r, dict) and "architecture_id" in r:
+                results.append(ArchitectureResult.from_dict(r))
+            else:
+                results.append(r)
+
         return cls(
             id=data["id"],
             started_at=datetime.fromisoformat(data["started_at"]),
@@ -222,7 +253,7 @@ class ValidationRun:
             timing=(
                 StageTiming.from_dict(data["timing"]) if data.get("timing") else None
             ),
-            results=data.get("results", []),
+            results=results,
             token_usage=data.get("token_usage", 0),
             token_budget=data.get("token_budget", 500000),
         )
@@ -234,38 +265,71 @@ class InfrastructureResult:
     Result of infrastructure deployment.
 
     Attributes:
-        success: Whether deployment succeeded
+        passed: Whether deployment succeeded
         duration_seconds: Time taken for deployment
         resources_created: List of created Terraform resources
-        errors: Error messages if deployment failed
-        terraform_output: Terraform command output
+        error_message: Error message if deployment failed
+        outputs: Terraform outputs
     """
 
-    success: bool
-    duration_seconds: float
+    passed: bool = False
+    duration_seconds: float = 0.0
     resources_created: list[str] = field(default_factory=list)
-    errors: Optional[str] = None
-    terraform_output: Optional[str] = None
+    error_message: Optional[str] = None
+    outputs: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
-            "success": self.success,
+            "passed": self.passed,
             "duration_seconds": round(self.duration_seconds, 3),
             "resources_created": self.resources_created,
-            "errors": self.errors,
-            "terraform_output": self.terraform_output,
+            "error_message": self.error_message,
+            "outputs": self.outputs,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> "InfrastructureResult":
         """Create from dictionary."""
         return cls(
-            success=data.get("success", False),
+            passed=data.get("passed", False),
             duration_seconds=data.get("duration_seconds", 0.0),
             resources_created=data.get("resources_created", []),
-            errors=data.get("errors"),
-            terraform_output=data.get("terraform_output"),
+            error_message=data.get("error_message"),
+            outputs=data.get("outputs", {}),
+        )
+
+
+@dataclass
+class TestFailure:
+    """
+    Details of a single test failure.
+
+    Attributes:
+        test_name: Name/path of the failed test
+        error_message: Error message or traceback
+        duration_seconds: Time the test took before failing
+    """
+
+    test_name: str
+    error_message: str = ""
+    duration_seconds: float = 0.0
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for serialization."""
+        return {
+            "test_name": self.test_name,
+            "error_message": self.error_message,
+            "duration_seconds": round(self.duration_seconds, 3),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "TestFailure":
+        """Create from dictionary."""
+        return cls(
+            test_name=data.get("test_name", "unknown"),
+            error_message=data.get("error_message", ""),
+            duration_seconds=data.get("duration_seconds", 0.0),
         )
 
 
@@ -275,20 +339,23 @@ class TestResult:
     Result of test execution.
 
     Attributes:
-        total: Total number of tests
         passed: Number of tests that passed
         failed: Number of tests that failed
         skipped: Number of tests skipped
         duration_seconds: Total test execution time
-        failures: List of failure details
+        failures: List of TestFailure details
     """
 
-    total: int
-    passed: int
-    failed: int
-    skipped: int
-    duration_seconds: float
-    failures: list[dict] = field(default_factory=list)
+    passed: int = 0
+    failed: int = 0
+    skipped: int = 0
+    duration_seconds: float = 0.0
+    failures: list[TestFailure] = field(default_factory=list)
+
+    @property
+    def total(self) -> int:
+        """Total number of tests."""
+        return self.passed + self.failed + self.skipped
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
@@ -298,19 +365,22 @@ class TestResult:
             "failed": self.failed,
             "skipped": self.skipped,
             "duration_seconds": round(self.duration_seconds, 3),
-            "failures": self.failures,
+            "failures": [f.to_dict() for f in self.failures],
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> "TestResult":
         """Create from dictionary."""
+        failures = [
+            TestFailure.from_dict(f) if isinstance(f, dict) else f
+            for f in data.get("failures", [])
+        ]
         return cls(
-            total=data.get("total", 0),
             passed=data.get("passed", 0),
             failed=data.get("failed", 0),
             skipped=data.get("skipped", 0),
             duration_seconds=data.get("duration_seconds", 0.0),
-            failures=data.get("failures", []),
+            failures=failures,
         )
 
 
@@ -326,10 +396,10 @@ class LogBundle:
         test_output: pytest output
     """
 
-    terraform_log: str
-    localstack_log: str
-    app_log: str
-    test_output: str
+    terraform_log: str = ""
+    localstack_log: str = ""
+    app_log: str = ""
+    test_output: str = ""
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
@@ -367,28 +437,37 @@ class ArchitectureResult:
     Outcome of validating a single architecture within a run.
 
     Attributes:
-        id: Result identifier in format "{run_id}/{architecture_id}"
-        run_id: Reference to ValidationRun.id
         architecture_id: Reference to Architecture.id
+        source_type: Source type of the architecture (template, diagram)
         status: Result status
+        services: Set of AWS services used
         infrastructure: Infrastructure deployment result
         tests: Test execution result
         logs: Log bundle from validation
         duration_seconds: Total validation time
         issue_number: GitHub issue number if created
         suggested_issue_title: Suggested title for issue creation
+        id: Result identifier (optional, for legacy compatibility)
+        run_id: Reference to ValidationRun.id (optional)
     """
 
-    id: str
-    run_id: str
     architecture_id: str
+    source_type: "ArchitectureSourceType"
     status: ResultStatus
+    services: set[str] = field(default_factory=set)
     infrastructure: Optional[InfrastructureResult] = None
     tests: Optional[TestResult] = None
     logs: Optional[LogBundle] = None
     duration_seconds: float = 0.0
     issue_number: Optional[int] = None
     suggested_issue_title: Optional[str] = None
+    id: Optional[str] = None
+    run_id: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        """Generate ID if not provided."""
+        if self.id is None and self.run_id:
+            self.id = f"{self.run_id}/{self.architecture_id}"
 
     @classmethod
     def create(
@@ -396,13 +475,17 @@ class ArchitectureResult:
         run_id: str,
         architecture_id: str,
         status: ResultStatus,
+        source_type: "ArchitectureSourceType",
+        services: Optional[set[str]] = None,
     ) -> "ArchitectureResult":
         """Create a new architecture result."""
         return cls(
             id=f"{run_id}/{architecture_id}",
             run_id=run_id,
             architecture_id=architecture_id,
+            source_type=source_type,
             status=status,
+            services=services or set(),
         )
 
     def determine_status(self) -> ResultStatus:
@@ -410,7 +493,7 @@ class ArchitectureResult:
         if self.infrastructure is None:
             return ResultStatus.SKIPPED
 
-        if not self.infrastructure.success:
+        if not self.infrastructure.passed:
             return ResultStatus.FAILED
 
         if self.tests is None:
@@ -427,7 +510,9 @@ class ArchitectureResult:
             "id": self.id,
             "run_id": self.run_id,
             "architecture_id": self.architecture_id,
+            "source_type": self.source_type.value if hasattr(self.source_type, 'value') else str(self.source_type),
             "status": self.status.value,
+            "services": list(self.services),
             "infrastructure": (
                 self.infrastructure.to_dict() if self.infrastructure else None
             ),
@@ -441,11 +526,19 @@ class ArchitectureResult:
     @classmethod
     def from_dict(cls, data: dict) -> "ArchitectureResult":
         """Create from dictionary."""
+        from src.models.architecture import ArchitectureSourceType
+
+        source_type_value = data.get("source_type", "template")
+        if isinstance(source_type_value, str):
+            source_type = ArchitectureSourceType(source_type_value)
+        else:
+            source_type = source_type_value
+
         return cls(
-            id=data["id"],
-            run_id=data["run_id"],
             architecture_id=data["architecture_id"],
+            source_type=source_type,
             status=ResultStatus(data["status"]),
+            services=set(data.get("services", [])),
             infrastructure=(
                 InfrastructureResult.from_dict(data["infrastructure"])
                 if data.get("infrastructure")
@@ -458,4 +551,6 @@ class ArchitectureResult:
             duration_seconds=data.get("duration_seconds", 0.0),
             issue_number=data.get("issue_number"),
             suggested_issue_title=data.get("suggested_issue_title"),
+            id=data.get("id"),
+            run_id=data.get("run_id"),
         )
