@@ -314,7 +314,7 @@ class ResultsAggregator:
                         if base_logs_url
                         else None
                     ),
-                    issue_url=result.issue_url,
+                    issue_url=getattr(result, 'issue_url', None),
                     source_info=source_info,
                     terraform_code=terraform_code,
                     generated_app=generated_app,
