@@ -85,9 +85,9 @@ jobs:
         with:
           path: |
             ./cache
-          key: arch-validator-cache-${{ github.run_id }}
+          key: arch-validator-cache-v2-${{ github.run_id }}
           restore-keys: |
-            arch-validator-cache-
+            arch-validator-cache-v2-
 
       - name: Start Docker service
         run: |
@@ -127,7 +127,7 @@ jobs:
         with:
           path: |
             ./cache
-          key: arch-validator-cache-${{ github.run_id }}
+          key: arch-validator-cache-v2-${{ github.run_id }}
 
       - name: Upload results artifact
         uses: actions/upload-artifact@v4
