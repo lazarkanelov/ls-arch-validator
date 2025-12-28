@@ -151,32 +151,28 @@ class Architecture:
     """
     A normalized infrastructure template ready for validation.
 
-    Unique by source_id + template_path.
-
     Attributes:
-        id: Unique identifier derived from source_id/template_path_slug
-        source_id: Reference to TemplateSource.id
-        template_path: Path within source (or diagram URL for diagrams)
+        id: Unique identifier for this architecture
         source_type: Whether from template or diagram
-        status: Current processing status
-        terraform_content: Normalized main.tf content
-        variables_content: Optional variables.tf content
-        outputs_content: Optional outputs.tf content
+        source_name: Name of the source (e.g., "aws-quickstarts")
+        source_url: URL to the original source
+        main_tf: Normalized main.tf content
+        variables_tf: Optional variables.tf content
+        outputs_tf: Optional outputs.tf content
         metadata: Extracted metadata (services, complexity, etc.)
         created_at: When this architecture was first discovered
         updated_at: When this architecture was last modified
-        content_hash: SHA256 of terraform_content for cache invalidation
+        content_hash: SHA256 of main_tf for cache invalidation
         synthesis_notes: For diagram-sourced: assumptions made during synthesis
     """
 
     id: str
-    source_id: str
-    template_path: str
     source_type: ArchitectureSourceType
-    status: ArchitectureStatus
-    terraform_content: str
-    variables_content: Optional[str] = None
-    outputs_content: Optional[str] = None
+    source_name: str
+    source_url: str
+    main_tf: str
+    variables_tf: Optional[str] = None
+    outputs_tf: Optional[str] = None
     metadata: Optional[ArchitectureMetadata] = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -192,13 +188,12 @@ class Architecture:
         """Convert to dictionary for serialization."""
         return {
             "id": self.id,
-            "source_id": self.source_id,
-            "template_path": self.template_path,
             "source_type": self.source_type.value,
-            "status": self.status.value,
-            "terraform_content": self.terraform_content,
-            "variables_content": self.variables_content,
-            "outputs_content": self.outputs_content,
+            "source_name": self.source_name,
+            "source_url": self.source_url,
+            "main_tf": self.main_tf,
+            "variables_tf": self.variables_tf,
+            "outputs_tf": self.outputs_tf,
             "metadata": self.metadata.to_dict() if self.metadata else None,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
@@ -211,20 +206,19 @@ class Architecture:
         """Create from dictionary."""
         return cls(
             id=data["id"],
-            source_id=data["source_id"],
-            template_path=data["template_path"],
             source_type=ArchitectureSourceType(data["source_type"]),
-            status=ArchitectureStatus(data["status"]),
-            terraform_content=data["terraform_content"],
-            variables_content=data.get("variables_content"),
-            outputs_content=data.get("outputs_content"),
+            source_name=data.get("source_name", ""),
+            source_url=data.get("source_url", ""),
+            main_tf=data.get("main_tf", ""),
+            variables_tf=data.get("variables_tf"),
+            outputs_tf=data.get("outputs_tf"),
             metadata=(
                 ArchitectureMetadata.from_dict(data["metadata"])
                 if data.get("metadata")
                 else None
             ),
-            created_at=datetime.fromisoformat(data["created_at"]),
-            updated_at=datetime.fromisoformat(data["updated_at"]),
+            created_at=datetime.fromisoformat(data["created_at"]) if data.get("created_at") else datetime.now(timezone.utc),
+            updated_at=datetime.fromisoformat(data["updated_at"]) if data.get("updated_at") else datetime.now(timezone.utc),
             content_hash=data.get("content_hash", ""),
             synthesis_notes=data.get("synthesis_notes"),
         )

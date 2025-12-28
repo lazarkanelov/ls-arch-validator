@@ -542,8 +542,8 @@ class ResultsAggregator:
 
     def _build_source_info(self, arch) -> ArchitectureSourceInfo:
         """Build source info from an Architecture object."""
-        # Determine source name from source_id
-        source_names = {
+        # Determine friendly source name from source_name
+        source_name_map = {
             "aws-quickstarts": "AWS QuickStart Templates",
             "terraform-registry": "Terraform Registry",
             "aws-solutions": "AWS Solutions Library",
@@ -551,27 +551,14 @@ class ResultsAggregator:
             "aws-architecture-center": "AWS Architecture Center",
             "azure-architecture-center": "Azure Architecture Center",
         }
-        source_name = source_names.get(arch.source_id, arch.source_id)
-
-        # Build source URL if possible
-        source_url = None
-        if arch.template_path:
-            if arch.source_id == "terraform-registry":
-                source_url = f"https://registry.terraform.io/modules/{arch.template_path}"
-            elif "github" in arch.source_id.lower() or arch.source_id == "aws-quickstarts":
-                source_url = arch.template_path if arch.template_path.startswith("http") else None
-
-        # For diagram sources, template_path often contains the page URL
-        if arch.source_type == ArchitectureSourceType.DIAGRAM and arch.template_path:
-            if arch.template_path.startswith("http"):
-                source_url = arch.template_path
+        display_name = source_name_map.get(arch.source_name, arch.source_name)
 
         return ArchitectureSourceInfo(
-            source_id=arch.source_id,
-            source_name=source_name,
+            source_id=arch.source_name,
+            source_name=display_name,
             source_type=self._format_source_type(arch.source_type),
-            source_url=source_url,
-            template_path=arch.template_path if not (arch.template_path and arch.template_path.startswith("http")) else None,
+            source_url=arch.source_url if arch.source_url else None,
+            template_path=None,  # Not stored separately anymore
             original_format=arch.metadata.original_format if arch.metadata else None,
             diagram_confidence=arch.metadata.diagram_confidence if arch.metadata else None,
             synthesis_notes=arch.synthesis_notes,
@@ -580,9 +567,9 @@ class ResultsAggregator:
     def _build_terraform_code(self, arch) -> TerraformCodeInfo:
         """Build terraform code info from an Architecture object."""
         return TerraformCodeInfo(
-            main_tf=arch.terraform_content or "",
-            variables_tf=arch.variables_content,
-            outputs_tf=arch.outputs_content,
+            main_tf=arch.main_tf or "",
+            variables_tf=arch.variables_tf,
+            outputs_tf=arch.outputs_tf,
         )
 
     def _build_generated_app_info(
