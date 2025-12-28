@@ -214,28 +214,45 @@ class SiteGenerator:
                 dashboard_data["diagram_count"] = latest.get("diagram_count", 0)
 
                 # Process results into failures and passing
+                # Preserve enriched data (source_info, terraform_code, generated_app)
                 results = latest.get("results", [])
                 failures = []
                 passing = []
 
                 for result in results:
                     if result.get("status") in ("failed", "partial"):
-                        failures.append({
+                        failure = {
                             "architecture_id": result.get("architecture_id", ""),
                             "source_type": result.get("source_type", "template"),
                             "services": result.get("services", []),
                             "error_summary": result.get("error_summary", ""),
                             "infrastructure_error": result.get("infrastructure_error"),
                             "test_failures": result.get("test_failures", []),
-                            "logs_url": None,
+                            "logs_url": result.get("logs_url"),
                             "issue_url": result.get("issue_url"),
-                        })
+                        }
+                        # Preserve enriched architecture and app data
+                        if result.get("source_info"):
+                            failure["source_info"] = result["source_info"]
+                        if result.get("terraform_code"):
+                            failure["terraform_code"] = result["terraform_code"]
+                        if result.get("generated_app"):
+                            failure["generated_app"] = result["generated_app"]
+                        failures.append(failure)
                     elif result.get("status") == "passed":
-                        passing.append({
+                        passing_item = {
                             "architecture_id": result.get("architecture_id", ""),
                             "source_type": result.get("source_type", "template"),
                             "services": result.get("services", []),
-                        })
+                        }
+                        # Preserve enriched architecture and app data
+                        if result.get("source_info"):
+                            passing_item["source_info"] = result["source_info"]
+                        if result.get("terraform_code"):
+                            passing_item["terraform_code"] = result["terraform_code"]
+                        if result.get("generated_app"):
+                            passing_item["generated_app"] = result["generated_app"]
+                        passing.append(passing_item)
 
                 dashboard_data["failures"] = failures
                 dashboard_data["passing"] = passing
@@ -317,6 +334,24 @@ class SiteGenerator:
             dashboard_data: Aggregated dashboard data
             data_dir: Output directory for data files
         """
+        # Combine enriched failures and passing data into results
+        # This preserves source_info, terraform_code, and generated_app
+        enriched_results = []
+
+        # Add failures with status
+        for failure in dashboard_data.get("failures", []):
+            result = dict(failure)  # Copy the enriched data
+            result["status"] = "failed"
+            if not result.get("infrastructure_error") and result.get("test_failures"):
+                result["status"] = "partial"
+            enriched_results.append(result)
+
+        # Add passing results
+        for passing in dashboard_data.get("passing", []):
+            result = dict(passing)
+            result["status"] = "passed"
+            enriched_results.append(result)
+
         latest = {
             "id": run.id,
             "status": run.status,
@@ -326,7 +361,7 @@ class SiteGenerator:
             "statistics": dashboard_data.get("statistics", {}),
             "template_count": dashboard_data.get("template_count", 0),
             "diagram_count": dashboard_data.get("diagram_count", 0),
-            "results": [r.to_dict() for r in run.results],
+            "results": enriched_results,
             "service_coverage": dashboard_data.get("service_coverage", []),
             "unsupported_services": dashboard_data.get("unsupported_services", []),
         }
