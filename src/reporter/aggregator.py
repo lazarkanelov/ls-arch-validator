@@ -265,6 +265,16 @@ class ResultsAggregator:
                 # Get source info from architecture
                 source_info = None
                 terraform_code = None
+
+                # Debug: Log architecture matching
+                if architectures:
+                    logger.debug(
+                        "arch_lookup",
+                        result_id=result.architecture_id,
+                        available_ids=list(architectures.keys())[:5],
+                        found=result.architecture_id in architectures,
+                    )
+
                 if architectures and result.architecture_id in architectures:
                     arch = architectures[result.architecture_id]
                     source_info = self._build_source_info(arch)

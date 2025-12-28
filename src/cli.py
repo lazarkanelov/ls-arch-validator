@@ -276,18 +276,23 @@ def generate(
             if cached:
                 from src.models import ArchitectureMetadata, ArchitectureSourceType
                 metadata = None
-                if cached.get("metadata"):
-                    metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+                meta_dict = cached.get("metadata", {})
+                if meta_dict:
+                    metadata = ArchitectureMetadata.from_dict(meta_dict)
+
+                # Get content_hash and source info from metadata
+                content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
 
                 arch = Architecture(
                     id=arch_id,
-                    source_type=ArchitectureSourceType.TEMPLATE,
-                    source_name="cached",
-                    source_url="",
+                    source_type=ArchitectureSourceType(cached.get("source_type", "template")),
+                    source_name=cached.get("source_name", "cached"),
+                    source_url=cached.get("source_url", ""),
                     main_tf=cached.get("main_tf", ""),
                     variables_tf=cached.get("variables_tf"),
                     outputs_tf=cached.get("outputs_tf"),
                     metadata=metadata,
+                    content_hash=content_hash,
                 )
                 arch_list.append(arch)
 
@@ -729,18 +734,23 @@ def run(
                 cached = arch_cache.load_architecture(arch_id)
                 if cached:
                     metadata = None
-                    if cached.get("metadata"):
-                        metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+                    meta_dict = cached.get("metadata", {})
+                    if meta_dict:
+                        metadata = ArchitectureMetadata.from_dict(meta_dict)
+
+                    # Get content_hash and source info from metadata
+                    content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
 
                     arch = Architecture(
                         id=arch_id,
-                        source_type=ArchitectureSourceType.TEMPLATE,
-                        source_name="cached",
-                        source_url="",
+                        source_type=ArchitectureSourceType(cached.get("source_type", "template")),
+                        source_name=cached.get("source_name", "cached"),
+                        source_url=cached.get("source_url", ""),
                         main_tf=cached.get("main_tf", ""),
                         variables_tf=cached.get("variables_tf"),
                         outputs_tf=cached.get("outputs_tf"),
                         metadata=metadata,
+                        content_hash=content_hash,
                     )
                     arch_list.append(arch)
 
