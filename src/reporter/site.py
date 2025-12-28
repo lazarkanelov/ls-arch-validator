@@ -139,6 +139,25 @@ class SiteGenerator:
             download_generator = AppDownloadGenerator(app_cache, self.output_dir)
             download_generator.generate_for_architectures(architectures)
 
+        # Debug: Log architecture info
+        if architectures:
+            logger.info(
+                "architectures_for_dashboard",
+                count=len(architectures),
+                sample_ids=list(architectures.keys())[:5],
+            )
+        else:
+            logger.warning("no_architectures_for_dashboard")
+
+        # Debug: Log result IDs
+        if run.results:
+            result_ids = [r.architecture_id for r in run.results[:5]]
+            logger.info(
+                "result_architecture_ids",
+                count=len(run.results),
+                sample_ids=result_ids,
+            )
+
         # Aggregate results with architecture and app data
         aggregator = ResultsAggregator(run)
         dashboard_data = aggregator.to_dashboard_data(
