@@ -1,0 +1,60 @@
+# Architecture diagram sources for visual pattern mining
+# Diagrams are parsed using Claude Vision API and synthesized to Terraform
+
+diagram_sources:
+  - id: aws-architecture-center
+    name: AWS Architecture Center
+    base_url: https://aws.amazon.com/architecture/
+    enabled: true
+    categories:
+      - serverless
+      - analytics
+      - containers
+      - databases
+      - machine-learning
+      - storage
+      - compute
+    selectors:
+      - "img.architecture-diagram"
+      - "img[alt*='architecture']"
+      - "img[alt*='diagram']"
+    max_diagrams: 30
+    rate_limit_seconds: 1
+
+  - id: azure-architecture-center
+    name: Azure Architecture Center
+    base_url: https://learn.microsoft.com/en-us/azure/architecture/
+    enabled: true
+    sections:
+      - browse/
+      - reference-architectures/
+      - solution-ideas/
+    selectors:
+      - "img[src*='architecture']"
+      - "img[alt*='diagram']"
+      - "img[alt*='architecture']"
+    max_diagrams: 20
+    rate_limit_seconds: 1
+    # Azure services are mapped to AWS equivalents before Terraform generation
+
+# Azure to AWS service mapping (used for diagram parsing)
+azure_to_aws_mapping:
+  "Azure Functions": "lambda"
+  "Cosmos DB": "dynamodb"
+  "Blob Storage": "s3"
+  "Service Bus": "sqs"
+  "Event Grid": "eventbridge"
+  "API Management": "apigateway"
+  "Azure SQL": "rds"
+  "Key Vault": "secretsmanager"
+  "Application Insights": "cloudwatch"
+  "Azure AD": "cognito"
+  "Logic Apps": "stepfunctions"
+  "Event Hubs": "kinesis"
+  "Container Apps": "ecs"
+  "Azure Kubernetes Service": "eks"
+  "Virtual Machines": "ec2"
+  "Virtual Network": "vpc"
+  "Load Balancer": "elb"
+  "CDN": "cloudfront"
+  "Redis Cache": "elasticache"

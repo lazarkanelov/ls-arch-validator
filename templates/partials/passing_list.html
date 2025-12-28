@@ -1,0 +1,30 @@
+{# Collapsible list of passing architectures #}
+<section class="passing-section" aria-label="Passing Architectures">
+    <h2>Passing Architectures ({{ passing | length }})</h2>
+
+    {% if passing %}
+    <details class="passing-details">
+        <summary class="passing-summary">
+            Show {{ passing | length }} passing architecture{% if passing | length != 1 %}s{% endif %}
+        </summary>
+        <div class="passing-list">
+            {% for arch in passing %}
+            <div class="passing-entry">
+                <span class="passing-name">{{ arch.architecture_id }}</span>
+                <span class="passing-source">{{ arch.source_type }}</span>
+                <span class="passing-services">
+                    {% for service in arch.services[:5] %}
+                    <span class="service-tag service-tag-small">{{ service }}</span>
+                    {% endfor %}
+                    {% if arch.services | length > 5 %}
+                    <span class="service-tag service-tag-small more">+{{ arch.services | length - 5 }}</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </details>
+    {% else %}
+    <p class="no-passing">No passing architectures in this run.</p>
+    {% endif %}
+</section>

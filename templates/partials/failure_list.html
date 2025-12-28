@@ -1,0 +1,57 @@
+{# List of failed architectures with expandable details #}
+<section class="failure-section" aria-label="Failed Architectures">
+    <h2>Failed Architectures ({{ failures | length }})</h2>
+
+    {% if failures %}
+    <div class="failure-list">
+        {% for failure in failures %}
+        <details class="failure-entry">
+            <summary class="failure-summary">
+                <span class="failure-name">{{ failure.architecture_id }}</span>
+                <span class="failure-source">{{ failure.source_type }}</span>
+                <span class="failure-services">
+                    {% for service in failure.services[:3] %}
+                    <span class="service-tag">{{ service }}</span>
+                    {% endfor %}
+                    {% if failure.services | length > 3 %}
+                    <span class="service-tag more">+{{ failure.services | length - 3 }}</span>
+                    {% endif %}
+                </span>
+            </summary>
+            <div class="failure-details">
+                <div class="failure-error">
+                    <strong>Error:</strong>
+                    <pre>{{ failure.error_summary }}</pre>
+                </div>
+                {% if failure.infrastructure_error %}
+                <div class="failure-infra">
+                    <strong>Infrastructure Error:</strong>
+                    <pre>{{ failure.infrastructure_error }}</pre>
+                </div>
+                {% endif %}
+                {% if failure.test_failures %}
+                <div class="failure-tests">
+                    <strong>Test Failures:</strong>
+                    <ul>
+                        {% for test in failure.test_failures %}
+                        <li>{{ test }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <div class="failure-links">
+                    {% if failure.logs_url %}
+                    <a href="{{ failure.logs_url }}" class="btn btn-small">View Logs</a>
+                    {% endif %}
+                    {% if failure.issue_url %}
+                    <a href="{{ failure.issue_url }}" class="btn btn-small btn-github" target="_blank">GitHub Issue</a>
+                    {% endif %}
+                </div>
+            </div>
+        </details>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-failures">No failures in this run.</p>
+    {% endif %}
+</section>

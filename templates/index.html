@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - LocalStack Architecture Validator{% endblock %}
+
+{% block content %}
+{# Summary Statistics Cards #}
+{% include "partials/summary_cards.html" %}
+
+{# Architecture Source Type Filter #}
+<section class="source-filter" aria-label="Source Type Filter">
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All Sources</button>
+        <button class="filter-tab" data-filter="template">Templates ({{ template_count }})</button>
+        <button class="filter-tab" data-filter="diagram">Diagrams ({{ diagram_count }})</button>
+    </div>
+</section>
+
+{# 7-Day Trend Chart #}
+{% include "partials/trend_chart.html" %}
+
+<div class="two-column">
+    <div class="column">
+        {# Failed Architectures List #}
+        {% include "partials/failure_list.html" %}
+    </div>
+    <div class="column">
+        {# Passing Architectures List #}
+        {% include "partials/passing_list.html" %}
+    </div>
+</div>
+
+{# Service Coverage Matrix #}
+{% include "partials/service_matrix.html" %}
+
+{# Run History #}
+<section class="history-section" aria-label="Run History">
+    <h2>Recent Runs</h2>
+    {% if run_history %}
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th>Run ID</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Passed</th>
+                <th>Failed</th>
+                <th>Pass Rate</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for run in run_history %}
+            <tr>
+                <td><a href="{{ base_url }}/data/runs/{{ run.id }}.json">{{ run.id[:8] }}...</a></td>
+                <td>{{ run.date }}</td>
+                <td>{{ run.total }}</td>
+                <td>{{ run.passed }}</td>
+                <td>{{ run.failed }}</td>
+                <td>{{ "%.1f"|format(run.pass_rate * 100) }}%</td>
+                <td>{{ run.duration_formatted }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-history">No run history available.</p>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Source type filter functionality
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const failureEntries = document.querySelectorAll('.failure-entry');
+    const passingEntries = document.querySelectorAll('.passing-entry');
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+
+            // Update active tab
+            filterTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter failure entries
+            failureEntries.forEach(entry => {
+                const source = entry.querySelector('.failure-source').textContent.toLowerCase();
+                if (filter === 'all') {
+                    entry.style.display = '';
+                } else if (filter === 'template' && source.includes('template')) {
+                    entry.style.display = '';
+                } else if (filter === 'diagram' && source.includes('diagram')) {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+
+            // Filter passing entries
+            passingEntries.forEach(entry => {
+                const source = entry.querySelector('.passing-source').textContent.toLowerCase();
+                if (filter === 'all') {
+                    entry.style.display = '';
+                } else if (filter === 'template' && source.includes('template')) {
+                    entry.style.display = '';
+                } else if (filter === 'diagram' && source.includes('diagram')) {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

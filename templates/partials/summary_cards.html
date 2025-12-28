@@ -1,0 +1,28 @@
+{# Summary cards showing overall validation statistics #}
+<section class="summary-cards" aria-label="Validation Summary">
+    <div class="card card-total">
+        <div class="card-value">{{ statistics.total }}</div>
+        <div class="card-label">Total Architectures</div>
+    </div>
+    <div class="card card-passed">
+        <div class="card-value">{{ statistics.passed }}</div>
+        <div class="card-label">Passed</div>
+    </div>
+    <div class="card card-partial">
+        <div class="card-value">{{ statistics.partial }}</div>
+        <div class="card-label">Partial</div>
+    </div>
+    <div class="card card-failed">
+        <div class="card-value">{{ statistics.failed }}</div>
+        <div class="card-label">Failed</div>
+    </div>
+    <div class="card card-rate">
+        <div class="card-value">{{ "%.1f"|format(statistics.pass_rate * 100) }}%</div>
+        <div class="card-label">Pass Rate</div>
+        {% if statistics.pass_rate_change is defined %}
+        <div class="card-change {% if statistics.pass_rate_change >= 0 %}positive{% else %}negative{% endif %}">
+            {% if statistics.pass_rate_change >= 0 %}+{% endif %}{{ "%.1f"|format(statistics.pass_rate_change * 100) }}%
+        </div>
+        {% endif %}
+    </div>
+</section>
