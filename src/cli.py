@@ -475,7 +475,8 @@ def report(
     """Generate dashboard report."""
     import json as json_module
     from src.reporter import SiteGenerator, process_results_for_issues
-    from src.models import ArchitectureResult, ValidationRun
+    from src.models import ArchitectureResult, ValidationRun, Architecture, ArchitectureMetadata, ArchitectureSourceType
+    from src.utils.cache import ArchitectureCache, AppCache
 
     ctx.logger.info(
         "report_started",
@@ -498,6 +499,30 @@ def report(
         # Fall back to current directory
         templates_dir = Path("templates")
 
+    # Load architectures from cache for enriched dashboard data
+    arch_cache = ArchitectureCache(ctx.cache_dir)
+    app_cache = AppCache(ctx.cache_dir)
+    architectures: dict[str, Architecture] = {}
+
+    for arch_id in arch_cache.list_keys():
+        cached = arch_cache.load_architecture(arch_id)
+        if cached:
+            metadata = None
+            if cached.get("metadata"):
+                metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+
+            arch = Architecture(
+                id=arch_id,
+                source_type=ArchitectureSourceType(cached.get("source_type", "template")),
+                source_name=cached.get("source_name", "cached"),
+                source_url=cached.get("source_url", ""),
+                main_tf=cached.get("main_tf", ""),
+                variables_tf=cached.get("variables_tf"),
+                outputs_tf=cached.get("outputs_tf"),
+                metadata=metadata,
+            )
+            architectures[arch_id] = arch
+
     # Generate the dashboard
     generator = SiteGenerator(
         templates_dir=templates_dir,
@@ -507,7 +532,11 @@ def report(
 
     try:
         data_dir = ctx.output_dir / "data"
-        index_path = generator.generate(data_dir=data_dir)
+        index_path = generator.generate(
+            data_dir=data_dir,
+            architectures=architectures if architectures else None,
+            app_cache=app_cache,
+        )
         ctx.logger.info("report_generated", output_path=str(index_path))
 
         issue_stats = {"created": 0, "closed": 0, "skipped": 0}
@@ -674,17 +703,20 @@ def run(
             if not mining_result.success:
                 errors.extend(mining_result.errors)
 
+        # Load cache and model classes
+        from src.utils.cache import ArchitectureCache
+        from src.models import Architecture, ArchitectureMetadata, ArchitectureSourceType
+
+        arch_cache = ArchitectureCache(ctx.cache_dir)
+
         # Stage 2: Generation
         if not skip_generation:
             from src.generator import generate_all
-            from src.utils.cache import ArchitectureCache
-            from src.models import Architecture, ArchitectureMetadata, ArchitectureSourceType
 
             ctx.logger.info("pipeline_stage", stage="generation")
             gen_start = datetime.utcnow()
 
             # Load architectures
-            arch_cache = ArchitectureCache(ctx.cache_dir)
             arch_ids = arch_cache.list_keys()
 
             arch_list = []
@@ -741,6 +773,7 @@ def run(
 
         # Stage 4: Reporting
         from src.reporter import SiteGenerator
+        from src.utils.cache import AppCache
 
         ctx.logger.info("pipeline_stage", stage="reporting")
         reporting_start = datetime.utcnow()
@@ -748,6 +781,29 @@ def run(
         templates_dir = Path(__file__).parent.parent / "templates"
         if not templates_dir.exists():
             templates_dir = Path("templates")
+
+        # Load architectures for enriched dashboard data
+        architectures: dict[str, Architecture] = {}
+        for arch_id in arch_cache.list_keys():
+            cached = arch_cache.load_architecture(arch_id)
+            if cached:
+                metadata = None
+                if cached.get("metadata"):
+                    metadata = ArchitectureMetadata.from_dict(cached["metadata"])
+
+                arch = Architecture(
+                    id=arch_id,
+                    source_type=ArchitectureSourceType(cached.get("source_type", "template")),
+                    source_name=cached.get("source_name", "cached"),
+                    source_url=cached.get("source_url", ""),
+                    main_tf=cached.get("main_tf", ""),
+                    variables_tf=cached.get("variables_tf"),
+                    outputs_tf=cached.get("outputs_tf"),
+                    metadata=metadata,
+                )
+                architectures[arch_id] = arch
+
+        app_cache = AppCache(ctx.cache_dir)
 
         generator = SiteGenerator(
             templates_dir=templates_dir,
@@ -758,6 +814,8 @@ def run(
         generator.generate(
             run=validation_result.run,
             data_dir=ctx.output_dir / "data",
+            architectures=architectures if architectures else None,
+            app_cache=app_cache,
         )
 
         timing.reporting_seconds = (datetime.utcnow() - reporting_start).total_seconds()

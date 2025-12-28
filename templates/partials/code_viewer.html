@@ -1,0 +1,165 @@
+{# Code viewer with tabbed interface and syntax highlighting #}
+{% macro render_code_viewer(terraform_code, generated_app, base_url) %}
+<div class="code-viewer">
+    {% if generated_app and generated_app.download_url %}
+    <div class="code-header">
+        <div class="code-stats">
+            {% if terraform_code %}
+            <span class="stat">
+                <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                </svg>
+                Infrastructure
+            </span>
+            {% endif %}
+            {% if generated_app.source_file_count %}
+            <span class="stat">{{ generated_app.source_file_count }} source files</span>
+            {% endif %}
+            {% if generated_app.test_file_count %}
+            <span class="stat">{{ generated_app.test_file_count }} test files</span>
+            {% endif %}
+            {% if generated_app.requirements_count %}
+            <span class="stat">{{ generated_app.requirements_count }} dependencies</span>
+            {% endif %}
+        </div>
+        <a href="{{ base_url }}/{{ generated_app.download_url }}" class="btn btn-download" download>
+            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download ZIP
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="code-tabs">
+        <div class="tab-buttons" role="tablist">
+            {# Terraform tabs #}
+            {% if terraform_code %}
+            {% if terraform_code.main_tf %}
+            <button class="tab-btn active" data-tab="main-tf" role="tab" aria-selected="true">main.tf</button>
+            {% endif %}
+            {% if terraform_code.variables_tf %}
+            <button class="tab-btn" data-tab="variables-tf" role="tab" aria-selected="false">variables.tf</button>
+            {% endif %}
+            {% if terraform_code.outputs_tf %}
+            <button class="tab-btn" data-tab="outputs-tf" role="tab" aria-selected="false">outputs.tf</button>
+            {% endif %}
+            {% endif %}
+
+            {# App source tabs #}
+            {% if generated_app and generated_app.source_files %}
+            {% for filename in generated_app.source_files.keys() %}
+            <button class="tab-btn {% if not terraform_code and loop.first %}active{% endif %}"
+                    data-tab="src-{{ loop.index }}"
+                    role="tab"
+                    aria-selected="{% if not terraform_code and loop.first %}true{% else %}false{% endif %}">
+                src/{{ filename }}
+            </button>
+            {% endfor %}
+            {% endif %}
+
+            {# Test tabs #}
+            {% if generated_app and generated_app.test_files %}
+            {% for filename in generated_app.test_files.keys() %}
+            <button class="tab-btn" data-tab="test-{{ loop.index }}" role="tab" aria-selected="false">
+                tests/{{ filename }}
+            </button>
+            {% endfor %}
+            {% endif %}
+
+            {# Requirements tab #}
+            {% if generated_app and generated_app.requirements %}
+            <button class="tab-btn" data-tab="requirements" role="tab" aria-selected="false">requirements.txt</button>
+            {% endif %}
+        </div>
+
+        <div class="tab-content">
+            {# Terraform panes #}
+            {% if terraform_code %}
+            {% if terraform_code.main_tf %}
+            <div class="tab-pane active" id="main-tf" role="tabpanel">
+                <pre class="line-numbers"><code class="language-hcl">{{ terraform_code.main_tf | e }}</code></pre>
+            </div>
+            {% endif %}
+            {% if terraform_code.variables_tf %}
+            <div class="tab-pane" id="variables-tf" role="tabpanel">
+                <pre class="line-numbers"><code class="language-hcl">{{ terraform_code.variables_tf | e }}</code></pre>
+            </div>
+            {% endif %}
+            {% if terraform_code.outputs_tf %}
+            <div class="tab-pane" id="outputs-tf" role="tabpanel">
+                <pre class="line-numbers"><code class="language-hcl">{{ terraform_code.outputs_tf | e }}</code></pre>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            {# Source panes #}
+            {% if generated_app and generated_app.source_files %}
+            {% for filename, content in generated_app.source_files.items() %}
+            <div class="tab-pane {% if not terraform_code and loop.first %}active{% endif %}"
+                 id="src-{{ loop.index }}"
+                 role="tabpanel">
+                <pre class="line-numbers"><code class="language-python">{{ content | e }}</code></pre>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {# Test panes #}
+            {% if generated_app and generated_app.test_files %}
+            {% for filename, content in generated_app.test_files.items() %}
+            <div class="tab-pane" id="test-{{ loop.index }}" role="tabpanel">
+                <pre class="line-numbers"><code class="language-python">{{ content | e }}</code></pre>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {# Requirements pane #}
+            {% if generated_app and generated_app.requirements %}
+            <div class="tab-pane" id="requirements" role="tabpanel">
+                <pre><code class="language-text">{{ generated_app.requirements | join('\n') }}</code></pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab switching functionality
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tabGroup = this.closest('.code-tabs');
+        const targetId = this.dataset.tab;
+
+        // Update buttons
+        tabGroup.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+
+        // Update panes
+        tabGroup.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+        });
+        const targetPane = document.getElementById(targetId);
+        if (targetPane) {
+            targetPane.classList.add('active');
+            // Trigger Prism highlighting if not already done
+            if (!targetPane.dataset.highlighted) {
+                Prism.highlightAllUnder(targetPane);
+                targetPane.dataset.highlighted = 'true';
+            }
+        }
+    });
+});
+
+// Highlight the initially active pane
+document.querySelectorAll('.tab-pane.active').forEach(pane => {
+    Prism.highlightAllUnder(pane);
+    pane.dataset.highlighted = 'true';
+});
+</script>
+{% endmacro %}

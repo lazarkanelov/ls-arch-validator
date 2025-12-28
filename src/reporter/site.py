@@ -11,9 +11,11 @@ from typing import Any, Optional
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from src import __version__
-from src.models import ValidationRun
+from src.models import Architecture, ValidationRun
 from src.reporter.aggregator import ResultsAggregator
+from src.reporter.downloads import AppDownloadGenerator
 from src.reporter.trends import TrendAnalyzer
+from src.utils.cache import AppCache
 from src.utils.logging import get_logger
 
 logger = get_logger("reporter.site")
@@ -52,6 +54,8 @@ class SiteGenerator:
         self,
         run: Optional[ValidationRun] = None,
         data_dir: Optional[Path] = None,
+        architectures: Optional[dict[str, Architecture]] = None,
+        app_cache: Optional[AppCache] = None,
     ) -> Path:
         """
         Generate the static dashboard site.
@@ -59,6 +63,8 @@ class SiteGenerator:
         Args:
             run: ValidationRun to generate dashboard for (optional if using cached data)
             data_dir: Directory containing cached data files
+            architectures: Dict of architecture_id -> Architecture objects
+            app_cache: App cache for retrieving generated code
 
         Returns:
             Path to the generated index.html
@@ -76,7 +82,9 @@ class SiteGenerator:
 
         # Get dashboard data
         if run is not None:
-            dashboard_data = self._prepare_data_from_run(run, data_output_dir)
+            dashboard_data = self._prepare_data_from_run(
+                run, data_output_dir, architectures, app_cache
+            )
         elif data_dir is not None:
             dashboard_data = self._load_data_from_files(data_dir)
         else:
@@ -98,6 +106,8 @@ class SiteGenerator:
         self,
         run: ValidationRun,
         data_output_dir: Path,
+        architectures: Optional[dict[str, Architecture]] = None,
+        app_cache: Optional[AppCache] = None,
     ) -> dict[str, Any]:
         """
         Prepare dashboard data from a validation run.
@@ -105,6 +115,8 @@ class SiteGenerator:
         Args:
             run: The validation run
             data_output_dir: Output directory for data files
+            architectures: Dict of architecture_id -> Architecture objects
+            app_cache: App cache for retrieving generated code
 
         Returns:
             Dashboard data dictionary
@@ -113,11 +125,28 @@ class SiteGenerator:
         trend_analyzer = TrendAnalyzer(data_output_dir)
         previous_pass_rate = trend_analyzer.get_previous_pass_rate()
 
-        # Aggregate results
+        # Load app data from cache
+        app_data: dict[str, dict] = {}
+        if app_cache and architectures:
+            for arch_id, arch in architectures.items():
+                if arch.content_hash:
+                    loaded = app_cache.load_app(arch.content_hash)
+                    if loaded:
+                        app_data[arch.content_hash] = loaded
+
+        # Generate download files if we have architectures and app cache
+        if architectures and app_cache:
+            download_generator = AppDownloadGenerator(app_cache, self.output_dir)
+            download_generator.generate_for_architectures(architectures)
+
+        # Aggregate results with architecture and app data
         aggregator = ResultsAggregator(run)
         dashboard_data = aggregator.to_dashboard_data(
             previous_pass_rate=previous_pass_rate,
             base_logs_url=f"{self.base_url}/data/runs",
+            architectures=architectures,
+            app_data=app_data,
+            base_download_url=f"{self.base_url}/data/apps",
         )
 
         # Add trend data

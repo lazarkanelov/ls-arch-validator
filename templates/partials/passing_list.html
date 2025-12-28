@@ -1,15 +1,15 @@
 {# Collapsible list of passing architectures #}
+{% from "partials/source_info.html" import render_source_info %}
+{% from "partials/code_viewer.html" import render_code_viewer %}
+
 <section class="passing-section" aria-label="Passing Architectures">
     <h2>Passing Architectures ({{ passing | length }})</h2>
 
     {% if passing %}
-    <details class="passing-details">
-        <summary class="passing-summary">
-            Show {{ passing | length }} passing architecture{% if passing | length != 1 %}s{% endif %}
-        </summary>
-        <div class="passing-list">
-            {% for arch in passing %}
-            <div class="passing-entry">
+    <div class="passing-list">
+        {% for arch in passing %}
+        <details class="passing-entry">
+            <summary class="passing-summary">
                 <span class="passing-name">{{ arch.architecture_id }}</span>
                 <span class="passing-source">{{ arch.source_type }}</span>
                 <span class="passing-services">
@@ -20,10 +20,32 @@
                     <span class="service-tag service-tag-small more">+{{ arch.services | length - 5 }}</span>
                     {% endif %}
                 </span>
+            </summary>
+            <div class="passing-details">
+                {# Architecture source information #}
+                {% if arch.source_info %}
+                <details class="source-details-section" open>
+                    <summary>Architecture Source</summary>
+                    {{ render_source_info(arch.source_info) }}
+                </details>
+                {% endif %}
+
+                {# Code viewer for infrastructure and app code #}
+                {% if arch.terraform_code or arch.generated_app %}
+                <details class="code-details-section">
+                    <summary>
+                        View Code
+                        {% if arch.generated_app and arch.generated_app.download_url %}
+                        <a href="{{ base_url }}/{{ arch.generated_app.download_url }}" class="btn btn-small btn-download" download onclick="event.stopPropagation();">Download</a>
+                        {% endif %}
+                    </summary>
+                    {{ render_code_viewer(arch.terraform_code, arch.generated_app, base_url) }}
+                </details>
+                {% endif %}
             </div>
-            {% endfor %}
-        </div>
-    </details>
+        </details>
+        {% endfor %}
+    </div>
     {% else %}
     <p class="no-passing">No passing architectures in this run.</p>
     {% endif %}

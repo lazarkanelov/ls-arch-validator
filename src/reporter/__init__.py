@@ -2,10 +2,14 @@
 
 from src.reporter.aggregator import (
     AggregatedStatistics,
+    ArchitectureSourceInfo,
     FailureInfo,
+    GeneratedAppInfo,
     PassingInfo,
     ResultsAggregator,
+    TerraformCodeInfo,
 )
+from src.reporter.downloads import AppDownloadGenerator
 from src.reporter.issues import (
     FailureTrackerManager,
     GitHubIssueManager,
@@ -23,15 +27,20 @@ from src.reporter.trends import RunSummary, TrendAnalyzer, TrendData
 __all__ = [
     # Aggregator
     "AggregatedStatistics",
+    "ArchitectureSourceInfo",
     "FailureInfo",
+    "GeneratedAppInfo",
     "PassingInfo",
     "ResultsAggregator",
+    "TerraformCodeInfo",
     # Trends
     "RunSummary",
     "TrendAnalyzer",
     "TrendData",
     # Site
     "SiteGenerator",
+    # Downloads
+    "AppDownloadGenerator",
     # Issues
     "FailureTrackerManager",
     "GitHubIssueManager",

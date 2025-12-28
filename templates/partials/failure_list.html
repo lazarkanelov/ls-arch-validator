@@ -1,4 +1,7 @@
 {# List of failed architectures with expandable details #}
+{% from "partials/source_info.html" import render_source_info %}
+{% from "partials/code_viewer.html" import render_code_viewer %}
+
 <section class="failure-section" aria-label="Failed Architectures">
     <h2>Failed Architectures ({{ failures | length }})</h2>
 
@@ -47,6 +50,27 @@
                     <a href="{{ failure.issue_url }}" class="btn btn-small btn-github" target="_blank">GitHub Issue</a>
                     {% endif %}
                 </div>
+
+                {# Architecture source information #}
+                {% if failure.source_info %}
+                <details class="source-details-section">
+                    <summary>Architecture Source</summary>
+                    {{ render_source_info(failure.source_info) }}
+                </details>
+                {% endif %}
+
+                {# Code viewer for infrastructure and app code #}
+                {% if failure.terraform_code or failure.generated_app %}
+                <details class="code-details-section">
+                    <summary>
+                        View Code
+                        {% if failure.generated_app and failure.generated_app.download_url %}
+                        <a href="{{ base_url }}/{{ failure.generated_app.download_url }}" class="btn btn-small btn-download" download onclick="event.stopPropagation();">Download</a>
+                        {% endif %}
+                    </summary>
+                    {{ render_code_viewer(failure.terraform_code, failure.generated_app, base_url) }}
+                </details>
+                {% endif %}
             </div>
         </details>
         {% endfor %}

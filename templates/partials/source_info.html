@@ -1,0 +1,60 @@
+{# Architecture source and origin details #}
+{% macro render_source_info(source_info) %}
+{% if source_info %}
+<div class="source-info">
+    <h4>Architecture Source</h4>
+    <dl class="source-details">
+        <dt>Source:</dt>
+        <dd>
+            <span class="badge badge-{{ source_info.source_type }}">{{ source_info.source_type | capitalize }}</span>
+            {{ source_info.source_name }}
+        </dd>
+
+        {% if source_info.source_url %}
+        <dt>Original URL:</dt>
+        <dd>
+            <a href="{{ source_info.source_url }}" target="_blank" rel="noopener" class="source-link">
+                {{ source_info.source_url | truncate(60) }}
+                <svg class="icon-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </a>
+        </dd>
+        {% endif %}
+
+        {% if source_info.template_path %}
+        <dt>Template Path:</dt>
+        <dd><code class="template-path">{{ source_info.template_path }}</code></dd>
+        {% endif %}
+
+        {% if source_info.original_format %}
+        <dt>Original Format:</dt>
+        <dd>
+            <span class="format-badge format-{{ source_info.original_format }}">
+                {{ source_info.original_format | capitalize }}
+            </span>
+        </dd>
+        {% endif %}
+
+        {% if source_info.diagram_confidence is not none %}
+        <dt>Diagram Confidence:</dt>
+        <dd>
+            <div class="confidence-container">
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: {{ source_info.diagram_confidence * 100 }}%"></div>
+                </div>
+                <span class="confidence-text">{{ "%.0f"|format(source_info.diagram_confidence * 100) }}%</span>
+            </div>
+        </dd>
+        {% endif %}
+
+        {% if source_info.synthesis_notes %}
+        <dt>Synthesis Notes:</dt>
+        <dd class="synthesis-notes">{{ source_info.synthesis_notes }}</dd>
+        {% endif %}
+    </dl>
+</div>
+{% endif %}
+{% endmacro %}

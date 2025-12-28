@@ -19,6 +19,74 @@ logger = get_logger("reporter.aggregator")
 
 
 @dataclass
+class ArchitectureSourceInfo:
+    """Source information for an architecture - where it was scraped from."""
+
+    source_id: str
+    source_name: str
+    source_type: str  # "template" or "diagram"
+    source_url: Optional[str] = None
+    template_path: Optional[str] = None
+    original_format: Optional[str] = None  # "cloudformation", "terraform", "sam", "diagram"
+    diagram_confidence: Optional[float] = None  # 0.0-1.0 for diagram sources
+    synthesis_notes: Optional[str] = None  # Assumptions made during conversion
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary."""
+        return {
+            "source_id": self.source_id,
+            "source_name": self.source_name,
+            "source_type": self.source_type,
+            "source_url": self.source_url,
+            "template_path": self.template_path,
+            "original_format": self.original_format,
+            "diagram_confidence": self.diagram_confidence,
+            "synthesis_notes": self.synthesis_notes,
+        }
+
+
+@dataclass
+class TerraformCodeInfo:
+    """Terraform infrastructure code for display."""
+
+    main_tf: str
+    variables_tf: Optional[str] = None
+    outputs_tf: Optional[str] = None
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary."""
+        return {
+            "main_tf": self.main_tf,
+            "variables_tf": self.variables_tf,
+            "outputs_tf": self.outputs_tf,
+        }
+
+
+@dataclass
+class GeneratedAppInfo:
+    """Information about generated application code."""
+
+    content_hash: str
+    source_files: dict[str, str] = field(default_factory=dict)
+    test_files: dict[str, str] = field(default_factory=dict)
+    requirements: list[str] = field(default_factory=list)
+    download_url: Optional[str] = None
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary."""
+        return {
+            "content_hash": self.content_hash,
+            "source_files": self.source_files,
+            "test_files": self.test_files,
+            "requirements": self.requirements,
+            "download_url": self.download_url,
+            "source_file_count": len(self.source_files),
+            "test_file_count": len(self.test_files),
+            "requirements_count": len(self.requirements),
+        }
+
+
+@dataclass
 class AggregatedStatistics:
     """Aggregated statistics for a validation run."""
 
@@ -57,10 +125,13 @@ class FailureInfo:
     test_failures: list[str] = field(default_factory=list)
     logs_url: Optional[str] = None
     issue_url: Optional[str] = None
+    source_info: Optional[ArchitectureSourceInfo] = None
+    terraform_code: Optional[TerraformCodeInfo] = None
+    generated_app: Optional[GeneratedAppInfo] = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
-        return {
+        result = {
             "architecture_id": self.architecture_id,
             "source_type": self.source_type,
             "services": self.services,
@@ -70,6 +141,13 @@ class FailureInfo:
             "logs_url": self.logs_url,
             "issue_url": self.issue_url,
         }
+        if self.source_info:
+            result["source_info"] = self.source_info.to_dict()
+        if self.terraform_code:
+            result["terraform_code"] = self.terraform_code.to_dict()
+        if self.generated_app:
+            result["generated_app"] = self.generated_app.to_dict()
+        return result
 
 
 @dataclass
@@ -79,14 +157,24 @@ class PassingInfo:
     architecture_id: str
     source_type: str
     services: list[str]
+    source_info: Optional[ArchitectureSourceInfo] = None
+    terraform_code: Optional[TerraformCodeInfo] = None
+    generated_app: Optional[GeneratedAppInfo] = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
-        return {
+        result = {
             "architecture_id": self.architecture_id,
             "source_type": self.source_type,
             "services": self.services,
         }
+        if self.source_info:
+            result["source_info"] = self.source_info.to_dict()
+        if self.terraform_code:
+            result["terraform_code"] = self.terraform_code.to_dict()
+        if self.generated_app:
+            result["generated_app"] = self.generated_app.to_dict()
+        return result
 
 
 class ResultsAggregator:
@@ -152,22 +240,47 @@ class ResultsAggregator:
         )
         return stats
 
-    def get_failures(self, base_logs_url: str = "") -> list[FailureInfo]:
+    def get_failures(
+        self,
+        base_logs_url: str = "",
+        architectures: Optional[dict] = None,
+        app_data: Optional[dict] = None,
+        base_download_url: str = "",
+    ) -> list[FailureInfo]:
         """
         Extract failure information for dashboard display.
 
         Args:
             base_logs_url: Base URL for log files
+            architectures: Dict of architecture_id -> Architecture objects
+            app_data: Dict of content_hash -> app data dicts
+            base_download_url: Base URL for app downloads
 
         Returns:
             List of failure information
         """
-        if self._failures is not None:
-            return self._failures
-
         failures = []
         for result in self.run.results:
             if result.status in (ResultStatus.FAILED, ResultStatus.PARTIAL):
+                # Get source info from architecture
+                source_info = None
+                terraform_code = None
+                if architectures and result.architecture_id in architectures:
+                    arch = architectures[result.architecture_id]
+                    source_info = self._build_source_info(arch)
+                    terraform_code = self._build_terraform_code(arch)
+
+                # Get generated app info
+                generated_app = None
+                if architectures and result.architecture_id in architectures:
+                    arch = architectures[result.architecture_id]
+                    if arch.content_hash and app_data and arch.content_hash in app_data:
+                        generated_app = self._build_generated_app_info(
+                            arch.content_hash,
+                            app_data[arch.content_hash],
+                            base_download_url,
+                        )
+
                 failure = FailureInfo(
                     architecture_id=result.architecture_id,
                     source_type=self._format_source_type(result.source_type),
@@ -192,35 +305,65 @@ class ResultsAggregator:
                         else None
                     ),
                     issue_url=result.issue_url,
+                    source_info=source_info,
+                    terraform_code=terraform_code,
+                    generated_app=generated_app,
                 )
                 failures.append(failure)
 
-        self._failures = failures
         logger.debug("failures_extracted", count=len(failures))
         return failures
 
-    def get_passing(self) -> list[PassingInfo]:
+    def get_passing(
+        self,
+        architectures: Optional[dict] = None,
+        app_data: Optional[dict] = None,
+        base_download_url: str = "",
+    ) -> list[PassingInfo]:
         """
         Extract passing architecture information.
+
+        Args:
+            architectures: Dict of architecture_id -> Architecture objects
+            app_data: Dict of content_hash -> app data dicts
+            base_download_url: Base URL for app downloads
 
         Returns:
             List of passing architecture information
         """
-        if self._passing is not None:
-            return self._passing
-
         passing = []
         for result in self.run.results:
             if result.status == ResultStatus.PASSED:
+                # Get source info from architecture
+                source_info = None
+                terraform_code = None
+                if architectures and result.architecture_id in architectures:
+                    arch = architectures[result.architecture_id]
+                    source_info = self._build_source_info(arch)
+                    terraform_code = self._build_terraform_code(arch)
+
+                # Get generated app info
+                generated_app = None
+                if architectures and result.architecture_id in architectures:
+                    arch = architectures[result.architecture_id]
+                    if arch.content_hash and app_data and arch.content_hash in app_data:
+                        generated_app = self._build_generated_app_info(
+                            arch.content_hash,
+                            app_data[arch.content_hash],
+                            base_download_url,
+                        )
+
                 passing.append(
                     PassingInfo(
                         architecture_id=result.architecture_id,
                         source_type=self._format_source_type(result.source_type),
                         services=list(result.services),
+                        source_info=source_info,
+                        terraform_code=terraform_code,
+                        generated_app=generated_app,
                     )
                 )
 
-        self._passing = passing
         logger.debug("passing_extracted", count=len(passing))
         return passing
 
@@ -343,6 +486,9 @@ class ResultsAggregator:
         self,
         previous_pass_rate: Optional[float] = None,
         base_logs_url: str = "",
+        architectures: Optional[dict] = None,
+        app_data: Optional[dict] = None,
+        base_download_url: str = "",
     ) -> dict[str, Any]:
         """
         Generate complete dashboard data structure.
@@ -350,6 +496,9 @@ class ResultsAggregator:
         Args:
             previous_pass_rate: Pass rate from previous run
             base_logs_url: Base URL for log files
+            architectures: Dict of architecture_id -> Architecture objects
+            app_data: Dict of content_hash -> app data dicts
+            base_download_url: Base URL for app downloads
 
         Returns:
             Complete dashboard data dictionary
@@ -361,8 +510,16 @@ class ResultsAggregator:
             "statistics": stats.to_dict(),
             "template_count": source_counts["template_count"],
             "diagram_count": source_counts["diagram_count"],
-            "failures": [f.to_dict() for f in self.get_failures(base_logs_url)],
-            "passing": [p.to_dict() for p in self.get_passing()],
+            "failures": [
+                f.to_dict()
+                for f in self.get_failures(
+                    base_logs_url, architectures, app_data, base_download_url
+                )
+            ],
+            "passing": [
+                p.to_dict()
+                for p in self.get_passing(architectures, app_data, base_download_url)
+            ],
             "service_coverage": [
                 {
                     "name": sc.service_name,
@@ -382,3 +539,63 @@ class ResultsAggregator:
         if source_type == ArchitectureSourceType.DIAGRAM:
             return "diagram"
         return "template"
+
+    def _build_source_info(self, arch) -> ArchitectureSourceInfo:
+        """Build source info from an Architecture object."""
+        # Determine source name from source_id
+        source_names = {
+            "aws-quickstarts": "AWS QuickStart Templates",
+            "terraform-registry": "Terraform Registry",
+            "aws-solutions": "AWS Solutions Library",
+            "serverless-examples": "Serverless Framework Examples",
+            "aws-architecture-center": "AWS Architecture Center",
+            "azure-architecture-center": "Azure Architecture Center",
+        }
+        source_name = source_names.get(arch.source_id, arch.source_id)
+
+        # Build source URL if possible
+        source_url = None
+        if arch.template_path:
+            if arch.source_id == "terraform-registry":
+                source_url = f"https://registry.terraform.io/modules/{arch.template_path}"
+            elif "github" in arch.source_id.lower() or arch.source_id == "aws-quickstarts":
+                source_url = arch.template_path if arch.template_path.startswith("http") else None
+
+        # For diagram sources, template_path often contains the page URL
+        if arch.source_type == ArchitectureSourceType.DIAGRAM and arch.template_path:
+            if arch.template_path.startswith("http"):
+                source_url = arch.template_path
+
+        return ArchitectureSourceInfo(
+            source_id=arch.source_id,
+            source_name=source_name,
+            source_type=self._format_source_type(arch.source_type),
+            source_url=source_url,
+            template_path=arch.template_path if not (arch.template_path and arch.template_path.startswith("http")) else None,
+            original_format=arch.metadata.original_format if arch.metadata else None,
+            diagram_confidence=arch.metadata.diagram_confidence if arch.metadata else None,
+            synthesis_notes=arch.synthesis_notes,
+        )
+
+    def _build_terraform_code(self, arch) -> TerraformCodeInfo:
+        """Build terraform code info from an Architecture object."""
+        return TerraformCodeInfo(
+            main_tf=arch.terraform_content or "",
+            variables_tf=arch.variables_content,
+            outputs_tf=arch.outputs_content,
+        )
+
+    def _build_generated_app_info(
+        self,
+        content_hash: str,
+        app_data_dict: dict,
+        base_download_url: str,
+    ) -> GeneratedAppInfo:
+        """Build generated app info from app cache data."""
+        return GeneratedAppInfo(
+            content_hash=content_hash,
+            source_files=app_data_dict.get("source_code", {}),
+            test_files=app_data_dict.get("test_code", {}),
+            requirements=app_data_dict.get("requirements", []),
+            download_url=f"{base_download_url}/{content_hash}.zip" if base_download_url else None,
+        )
