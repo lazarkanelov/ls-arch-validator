@@ -338,8 +338,21 @@ class SiteGenerator:
         # This preserves source_info, terraform_code, and generated_app
         enriched_results = []
 
+        # Debug: Check if dashboard_data has enriched info
+        failures = dashboard_data.get("failures", [])
+        passing = dashboard_data.get("passing", [])
+        failures_with_source = sum(1 for f in failures if f.get("source_info"))
+        passing_with_source = sum(1 for p in passing if p.get("source_info"))
+        logger.info(
+            "enriched_data_check",
+            total_failures=len(failures),
+            failures_with_source_info=failures_with_source,
+            total_passing=len(passing),
+            passing_with_source_info=passing_with_source,
+        )
+
         # Add failures with status
-        for failure in dashboard_data.get("failures", []):
+        for failure in failures:
             result = dict(failure)  # Copy the enriched data
             result["status"] = "failed"
             if not result.get("infrastructure_error") and result.get("test_failures"):

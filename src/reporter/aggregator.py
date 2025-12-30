@@ -268,12 +268,14 @@ class ResultsAggregator:
 
                 # Debug: Log architecture matching
                 if architectures:
-                    logger.debug(
+                    logger.info(
                         "arch_lookup",
                         result_id=result.architecture_id,
                         available_ids=list(architectures.keys())[:5],
                         found=result.architecture_id in architectures,
                     )
+                else:
+                    logger.warning("no_architectures_passed_to_aggregator")
 
                 if architectures and result.architecture_id in architectures:
                     arch = architectures[result.architecture_id]
