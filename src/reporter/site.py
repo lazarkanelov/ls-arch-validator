@@ -69,6 +69,17 @@ class SiteGenerator:
         Returns:
             Path to the generated index.html
         """
+        # Debug: Log paths and parameters
+        logger.info(
+            "generate_called",
+            output_dir=str(self.output_dir),
+            output_dir_absolute=str(self.output_dir.resolve()),
+            has_run=run is not None,
+            has_data_dir=data_dir is not None,
+            architectures_count=len(architectures) if architectures else 0,
+            has_app_cache=app_cache is not None,
+        )
+
         # Ensure output directory exists
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -79,6 +90,13 @@ class SiteGenerator:
         data_output_dir = self.output_dir / "data"
         data_output_dir.mkdir(parents=True, exist_ok=True)
         (data_output_dir / "runs").mkdir(parents=True, exist_ok=True)
+
+        logger.info(
+            "data_dir_created",
+            data_dir=str(data_output_dir),
+            data_dir_exists=data_output_dir.exists(),
+            runs_dir_exists=(data_output_dir / "runs").exists(),
+        )
 
         # Get dashboard data
         if run is not None:
@@ -381,7 +399,13 @@ class SiteGenerator:
 
         latest_file = data_dir / "latest.json"
         latest_file.write_text(json.dumps(latest, indent=2, default=str))
-        logger.debug("latest_json_saved", path=str(latest_file))
+        logger.info(
+            "latest_json_saved",
+            path=str(latest_file),
+            file_exists=latest_file.exists(),
+            file_size=latest_file.stat().st_size if latest_file.exists() else 0,
+            results_count=len(enriched_results),
+        )
 
     def _save_run_json(self, run: ValidationRun, data_dir: Path) -> None:
         """
