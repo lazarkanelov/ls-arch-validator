@@ -38,7 +38,7 @@
         </dd>
         {% endif %}
 
-        {% if source_info.diagram_confidence is not none %}
+        {% if source_info.diagram_confidence is defined and source_info.diagram_confidence is not none %}
         <dt>Diagram Confidence:</dt>
         <dd>
             <div class="confidence-container">

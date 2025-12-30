@@ -1,0 +1,42 @@
+{
+  "runs": [
+    {
+      "id": "run-20251230-test",
+      "date": "2025-12-30",
+      "total": 5,
+      "passed": 3,
+      "partial": 1,
+      "failed": 1,
+      "pass_rate": 60.0,
+      "duration_seconds": 1800,
+      "duration_formatted": "30m"
+    },
+    {
+      "id": "run-20251229-test",
+      "date": "2025-12-29",
+      "total": 5,
+      "passed": 3,
+      "partial": 0,
+      "failed": 2,
+      "pass_rate": 60.0,
+      "duration_seconds": 1750,
+      "duration_formatted": "29m"
+    },
+    {
+      "id": "run-20251228-test",
+      "date": "2025-12-28",
+      "total": 4,
+      "passed": 2,
+      "partial": 1,
+      "failed": 1,
+      "pass_rate": 50.0,
+      "duration_seconds": 1500,
+      "duration_formatted": "25m"
+    }
+  ],
+  "trend": {
+    "labels": ["Dec 28", "Dec 29", "Dec 30"],
+    "pass_rates": [50, 60, 60],
+    "totals": [4, 5, 5]
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "id": "run-20251230-test",
+  "status": "completed",
+  "started_at": "2025-12-30T10:00:00Z",
+  "completed_at": "2025-12-30T10:30:00Z",
+  "localstack_version": "latest",
+  "statistics": {
+    "total": 5,
+    "passed": 3,
+    "partial": 1,
+    "failed": 1,
+    "timeout": 0,
+    "pass_rate": 60.0
+  },
+  "template_count": 4,
+  "diagram_count": 1,
+  "results": [
+    {
+      "architecture_id": "aws-quickstart-vpc-3tier",
+      "source_type": "template",
+      "services": ["ec2", "vpc", "rds"],
+      "status": "passed",
+      "source_info": {
+        "source_id": "aws-quickstarts",
+        "source_name": "AWS QuickStart Templates",
+        "source_type": "template",
+        "source_url": "https://github.com/aws-quickstart/quickstart-examples",
+        "original_format": "cloudformation"
+      },
+      "terraform_code": {
+        "main_tf": "# AWS VPC 3-Tier Architecture\n\nresource \"aws_vpc\" \"main\" {\n  cidr_block = \"10.0.0.0/16\"\n  enable_dns_hostnames = true\n\n  tags = {\n    Name = \"three-tier-vpc\"\n  }\n}\n\nresource \"aws_subnet\" \"public\" {\n  count             = 2\n  vpc_id            = aws_vpc.main.id\n  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)\n  availability_zone = data.aws_availability_zones.available.names[count.index]\n\n  tags = {\n    Name = \"public-subnet-${count.index + 1}\"\n  }\n}\n\nresource \"aws_db_instance\" \"main\" {\n  allocated_storage    = 20\n  engine               = \"mysql\"\n  engine_version       = \"8.0\"\n  instance_class       = \"db.t3.micro\"\n  db_name              = \"appdb\"\n  username             = var.db_username\n  password             = var.db_password\n  parameter_group_name = \"default.mysql8.0\"\n  skip_final_snapshot  = true\n}\n",
+        "variables_tf": "variable \"db_username\" {\n  type        = string\n  description = \"Database administrator username\"\n}\n\nvariable \"db_password\" {\n  type        = string\n  sensitive   = true\n  description = \"Database administrator password\"\n}\n",
+        "outputs_tf": "output \"vpc_id\" {\n  value       = aws_vpc.main.id\n  description = \"The ID of the VPC\"\n}\n"
+      },
+      "generated_app": {
+        "content_hash": "abc123def456",
+        "source_files": {
+          "app.py": "import boto3\nimport os\n\ndef get_db_connection():\n    client = boto3.client('rds')\n    return client\n\ndef main():\n    print('Connecting to RDS...')\n    conn = get_db_connection()\n    print('Connected successfully!')\n\nif __name__ == '__main__':\n    main()\n",
+          "config.py": "import os\n\nDB_HOST = os.environ.get('DB_HOST', 'localhost')\nDB_PORT = int(os.environ.get('DB_PORT', 3306))\nDB_NAME = os.environ.get('DB_NAME', 'appdb')\n"
+        },
+        "test_files": {
+          "test_app.py": "import pytest\nfrom app import get_db_connection\n\ndef test_db_connection():\n    conn = get_db_connection()\n    assert conn is not None\n"
+        },
+        "requirements": ["boto3>=1.26.0", "pytest>=7.0.0"],
+        "source_file_count": 2,
+        "test_file_count": 1,
+        "requirements_count": 2
+      }
+    },
+    {
+      "architecture_id": "terraform-aws-lambda-api",
+      "source_type": "template",
+      "services": ["lambda", "apigateway", "dynamodb"],
+      "status": "passed",
+      "source_info": {
+        "source_id": "terraform-registry",
+        "source_name": "Terraform Registry",
+        "source_type": "template",
+        "source_url": "https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws",
+        "original_format": "terraform"
+      },
+      "terraform_code": {
+        "main_tf": "# Serverless API with Lambda and DynamoDB\n\nresource \"aws_lambda_function\" \"api\" {\n  function_name = \"api-handler\"\n  runtime       = \"python3.9\"\n  handler       = \"handler.main\"\n  role          = aws_iam_role.lambda.arn\n  filename      = \"lambda.zip\"\n}\n\nresource \"aws_dynamodb_table\" \"main\" {\n  name           = \"api-data\"\n  billing_mode   = \"PAY_PER_REQUEST\"\n  hash_key       = \"id\"\n\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n}\n"
+      }
+    },
+    {
+      "architecture_id": "serverless-rest-api",
+      "source_type": "template",
+      "services": ["lambda", "s3"],
+      "status": "passed",
+      "source_info": {
+        "source_id": "serverless-examples",
+        "source_name": "Serverless Framework Examples",
+        "source_type": "template",
+        "source_url": "https://github.com/serverless/examples",
+        "original_format": "serverless"
+      }
+    },
+    {
+      "architecture_id": "aws-diagram-microservices",
+      "source_type": "diagram",
+      "services": ["ecs", "alb", "rds"],
+      "status": "partial",
+      "error_summary": "ECS task failed to start",
+      "test_failures": ["test_ecs_service_running"],
+      "source_info": {
+        "source_id": "aws-architecture-center",
+        "source_name": "AWS Architecture Center",
+        "source_type": "diagram",
+        "source_url": "https://aws.amazon.com/architecture/",
+        "original_format": "diagram",
+        "diagram_confidence": 0.85,
+        "synthesis_notes": "Inferred ECS cluster from container icons. ALB placement determined from load balancer symbol."
+      },
+      "terraform_code": {
+        "main_tf": "# Microservices Architecture (from diagram)\n\nresource \"aws_ecs_cluster\" \"main\" {\n  name = \"microservices-cluster\"\n}\n\nresource \"aws_lb\" \"api\" {\n  name               = \"api-lb\"\n  internal           = false\n  load_balancer_type = \"application\"\n}\n"
+      }
+    },
+    {
+      "architecture_id": "aws-solutions-serverless-image",
+      "source_type": "template",
+      "services": ["lambda", "s3", "rekognition"],
+      "status": "failed",
+      "error_summary": "Rekognition service not available in LocalStack",
+      "infrastructure_error": "Service 'rekognition' is not supported by LocalStack Community Edition",
+      "source_info": {
+        "source_id": "aws-solutions",
+        "source_name": "AWS Solutions Library",
+        "source_type": "template",
+        "source_url": "https://aws.amazon.com/solutions/",
+        "original_format": "cloudformation"
+      }
+    }
+  ],
+  "service_coverage": [
+    {"name": "lambda", "total": 3, "passed": 2, "failed": 1, "pass_rate": 66.7},
+    {"name": "s3", "total": 2, "passed": 2, "failed": 0, "pass_rate": 100.0},
+    {"name": "dynamodb", "total": 1, "passed": 1, "failed": 0, "pass_rate": 100.0},
+    {"name": "ec2", "total": 1, "passed": 1, "failed": 0, "pass_rate": 100.0},
+    {"name": "rds", "total": 2, "passed": 1, "failed": 1, "pass_rate": 50.0}
+  ],
+  "unsupported_services": ["rekognition"]
+}
