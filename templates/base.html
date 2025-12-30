@@ -1,47 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LocalStack Architecture Validator{% endblock %}</title>
-    <link rel="stylesheet" href="{{ base_url }}/assets/styles.css">
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        success: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' },
+                        warning: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f' },
+                        danger: { 50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d' },
+                        slate: { 750: '#293548', 850: '#172033' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
     <!-- Prism.js for syntax highlighting -->
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-hcl.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+    <!-- Heroicons -->
+    <script src="https://unpkg.com/@heroicons/vue@2.0.18/dist/cjs/outline/index.js" defer></script>
+
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* Smooth transitions */
+        .transition-height { transition: max-height 0.3s ease-out; }
+
+        /* Progress ring */
+        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring__circle { transition: stroke-dashoffset 0.5s ease-out; }
+
+        /* Gradient text */
+        .gradient-text { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Code block styling */
+        pre[class*="language-"] { margin: 0; border-radius: 0; }
+        code[class*="language-"] { font-size: 0.8125rem; }
+
+        /* Allure-style donut chart animation */
+        @keyframes donut-fill { from { stroke-dasharray: 0 100; } }
+        .donut-segment { animation: donut-fill 1s ease-out forwards; }
+    </style>
+
     {% block head %}{% endblock %}
 </head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1 class="header-title">LocalStack Architecture Validator</h1>
-            <p class="header-subtitle">Automated AWS compatibility testing for real-world architecture patterns</p>
-            {% if last_updated %}
-            <p class="header-updated">Last updated: {{ last_updated }}</p>
-            {% endif %}
-        </div>
-    </header>
+<body class="h-full bg-slate-900 text-slate-100 antialiased">
+    <div class="flex h-full">
+        <!-- Sidebar -->
+        <aside class="hidden lg:flex lg:flex-shrink-0">
+            <div class="flex w-64 flex-col">
+                <div class="flex min-h-0 flex-1 flex-col bg-slate-850 border-r border-slate-700">
+                    <!-- Logo -->
+                    <div class="flex h-16 items-center px-4 border-b border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <span class="text-lg font-semibold text-white">LS Validator</span>
+                        </div>
+                    </div>
 
-    <main class="main">
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
-    </main>
+                    <!-- Navigation -->
+                    <nav class="flex-1 space-y-1 px-2 py-4">
+                        <a href="#overview" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-slate-700/50 text-white">
+                            <svg class="mr-3 h-5 w-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                            </svg>
+                            Overview
+                        </a>
+                        <a href="#results" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-700/30 hover:text-white">
+                            <svg class="mr-3 h-5 w-5 text-slate-400 group-hover:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                            Test Results
+                        </a>
+                        <a href="#services" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-700/30 hover:text-white">
+                            <svg class="mr-3 h-5 w-5 text-slate-400 group-hover:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                            Service Coverage
+                        </a>
+                        <a href="#history" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-700/30 hover:text-white">
+                            <svg class="mr-3 h-5 w-5 text-slate-400 group-hover:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Run History
+                        </a>
+                    </nav>
 
-    <footer class="footer">
-        <div class="container">
-            <p>
-                <a href="{{ base_url }}/data/latest.json" download>Download JSON</a> |
-                <a href="{{ base_url }}/data/history.json" download>Download History</a> |
-                <a href="https://github.com/localstack/localstack" target="_blank">LocalStack GitHub</a>
-            </p>
-            <p class="footer-note">Generated by ls-arch-validator v{{ version }}</p>
+                    <!-- Sidebar footer -->
+                    <div class="flex flex-shrink-0 border-t border-slate-700 p-4">
+                        <div class="w-full">
+                            <p class="text-xs text-slate-500">LocalStack Validator</p>
+                            <p class="text-xs text-slate-400">v{{ version }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex flex-1 flex-col overflow-hidden">
+            <!-- Top bar -->
+            <header class="bg-slate-850 border-b border-slate-700">
+                <div class="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+                    <!-- Mobile menu button -->
+                    <button type="button" class="lg:hidden -m-2.5 p-2.5 text-slate-400 hover:text-slate-300" onclick="toggleMobileMenu()">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+
+                    <div class="flex-1 flex items-center justify-center lg:justify-start lg:ml-0">
+                        <h1 class="text-xl font-semibold text-white lg:hidden">LS Validator</h1>
+                    </div>
+
+                    <!-- Right side -->
+                    <div class="flex items-center gap-4">
+                        {% if last_updated %}
+                        <span class="hidden sm:flex items-center text-sm text-slate-400">
+                            <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ last_updated }}
+                        </span>
+                        {% endif %}
+
+                        <a href="{{ base_url }}/data/latest.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
+                            <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Export
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page content -->
+            <main class="flex-1 overflow-y-auto bg-slate-900 p-4 sm:p-6 lg:p-8">
+                {% block content %}{% endblock %}
+            </main>
         </div>
-    </footer>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div id="mobile-menu" class="hidden fixed inset-0 z-50 lg:hidden">
+        <div class="fixed inset-0 bg-slate-900/80" onclick="toggleMobileMenu()"></div>
+        <div class="fixed inset-y-0 left-0 w-full max-w-xs bg-slate-850 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <span class="text-lg font-semibold text-white">Menu</span>
+                <button onclick="toggleMobileMenu()" class="text-slate-400 hover:text-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="space-y-2">
+                <a href="#overview" class="block px-3 py-2 text-base font-medium rounded-lg text-white bg-slate-700/50" onclick="toggleMobileMenu()">Overview</a>
+                <a href="#results" class="block px-3 py-2 text-base font-medium rounded-lg text-slate-300 hover:bg-slate-700/30" onclick="toggleMobileMenu()">Test Results</a>
+                <a href="#services" class="block px-3 py-2 text-base font-medium rounded-lg text-slate-300 hover:bg-slate-700/30" onclick="toggleMobileMenu()">Service Coverage</a>
+                <a href="#history" class="block px-3 py-2 text-base font-medium rounded-lg text-slate-300 hover:bg-slate-700/30" onclick="toggleMobileMenu()">Run History</a>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+    </script>
 
     {% block scripts %}{% endblock %}
 </body>
