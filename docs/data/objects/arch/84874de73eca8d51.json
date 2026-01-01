@@ -11,8 +11,22 @@
     "source_type": "diagram",
     "source_url": "https://github.com/aws-samples/saas-reference-architecture-ecs",
     "image_url": "https://raw.githubusercontent.com/aws-samples/saas-reference-architecture-ecs/main/images/archi-high-level.png",
-    "original_format": "diagram",
-    "diagram_confidence": 0.85,
-    "synthesis_notes": "Inferred ECS cluster from container icons. ALB placement determined from load balancer symbol."
+    "original_format": "diagram"
+  },
+  "scraping_info": {
+    "scraped_at": "2024-12-28T14:32:17Z",
+    "scraping_method": "image_analysis",
+    "scraper_version": "1.2.0",
+    "extraction_steps": [
+      "Fetched README.md from GitHub API",
+      "Extracted image URL from markdown content",
+      "Downloaded PNG image (3778x1704 pixels)",
+      "Analyzed image using Claude Vision API",
+      "Identified AWS service icons: ECS, ALB, RDS, VPC",
+      "Mapped icon positions to infer architecture topology"
+    ],
+    "confidence_score": 0.85,
+    "analysis_notes": "Inferred ECS cluster from container icons. ALB placement determined from load balancer symbol. RDS identified from database cylinder icon.",
+    "limitations": "Service configurations and IAM roles not visible in diagram"
   }
 }
