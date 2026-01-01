@@ -210,6 +210,8 @@ class SiteGenerator:
         """
         Load dashboard data from cached JSON files.
 
+        Supports both legacy (latest.json) and CAS (index.json) formats.
+
         Args:
             data_dir: Directory containing data files
 
@@ -219,7 +221,52 @@ class SiteGenerator:
         data_dir = Path(data_dir)
         dashboard_data: dict[str, Any] = {}
 
-        # Load latest.json
+        # Try CAS format first (index.json)
+        index_file = data_dir / "index.json"
+        if index_file.exists():
+            try:
+                index_data = json.loads(index_file.read_text())
+
+                # Map CAS format to dashboard format
+                dashboard_data["run_id"] = index_data.get("latest_run", "")
+                dashboard_data["localstack_version"] = ""  # Not in index.json
+                dashboard_data["statistics"] = index_data.get("statistics", {})
+                dashboard_data["template_count"] = index_data.get("statistics", {}).get("total", 0)
+                dashboard_data["diagram_count"] = 0
+
+                # Process results into failures and passing
+                results = index_data.get("results", [])
+                failures = []
+                passing = []
+
+                for result in results:
+                    item = {
+                        "architecture_id": result.get("arch_id", ""),
+                        "services": result.get("services", []),
+                        "arch_hash": result.get("arch_hash"),
+                        "tf_hash": result.get("tf_hash"),
+                        "app_hashes": result.get("app_hashes", []),
+                        "error_summary": result.get("error_summary"),
+                        "test_failures": result.get("test_failures", []),
+                    }
+
+                    if result.get("status") in ("failed", "partial"):
+                        failures.append(item)
+                    elif result.get("status") == "passed":
+                        passing.append(item)
+
+                dashboard_data["failures"] = failures
+                dashboard_data["passing"] = passing
+                dashboard_data["service_coverage"] = index_data.get("service_summary", [])
+                dashboard_data["use_lazy_loading"] = True
+
+                logger.info("loaded_from_cas_index", results_count=len(results))
+                return dashboard_data
+
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.warning("index_load_error", error=str(e))
+
+        # Fall back to legacy format (latest.json)
         latest_file = data_dir / "latest.json"
         if latest_file.exists():
             try:

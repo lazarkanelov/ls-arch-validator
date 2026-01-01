@@ -142,10 +142,10 @@
                             <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            2025-12-30 22:32 UTC
+                            2026-01-01 15:14 UTC
                         </span>
 
-                        <a href="/data/latest.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
+                        <a href="/data/index.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
                             <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
@@ -226,11 +226,11 @@
             <!-- Source breakdown -->
             <div class="flex gap-4 mt-4">
                 <div class="flex-1 bg-slate-700/50 rounded-lg p-3 text-center">
-                    <div class="text-lg font-semibold text-white">4</div>
+                    <div class="text-lg font-semibold text-white">5</div>
                     <div class="text-xs text-slate-400">Templates</div>
                 </div>
                 <div class="flex-1 bg-slate-700/50 rounded-lg p-3 text-center">
-                    <div class="text-lg font-semibold text-white">1</div>
+                    <div class="text-lg font-semibold text-white">0</div>
                     <div class="text-xs text-slate-400">Diagrams</div>
                 </div>
             </div>
@@ -332,8 +332,8 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-medium text-white truncate">aws-diagram-microservices</h3>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pink-500/10 text-pink-400">
-                            diagram
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400">
+                            
                         </span>
                     </div>
                     <p class="mt-1 text-sm text-slate-400 truncate">ECS task failed to start</p>
@@ -370,240 +370,10 @@
                     </div>
 
                     <!-- Source info -->
-                    <div class="bg-slate-700/30 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-slate-300 mb-3">Architecture Source</h4>
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <dt class="text-slate-400">Source:</dt>
-                            <dd class="text-slate-200">AWS Architecture Center</dd>
-                            <dt class="text-slate-400">Format:</dt>
-                            <dd><span class="px-2 py-0.5 bg-slate-600 rounded text-xs text-slate-200">diagram</span></dd>
-                            <dt class="text-slate-400">URL:</dt>
-                            <dd class="col-span-1">
-                                <a href="https://aws.amazon.com/architecture/" target="_blank" rel="noopener" class="text-primary-400 hover:text-primary-300 break-all inline-flex items-center gap-1">
-                                    https://aws.amazon.com/architecture/
-                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            </dd>
-                            <dt class="text-slate-400">Confidence:</dt>
-                            <dd class="flex items-center gap-2">
-                                <div class="flex-1 h-1.5 bg-slate-600 rounded-full overflow-hidden max-w-20">
-                                    <div class="h-full bg-gradient-to-r from-warning-500 to-success-500 rounded-full" style="width: 85.0%"></div>
-                                </div>
-                                <span class="text-slate-200">85%</span>
-                            </dd>
-                        </dl>
-                    </div>
 
                     <!-- Terraform Infrastructure Code -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Terraform Infrastructure</span>
-                            </div>
-                            <span class="text-xs text-slate-400">Generated from diagram</span>
-                        </div>
-                        <!-- main.tf -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                main.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code># Microservices Architecture (from diagram)
 
-resource &#34;aws_ecs_cluster&#34; &#34;main&#34; {
-  name = &#34;microservices-cluster&#34;
-
-  setting {
-    name  = &#34;containerInsights&#34;
-    value = &#34;enabled&#34;
-  }
-}
-
-resource &#34;aws_ecs_task_definition&#34; &#34;api&#34; {
-  family                   = &#34;api-service&#34;
-  network_mode             = &#34;awsvpc&#34;
-  requires_compatibilities = [&#34;FARGATE&#34;]
-  cpu                      = 256
-  memory                   = 512
-  execution_role_arn       = aws_iam_role.ecs_execution.arn
-
-  container_definitions = jsonencode([{
-    name  = &#34;api&#34;
-    image = &#34;api-service:latest&#34;
-    portMappings = [{
-      containerPort = 8080
-      protocol      = &#34;tcp&#34;
-    }]
-    environment = [
-      { name = &#34;DB_HOST&#34;, value = aws_db_instance.main.endpoint }
-    ]
-  }])
-}
-
-resource &#34;aws_lb&#34; &#34;api&#34; {
-  name               = &#34;api-lb&#34;
-  internal           = false
-  load_balancer_type = &#34;application&#34;
-  subnets            = aws_subnet.public[*].id
-  security_groups    = [aws_security_group.alb.id]
-}
-
-resource &#34;aws_db_instance&#34; &#34;main&#34; {
-  identifier        = &#34;microservices-db&#34;
-  engine            = &#34;postgres&#34;
-  engine_version    = &#34;14&#34;
-  instance_class    = &#34;db.t3.micro&#34;
-  allocated_storage = 20
-  db_name           = &#34;appdb&#34;
-  username          = var.db_username
-  password          = var.db_password
-}
-</code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Generated Python Application -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Generated Python Application</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>1 source files</span>
-                                <span>1 test files</span>
-                                <span>4 dependencies</span>
-                            </div>
-                        </div>
-                        <!-- Source files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Source Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/api_service.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;API Service for Microservices Architecture.&#34;&#34;&#34;
-import os
-import uuid
-from flask import Flask, jsonify, request
-import psycopg2
-from psycopg2.pool import ThreadedConnectionPool
-
-app = Flask(__name__)
-
-# Database connection pool
-db_pool = ThreadedConnectionPool(
-    minconn=2,
-    maxconn=10,
-    host=os.getenv(&#34;DB_HOST&#34;),
-    database=os.getenv(&#34;DB_NAME&#34;, &#34;appdb&#34;),
-    user=os.getenv(&#34;DB_USER&#34;),
-    password=os.getenv(&#34;DB_PASSWORD&#34;),
-)
-
-
-@app.route(&#34;/health&#34;)
-def health_check():
-    &#34;&#34;&#34;Health check for ALB.&#34;&#34;&#34;
-    try:
-        conn = db_pool.getconn()
-        cursor = conn.cursor()
-        cursor.execute(&#34;SELECT 1&#34;)
-        db_pool.putconn(conn)
-        return jsonify({&#34;status&#34;: &#34;healthy&#34;, &#34;database&#34;: &#34;connected&#34;})
-    except Exception as e:
-        return jsonify({&#34;status&#34;: &#34;unhealthy&#34;, &#34;error&#34;: str(e)}), 503
-
-
-@app.route(&#34;/api/v1/items&#34;, methods=[&#34;GET&#34;])
-def list_items():
-    &#34;&#34;&#34;List all items with pagination.&#34;&#34;&#34;
-    page = int(request.args.get(&#34;page&#34;, 1))
-    limit = int(request.args.get(&#34;limit&#34;, 20))
-    offset = (page - 1) * limit
-    
-    conn = db_pool.getconn()
-    try:
-        cursor = conn.cursor()
-        cursor.execute(
-            &#34;SELECT id, name, created_at FROM items ORDER BY created_at DESC LIMIT %s OFFSET %s&#34;,
-            (limit, offset)
-        )
-        items = [{&#34;id&#34;: row[0], &#34;name&#34;: row[1], &#34;created_at&#34;: row[2].isoformat()} for row in cursor.fetchall()]
-        return jsonify({&#34;items&#34;: items, &#34;page&#34;: page, &#34;limit&#34;: limit})
-    finally:
-        db_pool.putconn(conn)
-
-
-@app.route(&#34;/api/v1/items&#34;, methods=[&#34;POST&#34;])
-def create_item():
-    &#34;&#34;&#34;Create a new item.&#34;&#34;&#34;
-    data = request.get_json()
-    item_id = str(uuid.uuid4())
-    
-    conn = db_pool.getconn()
-    try:
-        cursor = conn.cursor()
-        cursor.execute(
-            &#34;INSERT INTO items (id, name) VALUES (%s, %s) RETURNING created_at&#34;,
-            (item_id, data.get(&#34;name&#34;))
-        )
-        created_at = cursor.fetchone()[0]
-        conn.commit()
-        return jsonify({&#34;id&#34;: item_id, &#34;name&#34;: data.get(&#34;name&#34;), &#34;created_at&#34;: created_at.isoformat()}), 201
-    finally:
-        db_pool.putconn(conn)
-
-
-if __name__ == &#34;__main__&#34;:
-    app.run(host=&#34;0.0.0.0&#34;, port=8080)
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Test files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Test Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    tests/test_api.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;API service tests.&#34;&#34;&#34;
-import pytest
-
-def test_health_check_returns_200():
-    pass
-
-def test_create_item_persists_to_db():
-    pass
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Requirements -->
-                        <div>
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Dependencies (requirements.txt)</div>
-                            <div class="px-4 py-3 font-mono text-sm text-slate-300">
-                                <div>flask&gt;=2.0.0</div>
-                                <div>psycopg2-binary&gt;=2.9.0</div>
-                                <div>gunicorn&gt;=21.0.0</div>
-                                <div>pytest&gt;=7.0.0</div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Generated Probe Applications -->
 
                     <!-- Test Execution Details -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
@@ -618,7 +388,7 @@ def test_create_item_persists_to_db():
                                 <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">1</span>
                                 <div>
                                     <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="https://aws.amazon.com/architecture/" target="_blank" class="text-primary-400 hover:underline">AWS Architecture Center</a> and converted to Terraform format.</div>
+                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
                                 </div>
                             </div>
                             <div class="flex gap-3">
@@ -671,13 +441,13 @@ pytest tests/</code></pre>
                 </div>
             </div>
         </div>
-        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="failed">
+        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="partial">
             <button class="w-full flex items-center gap-4 p-4 text-left hover:bg-slate-750 transition-colors" onclick="toggleDetails(this)">
                 <!-- Status indicator -->
                 <div class="flex-shrink-0">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-danger-500/10 ring-1 ring-danger-500/20">
-                        <svg class="h-5 w-5 text-danger-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-warning-500/10 ring-1 ring-warning-500/20">
+                        <svg class="h-5 w-5 text-warning-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                     </span>
                 </div>
@@ -687,7 +457,7 @@ pytest tests/</code></pre>
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-medium text-white truncate">aws-solutions-serverless-image</h3>
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400">
-                            template
+                            
                         </span>
                     </div>
                     <p class="mt-1 text-sm text-slate-400 truncate">Rekognition service not available in LocalStack</p>
@@ -710,35 +480,13 @@ pytest tests/</code></pre>
             <div class="details-panel hidden border-t border-slate-700">
                 <div class="p-4 space-y-4">
                     <!-- Error details -->
-                    <div class="bg-danger-500/5 border border-danger-500/20 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-danger-400 mb-2">Infrastructure Error</h4>
-                        <pre class="text-sm text-slate-300 whitespace-pre-wrap font-mono">Service &#39;rekognition&#39; is not supported by LocalStack Community Edition</pre>
-                    </div>
 
 
                     <!-- Source info -->
-                    <div class="bg-slate-700/30 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-slate-300 mb-3">Architecture Source</h4>
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <dt class="text-slate-400">Source:</dt>
-                            <dd class="text-slate-200">AWS Solutions Library</dd>
-                            <dt class="text-slate-400">Format:</dt>
-                            <dd><span class="px-2 py-0.5 bg-slate-600 rounded text-xs text-slate-200">cloudformation</span></dd>
-                            <dt class="text-slate-400">URL:</dt>
-                            <dd class="col-span-1">
-                                <a href="https://aws.amazon.com/solutions/" target="_blank" rel="noopener" class="text-primary-400 hover:text-primary-300 break-all inline-flex items-center gap-1">
-                                    https://aws.amazon.com/solutions/
-                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
 
                     <!-- Terraform Infrastructure Code -->
 
-                    <!-- Generated Python Application -->
+                    <!-- Generated Probe Applications -->
 
                     <!-- Test Execution Details -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
@@ -753,7 +501,7 @@ pytest tests/</code></pre>
                                 <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">1</span>
                                 <div>
                                     <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="https://aws.amazon.com/solutions/" target="_blank" class="text-primary-400 hover:underline">AWS Solutions Library</a> and converted to Terraform format.</div>
+                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
                                 </div>
                             </div>
                             <div class="flex gap-3">
@@ -821,7 +569,7 @@ pytest tests/</code></pre>
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-medium text-white truncate">aws-quickstart-vpc-3tier</h3>
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400">
-                            template
+                            
                         </span>
                     </div>
                     <p class="mt-1 text-sm text-success-400">All tests passed</p>
@@ -838,1283 +586,10 @@ pytest tests/</code></pre>
 
             <div class="details-panel hidden border-t border-slate-700">
                 <div class="p-4 space-y-4">
-                    <div class="bg-slate-700/30 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-slate-300 mb-3">Architecture Source</h4>
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <dt class="text-slate-400">Source:</dt>
-                            <dd class="text-slate-200">AWS QuickStart Templates</dd>
-                            <dt class="text-slate-400">Format:</dt>
-                            <dd><span class="px-2 py-0.5 bg-slate-600 rounded text-xs text-slate-200">cloudformation</span></dd>
-                            <dt class="text-slate-400">URL:</dt>
-                            <dd class="col-span-1">
-                                <a href="https://github.com/aws-quickstart/quickstart-examples" target="_blank" rel="noopener" class="text-primary-400 hover:text-primary-300 break-all inline-flex items-center gap-1">
-                                    https://github.com/aws-quickstart/quickstart-examples
-                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
 
                     <!-- Terraform Infrastructure Code -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Terraform Infrastructure</span>
-                            </div>
-                            <span class="text-xs text-slate-400">Generated from cloudformation</span>
-                        </div>
-                        <!-- main.tf -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                main.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code># AWS VPC 3-Tier Architecture
 
-resource &#34;aws_vpc&#34; &#34;main&#34; {
-  cidr_block           = &#34;10.0.0.0/16&#34;
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-
-  tags = {
-    Name        = &#34;three-tier-vpc&#34;
-    Environment = var.environment
-  }
-}
-
-resource &#34;aws_subnet&#34; &#34;public&#34; {
-  count                   = 2
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = &#34;public-subnet-${count.index + 1}&#34;
-    Tier = &#34;public&#34;
-  }
-}
-
-resource &#34;aws_subnet&#34; &#34;private&#34; {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 10)
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-
-  tags = {
-    Name = &#34;private-subnet-${count.index + 1}&#34;
-    Tier = &#34;private&#34;
-  }
-}
-
-resource &#34;aws_db_subnet_group&#34; &#34;main&#34; {
-  name       = &#34;main-db-subnet-group&#34;
-  subnet_ids = aws_subnet.private[*].id
-
-  tags = {
-    Name = &#34;Main DB Subnet Group&#34;
-  }
-}
-
-resource &#34;aws_db_instance&#34; &#34;main&#34; {
-  identifier           = &#34;app-database&#34;
-  allocated_storage    = 20
-  storage_type         = &#34;gp2&#34;
-  engine               = &#34;mysql&#34;
-  engine_version       = &#34;8.0&#34;
-  instance_class       = &#34;db.t3.micro&#34;
-  db_name              = &#34;appdb&#34;
-  username             = var.db_username
-  password             = var.db_password
-  parameter_group_name = &#34;default.mysql8.0&#34;
-  skip_final_snapshot  = true
-  db_subnet_group_name = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [aws_security_group.db.id]
-
-  tags = {
-    Name        = &#34;Application Database&#34;
-    Environment = var.environment
-  }
-}
-</code></pre>
-                        </div>
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                variables.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code>variable &#34;environment&#34; {
-  type        = string
-  description = &#34;Deployment environment (dev, staging, prod)&#34;
-  default     = &#34;dev&#34;
-}
-
-variable &#34;db_username&#34; {
-  type        = string
-  description = &#34;Database administrator username&#34;
-  sensitive   = true
-}
-
-variable &#34;db_password&#34; {
-  type        = string
-  description = &#34;Database administrator password&#34;
-  sensitive   = true
-}
-
-variable &#34;allowed_cidr_blocks&#34; {
-  type        = list(string)
-  description = &#34;CIDR blocks allowed to access the application&#34;
-  default     = [&#34;0.0.0.0/0&#34;]
-}
-</code></pre>
-                        </div>
-                        <div>
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                outputs.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code>output &#34;vpc_id&#34; {
-  value       = aws_vpc.main.id
-  description = &#34;The ID of the VPC&#34;
-}
-
-output &#34;public_subnet_ids&#34; {
-  value       = aws_subnet.public[*].id
-  description = &#34;List of public subnet IDs&#34;
-}
-
-output &#34;private_subnet_ids&#34; {
-  value       = aws_subnet.private[*].id
-  description = &#34;List of private subnet IDs&#34;
-}
-
-output &#34;database_endpoint&#34; {
-  value       = aws_db_instance.main.endpoint
-  description = &#34;RDS instance endpoint&#34;
-}
-</code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Generated Python Application -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Generated Python Application</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>6 source files</span>
-                                <span>3 test files</span>
-                                <span>6 dependencies</span>
-                            </div>
-                        </div>
-                        <!-- Source files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Source Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/models.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Domain models for Multi-Tenant SaaS Backend.&#34;&#34;&#34;
-from __future__ import annotations
-
-import uuid
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-from typing import Optional
-
-
-class SubscriptionTier(str, Enum):
-    FREE = &#34;free&#34;
-    STARTER = &#34;starter&#34;
-    PROFESSIONAL = &#34;professional&#34;
-    ENTERPRISE = &#34;enterprise&#34;
-
-
-class UserRole(str, Enum):
-    OWNER = &#34;owner&#34;
-    ADMIN = &#34;admin&#34;
-    MEMBER = &#34;member&#34;
-    VIEWER = &#34;viewer&#34;
-
-
-@dataclass
-class Tenant:
-    &#34;&#34;&#34;Represents a tenant organization in the SaaS platform.&#34;&#34;&#34;
-    tenant_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = &#34;&#34;
-    subdomain: str = &#34;&#34;
-    subscription_tier: SubscriptionTier = SubscriptionTier.FREE
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    is_active: bool = True
-    settings: dict = field(default_factory=dict)
-    
-    def to_dict(self) -&gt; dict:
-        return {
-            &#34;tenant_id&#34;: self.tenant_id,
-            &#34;name&#34;: self.name,
-            &#34;subdomain&#34;: self.subdomain,
-            &#34;subscription_tier&#34;: self.subscription_tier.value,
-            &#34;created_at&#34;: self.created_at.isoformat(),
-            &#34;is_active&#34;: self.is_active,
-            &#34;settings&#34;: self.settings,
-        }
-
-
-@dataclass
-class User:
-    &#34;&#34;&#34;Represents a user within a tenant.&#34;&#34;&#34;
-    user_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    tenant_id: str = &#34;&#34;
-    email: str = &#34;&#34;
-    password_hash: str = &#34;&#34;
-    full_name: str = &#34;&#34;
-    role: UserRole = UserRole.MEMBER
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    last_login: Optional[datetime] = None
-    is_active: bool = True
-    mfa_enabled: bool = False
-    
-    def has_permission(self, required_role: UserRole) -&gt; bool:
-        &#34;&#34;&#34;Check if user has at least the required role level.&#34;&#34;&#34;
-        role_hierarchy = [UserRole.VIEWER, UserRole.MEMBER, UserRole.ADMIN, UserRole.OWNER]
-        return role_hierarchy.index(self.role) &gt;= role_hierarchy.index(required_role)
-
-
-@dataclass
-class Session:
-    &#34;&#34;&#34;User session with JWT token management.&#34;&#34;&#34;
-    session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str = &#34;&#34;
-    tenant_id: str = &#34;&#34;
-    token: str = &#34;&#34;
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    expires_at: datetime = None
-    ip_address: str = &#34;&#34;
-    user_agent: str = &#34;&#34;
-    is_revoked: bool = False
-
-
-@dataclass
-class AuditLog:
-    &#34;&#34;&#34;Audit log entry for compliance tracking.&#34;&#34;&#34;
-    log_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    tenant_id: str = &#34;&#34;
-    user_id: str = &#34;&#34;
-    action: str = &#34;&#34;
-    resource_type: str = &#34;&#34;
-    resource_id: str = &#34;&#34;
-    old_value: Optional[dict] = None
-    new_value: Optional[dict] = None
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    ip_address: str = &#34;&#34;
-    correlation_id: str = &#34;&#34;
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/repositories.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Data access layer with tenant isolation.&#34;&#34;&#34;
-from __future__ import annotations
-
-import logging
-from contextlib import contextmanager
-from typing import Generator, Optional
-
-import mysql.connector
-from mysql.connector import pooling
-
-from src.config import settings
-from src.models import AuditLog, Session, Tenant, User
-
-logger = logging.getLogger(__name__)
-
-
-class DatabasePool:
-    &#34;&#34;&#34;Connection pool manager for RDS MySQL.&#34;&#34;&#34;
-    
-    _pool: Optional[pooling.MySQLConnectionPool] = None
-    
-    @classmethod
-    def get_pool(cls) -&gt; pooling.MySQLConnectionPool:
-        if cls._pool is None:
-            cls._pool = pooling.MySQLConnectionPool(
-                pool_name=&#34;saas_pool&#34;,
-                pool_size=5,
-                host=settings.db_host,
-                port=settings.db_port,
-                user=settings.db_username,
-                password=settings.db_password,
-                database=settings.db_name,
-            )
-        return cls._pool
-    
-    @classmethod
-    @contextmanager
-    def get_connection(cls) -&gt; Generator:
-        conn = cls.get_pool().get_connection()
-        try:
-            yield conn
-        finally:
-            conn.close()
-
-
-class TenantRepository:
-    &#34;&#34;&#34;Repository for tenant operations with row-level security.&#34;&#34;&#34;
-    
-    def create(self, tenant: Tenant) -&gt; Tenant:
-        &#34;&#34;&#34;Create a new tenant with isolated schema.&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            try:
-                cursor.execute(
-                    &#34;&#34;&#34;INSERT INTO tenants 
-                    (tenant_id, name, subdomain, subscription_tier, created_at, is_active, settings)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)&#34;&#34;&#34;,
-                    (tenant.tenant_id, tenant.name, tenant.subdomain,
-                     tenant.subscription_tier.value, tenant.created_at,
-                     tenant.is_active, str(tenant.settings))
-                )
-                conn.commit()
-                logger.info(&#34;tenant_created&#34;, extra={&#34;tenant_id&#34;: tenant.tenant_id})
-                return tenant
-            except mysql.connector.IntegrityError as e:
-                conn.rollback()
-                raise DuplicateTenantError(f&#34;Tenant {tenant.subdomain} already exists&#34;) from e
-    
-    def get_by_id(self, tenant_id: str) -&gt; Optional[Tenant]:
-        &#34;&#34;&#34;Retrieve tenant by ID.&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                &#34;SELECT * FROM tenants WHERE tenant_id = %s AND is_active = TRUE&#34;,
-                (tenant_id,)
-            )
-            row = cursor.fetchone()
-            return self._row_to_tenant(row) if row else None
-    
-    def get_by_subdomain(self, subdomain: str) -&gt; Optional[Tenant]:
-        &#34;&#34;&#34;Retrieve tenant by subdomain for routing.&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                &#34;SELECT * FROM tenants WHERE subdomain = %s AND is_active = TRUE&#34;,
-                (subdomain,)
-            )
-            row = cursor.fetchone()
-            return self._row_to_tenant(row) if row else None
-    
-    def _row_to_tenant(self, row: dict) -&gt; Tenant:
-        return Tenant(
-            tenant_id=row[&#34;tenant_id&#34;],
-            name=row[&#34;name&#34;],
-            subdomain=row[&#34;subdomain&#34;],
-            subscription_tier=row[&#34;subscription_tier&#34;],
-            created_at=row[&#34;created_at&#34;],
-            is_active=row[&#34;is_active&#34;],
-        )
-
-
-class UserRepository:
-    &#34;&#34;&#34;Repository for user operations with tenant isolation.&#34;&#34;&#34;
-    
-    def create(self, user: User) -&gt; User:
-        &#34;&#34;&#34;Create a new user within a tenant.&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                &#34;&#34;&#34;INSERT INTO users 
-                (user_id, tenant_id, email, password_hash, full_name, role, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)&#34;&#34;&#34;,
-                (user.user_id, user.tenant_id, user.email, user.password_hash,
-                 user.full_name, user.role.value, user.created_at)
-            )
-            conn.commit()
-            return user
-    
-    def get_by_email(self, tenant_id: str, email: str) -&gt; Optional[User]:
-        &#34;&#34;&#34;Get user by email within tenant scope (row-level security).&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                &#34;&#34;&#34;SELECT * FROM users 
-                WHERE tenant_id = %s AND email = %s AND is_active = TRUE&#34;&#34;&#34;,
-                (tenant_id, email)
-            )
-            row = cursor.fetchone()
-            return self._row_to_user(row) if row else None
-    
-    def update_last_login(self, user_id: str) -&gt; None:
-        &#34;&#34;&#34;Update user&#39;s last login timestamp.&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                &#34;UPDATE users SET last_login = NOW() WHERE user_id = %s&#34;,
-                (user_id,)
-            )
-            conn.commit()
-
-
-class AuditLogRepository:
-    &#34;&#34;&#34;Repository for compliance audit logs.&#34;&#34;&#34;
-    
-    def log(self, entry: AuditLog) -&gt; None:
-        &#34;&#34;&#34;Write an audit log entry (append-only).&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                &#34;&#34;&#34;INSERT INTO audit_logs
-                (log_id, tenant_id, user_id, action, resource_type, resource_id,
-                 old_value, new_value, timestamp, ip_address, correlation_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)&#34;&#34;&#34;,
-                (entry.log_id, entry.tenant_id, entry.user_id, entry.action,
-                 entry.resource_type, entry.resource_id, str(entry.old_value),
-                 str(entry.new_value), entry.timestamp, entry.ip_address,
-                 entry.correlation_id)
-            )
-            conn.commit()
-    
-    def query_by_tenant(
-        self, tenant_id: str, start_date: str, end_date: str, limit: int = 100
-    ) -&gt; list[AuditLog]:
-        &#34;&#34;&#34;Query audit logs for a tenant within date range.&#34;&#34;&#34;
-        with DatabasePool.get_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                &#34;&#34;&#34;SELECT * FROM audit_logs 
-                WHERE tenant_id = %s AND timestamp BETWEEN %s AND %s
-                ORDER BY timestamp DESC LIMIT %s&#34;&#34;&#34;,
-                (tenant_id, start_date, end_date, limit)
-            )
-            return [self._row_to_log(row) for row in cursor.fetchall()]
-
-
-class DuplicateTenantError(Exception):
-    &#34;&#34;&#34;Raised when attempting to create a duplicate tenant.&#34;&#34;&#34;
-    pass
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/services.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Business logic layer for SaaS operations.&#34;&#34;&#34;
-from __future__ import annotations
-
-import hashlib
-import hmac
-import logging
-import secrets
-from datetime import datetime, timedelta
-from typing import Optional
-
-import jwt
-
-from src.config import settings
-from src.models import AuditLog, Session, SubscriptionTier, Tenant, User, UserRole
-from src.repositories import (
-    AuditLogRepository,
-    TenantRepository,
-    UserRepository,
-)
-
-logger = logging.getLogger(__name__)
-
-
-class AuthenticationService:
-    &#34;&#34;&#34;Handles user authentication with JWT tokens.&#34;&#34;&#34;
-    
-    def __init__(self):
-        self.user_repo = UserRepository()
-        self.audit_repo = AuditLogRepository()
-    
-    def hash_password(self, password: str) -&gt; str:
-        &#34;&#34;&#34;Hash password using PBKDF2 with salt.&#34;&#34;&#34;
-        salt = secrets.token_hex(16)
-        hash_obj = hashlib.pbkdf2_hmac(
-            &#34;sha256&#34;, password.encode(), salt.encode(), 100000
-        )
-        return f&#34;{salt}${hash_obj.hex()}&#34;
-    
-    def verify_password(self, password: str, password_hash: str) -&gt; bool:
-        &#34;&#34;&#34;Verify password against stored hash.&#34;&#34;&#34;
-        try:
-            salt, stored_hash = password_hash.split(&#34;$&#34;)
-            hash_obj = hashlib.pbkdf2_hmac(
-                &#34;sha256&#34;, password.encode(), salt.encode(), 100000
-            )
-            return hmac.compare_digest(hash_obj.hex(), stored_hash)
-        except ValueError:
-            return False
-    
-    def authenticate(
-        self, tenant_id: str, email: str, password: str, ip_address: str
-    ) -&gt; Optional[Session]:
-        &#34;&#34;&#34;Authenticate user and create session.&#34;&#34;&#34;
-        user = self.user_repo.get_by_email(tenant_id, email)
-        
-        if not user or not self.verify_password(password, user.password_hash):
-            self._log_failed_login(tenant_id, email, ip_address)
-            return None
-        
-        session = self._create_session(user, ip_address)
-        self.user_repo.update_last_login(user.user_id)
-        
-        self.audit_repo.log(AuditLog(
-            tenant_id=tenant_id,
-            user_id=user.user_id,
-            action=&#34;user.login&#34;,
-            resource_type=&#34;session&#34;,
-            resource_id=session.session_id,
-            ip_address=ip_address,
-        ))
-        
-        logger.info(&#34;user_authenticated&#34;, extra={
-            &#34;user_id&#34;: user.user_id,
-            &#34;tenant_id&#34;: tenant_id,
-        })
-        return session
-    
-    def _create_session(self, user: User, ip_address: str) -&gt; Session:
-        &#34;&#34;&#34;Create JWT session token.&#34;&#34;&#34;
-        expires_at = datetime.utcnow() + timedelta(hours=settings.session_ttl_hours)
-        
-        payload = {
-            &#34;sub&#34;: user.user_id,
-            &#34;tenant_id&#34;: user.tenant_id,
-            &#34;role&#34;: user.role.value,
-            &#34;exp&#34;: expires_at,
-            &#34;iat&#34;: datetime.utcnow(),
-        }
-        token = jwt.encode(payload, settings.jwt_secret, algorithm=&#34;HS256&#34;)
-        
-        return Session(
-            user_id=user.user_id,
-            tenant_id=user.tenant_id,
-            token=token,
-            expires_at=expires_at,
-            ip_address=ip_address,
-        )
-    
-    def validate_token(self, token: str) -&gt; Optional[dict]:
-        &#34;&#34;&#34;Validate JWT token and return payload.&#34;&#34;&#34;
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[&#34;HS256&#34;])
-            return payload
-        except jwt.ExpiredSignatureError:
-            logger.warning(&#34;token_expired&#34;)
-            return None
-        except jwt.InvalidTokenError:
-            logger.warning(&#34;invalid_token&#34;)
-            return None
-
-
-class TenantService:
-    &#34;&#34;&#34;Manages tenant lifecycle and subscriptions.&#34;&#34;&#34;
-    
-    def __init__(self):
-        self.tenant_repo = TenantRepository()
-        self.user_repo = UserRepository()
-        self.auth_service = AuthenticationService()
-        self.audit_repo = AuditLogRepository()
-    
-    def create_tenant(
-        self, name: str, subdomain: str, owner_email: str, owner_password: str
-    ) -&gt; tuple[Tenant, User]:
-        &#34;&#34;&#34;Create new tenant with owner user (transactional).&#34;&#34;&#34;
-        # Validate subdomain format
-        if not self._is_valid_subdomain(subdomain):
-            raise InvalidSubdomainError(f&#34;Invalid subdomain: {subdomain}&#34;)
-        
-        # Create tenant
-        tenant = Tenant(
-            name=name,
-            subdomain=subdomain,
-            subscription_tier=SubscriptionTier.FREE,
-        )
-        tenant = self.tenant_repo.create(tenant)
-        
-        # Create owner user
-        owner = User(
-            tenant_id=tenant.tenant_id,
-            email=owner_email,
-            password_hash=self.auth_service.hash_password(owner_password),
-            full_name=name,
-            role=UserRole.OWNER,
-        )
-        owner = self.user_repo.create(owner)
-        
-        self.audit_repo.log(AuditLog(
-            tenant_id=tenant.tenant_id,
-            user_id=owner.user_id,
-            action=&#34;tenant.created&#34;,
-            resource_type=&#34;tenant&#34;,
-            resource_id=tenant.tenant_id,
-            new_value=tenant.to_dict(),
-        ))
-        
-        logger.info(&#34;tenant_created&#34;, extra={
-            &#34;tenant_id&#34;: tenant.tenant_id,
-            &#34;subdomain&#34;: subdomain,
-        })
-        return tenant, owner
-    
-    def upgrade_subscription(
-        self, tenant_id: str, new_tier: SubscriptionTier, user_id: str
-    ) -&gt; Tenant:
-        &#34;&#34;&#34;Upgrade tenant subscription with billing event.&#34;&#34;&#34;
-        tenant = self.tenant_repo.get_by_id(tenant_id)
-        if not tenant:
-            raise TenantNotFoundError(f&#34;Tenant {tenant_id} not found&#34;)
-        
-        old_tier = tenant.subscription_tier
-        tenant.subscription_tier = new_tier
-        
-        # In real implementation: trigger billing, provision resources
-        self.audit_repo.log(AuditLog(
-            tenant_id=tenant_id,
-            user_id=user_id,
-            action=&#34;subscription.upgraded&#34;,
-            resource_type=&#34;tenant&#34;,
-            resource_id=tenant_id,
-            old_value={&#34;tier&#34;: old_tier.value},
-            new_value={&#34;tier&#34;: new_tier.value},
-        ))
-        
-        return tenant
-    
-    def _is_valid_subdomain(self, subdomain: str) -&gt; bool:
-        &#34;&#34;&#34;Validate subdomain format.&#34;&#34;&#34;
-        import re
-        pattern = r&#34;^[a-z][a-z0-9-]{2,30}[a-z0-9]$&#34;
-        reserved = [&#34;www&#34;, &#34;api&#34;, &#34;admin&#34;, &#34;app&#34;, &#34;mail&#34;]
-        return bool(re.match(pattern, subdomain)) and subdomain not in reserved
-
-
-class TenantNotFoundError(Exception):
-    pass
-
-
-class InvalidSubdomainError(Exception):
-    pass
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/handlers.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;API request handlers for SaaS endpoints.&#34;&#34;&#34;
-from __future__ import annotations
-
-import json
-import logging
-import uuid
-from functools import wraps
-from typing import Any, Callable
-
-from src.models import SubscriptionTier
-from src.services import (
-    AuthenticationService,
-    TenantService,
-    TenantNotFoundError,
-    InvalidSubdomainError,
-)
-
-logger = logging.getLogger(__name__)
-
-
-def with_correlation_id(handler: Callable) -&gt; Callable:
-    &#34;&#34;&#34;Decorator to add correlation ID for distributed tracing.&#34;&#34;&#34;
-    @wraps(handler)
-    def wrapper(event: dict, context: Any) -&gt; dict:
-        correlation_id = event.get(&#34;headers&#34;, {}).get(
-            &#34;X-Correlation-ID&#34;, str(uuid.uuid4())
-        )
-        logger.info(&#34;request_started&#34;, extra={
-            &#34;correlation_id&#34;: correlation_id,
-            &#34;path&#34;: event.get(&#34;path&#34;),
-            &#34;method&#34;: event.get(&#34;httpMethod&#34;),
-        })
-        
-        try:
-            response = handler(event, context, correlation_id)
-            response[&#34;headers&#34;] = response.get(&#34;headers&#34;, {})
-            response[&#34;headers&#34;][&#34;X-Correlation-ID&#34;] = correlation_id
-            return response
-        except Exception as e:
-            logger.exception(&#34;request_failed&#34;, extra={&#34;correlation_id&#34;: correlation_id})
-            raise
-    return wrapper
-
-
-def require_auth(handler: Callable) -&gt; Callable:
-    &#34;&#34;&#34;Decorator to require valid JWT authentication.&#34;&#34;&#34;
-    @wraps(handler)
-    def wrapper(event: dict, context: Any, correlation_id: str) -&gt; dict:
-        auth_header = event.get(&#34;headers&#34;, {}).get(&#34;Authorization&#34;, &#34;&#34;)
-        
-        if not auth_header.startswith(&#34;Bearer &#34;):
-            return api_response(401, {&#34;error&#34;: &#34;Missing authentication token&#34;})
-        
-        token = auth_header[7:]
-        auth_service = AuthenticationService()
-        payload = auth_service.validate_token(token)
-        
-        if not payload:
-            return api_response(401, {&#34;error&#34;: &#34;Invalid or expired token&#34;})
-        
-        event[&#34;auth&#34;] = payload
-        return handler(event, context, correlation_id)
-    return wrapper
-
-
-def api_response(status_code: int, body: dict) -&gt; dict:
-    &#34;&#34;&#34;Create standardized API response.&#34;&#34;&#34;
-    return {
-        &#34;statusCode&#34;: status_code,
-        &#34;headers&#34;: {
-            &#34;Content-Type&#34;: &#34;application/json&#34;,
-            &#34;Access-Control-Allow-Origin&#34;: &#34;*&#34;,
-        },
-        &#34;body&#34;: json.dumps(body),
-    }
-
-
-@with_correlation_id
-def handle_create_tenant(event: dict, context: Any, correlation_id: str) -&gt; dict:
-    &#34;&#34;&#34;POST /tenants - Create new tenant with owner.&#34;&#34;&#34;
-    try:
-        body = json.loads(event.get(&#34;body&#34;, &#34;{}&#34;))
-        
-        # Validate required fields
-        required = [&#34;name&#34;, &#34;subdomain&#34;, &#34;owner_email&#34;, &#34;owner_password&#34;]
-        missing = [f for f in required if f not in body]
-        if missing:
-            return api_response(400, {
-                &#34;error&#34;: &#34;Missing required fields&#34;,
-                &#34;fields&#34;: missing,
-            })
-        
-        tenant_service = TenantService()
-        tenant, owner = tenant_service.create_tenant(
-            name=body[&#34;name&#34;],
-            subdomain=body[&#34;subdomain&#34;],
-            owner_email=body[&#34;owner_email&#34;],
-            owner_password=body[&#34;owner_password&#34;],
-        )
-        
-        return api_response(201, {
-            &#34;tenant_id&#34;: tenant.tenant_id,
-            &#34;subdomain&#34;: tenant.subdomain,
-            &#34;owner_id&#34;: owner.user_id,
-            &#34;message&#34;: &#34;Tenant created successfully&#34;,
-        })
-        
-    except InvalidSubdomainError as e:
-        return api_response(400, {&#34;error&#34;: str(e)})
-    except Exception as e:
-        logger.exception(&#34;create_tenant_failed&#34;)
-        return api_response(500, {&#34;error&#34;: &#34;Internal server error&#34;})
-
-
-@with_correlation_id
-def handle_login(event: dict, context: Any, correlation_id: str) -&gt; dict:
-    &#34;&#34;&#34;POST /auth/login - Authenticate user.&#34;&#34;&#34;
-    try:
-        body = json.loads(event.get(&#34;body&#34;, &#34;{}&#34;))
-        tenant_subdomain = event.get(&#34;pathParameters&#34;, {}).get(&#34;subdomain&#34;)
-        
-        # Resolve tenant from subdomain
-        tenant_service = TenantService()
-        tenant = tenant_service.tenant_repo.get_by_subdomain(tenant_subdomain)
-        
-        if not tenant:
-            return api_response(404, {&#34;error&#34;: &#34;Tenant not found&#34;})
-        
-        # Authenticate user
-        auth_service = AuthenticationService()
-        ip_address = event.get(&#34;requestContext&#34;, {}).get(&#34;identity&#34;, {}).get(
-            &#34;sourceIp&#34;, &#34;unknown&#34;
-        )
-        
-        session = auth_service.authenticate(
-            tenant_id=tenant.tenant_id,
-            email=body.get(&#34;email&#34;),
-            password=body.get(&#34;password&#34;),
-            ip_address=ip_address,
-        )
-        
-        if not session:
-            return api_response(401, {&#34;error&#34;: &#34;Invalid credentials&#34;})
-        
-        return api_response(200, {
-            &#34;token&#34;: session.token,
-            &#34;expires_at&#34;: session.expires_at.isoformat(),
-            &#34;user_id&#34;: session.user_id,
-        })
-        
-    except Exception as e:
-        logger.exception(&#34;login_failed&#34;)
-        return api_response(500, {&#34;error&#34;: &#34;Internal server error&#34;})
-
-
-@with_correlation_id
-@require_auth
-def handle_upgrade_subscription(
-    event: dict, context: Any, correlation_id: str
-) -&gt; dict:
-    &#34;&#34;&#34;POST /tenants/{id}/subscription - Upgrade subscription.&#34;&#34;&#34;
-    try:
-        tenant_id = event.get(&#34;pathParameters&#34;, {}).get(&#34;tenant_id&#34;)
-        auth = event.get(&#34;auth&#34;, {})
-        
-        # Verify user belongs to tenant and has permission
-        if auth.get(&#34;tenant_id&#34;) != tenant_id or auth.get(&#34;role&#34;) not in [&#34;owner&#34;, &#34;admin&#34;]:
-            return api_response(403, {&#34;error&#34;: &#34;Insufficient permissions&#34;})
-        
-        body = json.loads(event.get(&#34;body&#34;, &#34;{}&#34;))
-        new_tier = SubscriptionTier(body.get(&#34;tier&#34;))
-        
-        tenant_service = TenantService()
-        tenant = tenant_service.upgrade_subscription(
-            tenant_id=tenant_id,
-            new_tier=new_tier,
-            user_id=auth.get(&#34;sub&#34;),
-        )
-        
-        return api_response(200, {
-            &#34;tenant_id&#34;: tenant.tenant_id,
-            &#34;subscription_tier&#34;: tenant.subscription_tier.value,
-            &#34;message&#34;: &#34;Subscription upgraded successfully&#34;,
-        })
-        
-    except TenantNotFoundError:
-        return api_response(404, {&#34;error&#34;: &#34;Tenant not found&#34;})
-    except ValueError:
-        return api_response(400, {&#34;error&#34;: &#34;Invalid subscription tier&#34;})
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/config.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Configuration management for SaaS backend.&#34;&#34;&#34;
-from __future__ import annotations
-
-import os
-from dataclasses import dataclass
-from functools import lru_cache
-
-
-@dataclass
-class Settings:
-    &#34;&#34;&#34;Application settings with environment-based configuration.&#34;&#34;&#34;
-    
-    # Environment
-    environment: str = os.getenv(&#34;ENVIRONMENT&#34;, &#34;development&#34;)
-    debug: bool = os.getenv(&#34;DEBUG&#34;, &#34;false&#34;).lower() == &#34;true&#34;
-    
-    # Database (RDS MySQL)
-    db_host: str = os.getenv(&#34;DB_HOST&#34;, &#34;localhost&#34;)
-    db_port: int = int(os.getenv(&#34;DB_PORT&#34;, &#34;3306&#34;))
-    db_name: str = os.getenv(&#34;DB_NAME&#34;, &#34;saas_db&#34;)
-    db_username: str = os.getenv(&#34;DB_USERNAME&#34;, &#34;admin&#34;)
-    db_password: str = os.getenv(&#34;DB_PASSWORD&#34;, &#34;&#34;)
-    
-    # AWS / LocalStack
-    aws_endpoint_url: str = os.getenv(&#34;AWS_ENDPOINT_URL&#34;, &#34;http://localhost:4566&#34;)
-    aws_region: str = os.getenv(&#34;AWS_REGION&#34;, &#34;us-east-1&#34;)
-    use_localstack: bool = os.getenv(&#34;USE_LOCALSTACK&#34;, &#34;true&#34;).lower() == &#34;true&#34;
-    
-    # Authentication
-    jwt_secret: str = os.getenv(&#34;JWT_SECRET&#34;, &#34;dev-secret-change-in-production&#34;)
-    session_ttl_hours: int = int(os.getenv(&#34;SESSION_TTL_HOURS&#34;, &#34;24&#34;))
-    
-    # Feature flags
-    enable_audit_logging: bool = os.getenv(&#34;ENABLE_AUDIT_LOGGING&#34;, &#34;true&#34;).lower() == &#34;true&#34;
-    enable_mfa: bool = os.getenv(&#34;ENABLE_MFA&#34;, &#34;false&#34;).lower() == &#34;true&#34;
-
-
-@lru_cache(maxsize=1)
-def get_settings() -&gt; Settings:
-    &#34;&#34;&#34;Get cached settings instance.&#34;&#34;&#34;
-    return Settings()
-
-
-settings = get_settings()
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/__init__.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Multi-Tenant SaaS Backend Package.&#34;&#34;&#34;
-import logging
-import sys
-
-# Configure structured logging
-logging.basicConfig(
-    level=logging.INFO,
-    format=&#34;%(asctime)s - %(name)s - %(levelname)s - %(message)s&#34;,
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-
-__version__ = &#34;1.0.0&#34;
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Test files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Test Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    tests/conftest.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Pytest fixtures for SaaS backend tests.&#34;&#34;&#34;
-import os
-import pytest
-import mysql.connector
-from faker import Faker
-
-from src.config import Settings
-from src.models import Tenant, User, UserRole, SubscriptionTier
-from src.services import AuthenticationService
-
-fake = Faker()
-
-
-@pytest.fixture(scope=&#34;session&#34;)
-def localstack_settings():
-    &#34;&#34;&#34;Settings configured for LocalStack.&#34;&#34;&#34;
-    os.environ[&#34;AWS_ENDPOINT_URL&#34;] = &#34;http://localhost:4566&#34;
-    os.environ[&#34;USE_LOCALSTACK&#34;] = &#34;true&#34;
-    os.environ[&#34;DB_HOST&#34;] = &#34;localhost&#34;
-    return Settings()
-
-
-@pytest.fixture
-def db_connection(localstack_settings):
-    &#34;&#34;&#34;Database connection for test isolation.&#34;&#34;&#34;
-    conn = mysql.connector.connect(
-        host=localstack_settings.db_host,
-        port=localstack_settings.db_port,
-        user=localstack_settings.db_username,
-        password=localstack_settings.db_password,
-        database=localstack_settings.db_name,
-    )
-    yield conn
-    conn.rollback()
-    conn.close()
-
-
-@pytest.fixture
-def sample_tenant():
-    &#34;&#34;&#34;Generate a sample tenant for testing.&#34;&#34;&#34;
-    return Tenant(
-        name=fake.company(),
-        subdomain=fake.slug()[:20],
-        subscription_tier=SubscriptionTier.STARTER,
-    )
-
-
-@pytest.fixture
-def sample_user(sample_tenant):
-    &#34;&#34;&#34;Generate a sample user within a tenant.&#34;&#34;&#34;
-    auth = AuthenticationService()
-    return User(
-        tenant_id=sample_tenant.tenant_id,
-        email=fake.email(),
-        password_hash=auth.hash_password(&#34;SecureP@ss123&#34;),
-        full_name=fake.name(),
-        role=UserRole.ADMIN,
-    )
-
-
-@pytest.fixture
-def auth_token(sample_tenant, sample_user):
-    &#34;&#34;&#34;Generate valid JWT token for authenticated tests.&#34;&#34;&#34;
-    auth = AuthenticationService()
-    session = auth._create_session(sample_user, &#34;127.0.0.1&#34;)
-    return session.token
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    tests/test_services.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Tests for business logic services.&#34;&#34;&#34;
-import pytest
-from datetime import datetime, timedelta
-
-from src.models import SubscriptionTier, UserRole
-from src.services import (
-    AuthenticationService,
-    TenantService,
-    InvalidSubdomainError,
-)
-
-
-class TestAuthenticationService:
-    &#34;&#34;&#34;Test authentication workflows.&#34;&#34;&#34;
-    
-    def test_password_hashing_produces_unique_hashes(self):
-        &#34;&#34;&#34;Each hash should be unique due to salt.&#34;&#34;&#34;
-        auth = AuthenticationService()
-        hash1 = auth.hash_password(&#34;password123&#34;)
-        hash2 = auth.hash_password(&#34;password123&#34;)
-        assert hash1 != hash2
-    
-    def test_password_verification_succeeds(self):
-        &#34;&#34;&#34;Correct password should verify successfully.&#34;&#34;&#34;
-        auth = AuthenticationService()
-        password = &#34;MySecureP@ssw0rd!&#34;
-        hashed = auth.hash_password(password)
-        assert auth.verify_password(password, hashed) is True
-    
-    def test_password_verification_fails_wrong_password(self):
-        &#34;&#34;&#34;Wrong password should fail verification.&#34;&#34;&#34;
-        auth = AuthenticationService()
-        hashed = auth.hash_password(&#34;correct&#34;)
-        assert auth.verify_password(&#34;wrong&#34;, hashed) is False
-    
-    def test_jwt_token_contains_required_claims(self, sample_user):
-        &#34;&#34;&#34;JWT should contain user_id, tenant_id, role, exp.&#34;&#34;&#34;
-        auth = AuthenticationService()
-        session = auth._create_session(sample_user, &#34;10.0.0.1&#34;)
-        
-        payload = auth.validate_token(session.token)
-        assert payload[&#34;sub&#34;] == sample_user.user_id
-        assert payload[&#34;tenant_id&#34;] == sample_user.tenant_id
-        assert payload[&#34;role&#34;] == sample_user.role.value
-        assert &#34;exp&#34; in payload
-    
-    def test_expired_token_returns_none(self, sample_user):
-        &#34;&#34;&#34;Expired tokens should fail validation.&#34;&#34;&#34;
-        auth = AuthenticationService()
-        # Create expired session manually
-        import jwt
-        from src.config import settings
-        
-        payload = {
-            &#34;sub&#34;: sample_user.user_id,
-            &#34;exp&#34;: datetime.utcnow() - timedelta(hours=1),
-        }
-        token = jwt.encode(payload, settings.jwt_secret, algorithm=&#34;HS256&#34;)
-        
-        assert auth.validate_token(token) is None
-
-
-class TestTenantService:
-    &#34;&#34;&#34;Test tenant management workflows.&#34;&#34;&#34;
-    
-    def test_create_tenant_returns_tenant_and_owner(self):
-        &#34;&#34;&#34;Creating tenant should return both tenant and owner user.&#34;&#34;&#34;
-        service = TenantService()
-        tenant, owner = service.create_tenant(
-            name=&#34;Acme Corp&#34;,
-            subdomain=&#34;acme-corp&#34;,
-            owner_email=&#34;owner@acme.com&#34;,
-            owner_password=&#34;SecureP@ss123&#34;,
-        )
-        
-        assert tenant.name == &#34;Acme Corp&#34;
-        assert tenant.subdomain == &#34;acme-corp&#34;
-        assert owner.role == UserRole.OWNER
-        assert owner.tenant_id == tenant.tenant_id
-    
-    def test_subdomain_validation_rejects_reserved_words(self):
-        &#34;&#34;&#34;Reserved subdomains like &#39;api&#39; should be rejected.&#34;&#34;&#34;
-        service = TenantService()
-        
-        with pytest.raises(InvalidSubdomainError):
-            service.create_tenant(
-                name=&#34;API Company&#34;,
-                subdomain=&#34;api&#34;,
-                owner_email=&#34;owner@api.com&#34;,
-                owner_password=&#34;password&#34;,
-            )
-    
-    def test_subdomain_validation_rejects_invalid_format(self):
-        &#34;&#34;&#34;Invalid subdomain formats should be rejected.&#34;&#34;&#34;
-        service = TenantService()
-        invalid_subdomains = [&#34;ab&#34;, &#34;-invalid&#34;, &#34;has spaces&#34;, &#34;UPPERCASE&#34;]
-        
-        for subdomain in invalid_subdomains:
-            with pytest.raises(InvalidSubdomainError):
-                service.create_tenant(
-                    name=&#34;Test&#34;,
-                    subdomain=subdomain,
-                    owner_email=&#34;test@test.com&#34;,
-                    owner_password=&#34;password&#34;,
-                )
-    
-    def test_subscription_upgrade_creates_audit_log(self, sample_tenant):
-        &#34;&#34;&#34;Upgrading subscription should create audit entry.&#34;&#34;&#34;
-        service = TenantService()
-        # Setup: create tenant first
-        service.tenant_repo.create(sample_tenant)
-        
-        updated = service.upgrade_subscription(
-            tenant_id=sample_tenant.tenant_id,
-            new_tier=SubscriptionTier.PROFESSIONAL,
-            user_id=&#34;user-123&#34;,
-        )
-        
-        assert updated.subscription_tier == SubscriptionTier.PROFESSIONAL
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    tests/test_integration.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;End-to-end integration tests.&#34;&#34;&#34;
-import json
-import pytest
-
-from src.handlers import (
-    handle_create_tenant,
-    handle_login,
-    handle_upgrade_subscription,
-)
-from src.models import SubscriptionTier
-
-
-class TestTenantOnboarding:
-    &#34;&#34;&#34;Test complete tenant onboarding flow.&#34;&#34;&#34;
-    
-    def test_full_tenant_signup_flow(self):
-        &#34;&#34;&#34;Test: signup -&gt; login -&gt; upgrade subscription.&#34;&#34;&#34;
-        # Step 1: Create tenant
-        create_event = {
-            &#34;body&#34;: json.dumps({
-                &#34;name&#34;: &#34;Integration Test Corp&#34;,
-                &#34;subdomain&#34;: &#34;integration-test&#34;,
-                &#34;owner_email&#34;: &#34;owner@integration.test&#34;,
-                &#34;owner_password&#34;: &#34;TestP@ssw0rd!&#34;,
-            }),
-            &#34;headers&#34;: {},
-        }
-        
-        response = handle_create_tenant(create_event, None)
-        assert response[&#34;statusCode&#34;] == 201
-        
-        body = json.loads(response[&#34;body&#34;])
-        tenant_id = body[&#34;tenant_id&#34;]
-        
-        # Step 2: Login as owner
-        login_event = {
-            &#34;body&#34;: json.dumps({
-                &#34;email&#34;: &#34;owner@integration.test&#34;,
-                &#34;password&#34;: &#34;TestP@ssw0rd!&#34;,
-            }),
-            &#34;pathParameters&#34;: {&#34;subdomain&#34;: &#34;integration-test&#34;},
-            &#34;headers&#34;: {},
-            &#34;requestContext&#34;: {&#34;identity&#34;: {&#34;sourceIp&#34;: &#34;127.0.0.1&#34;}},
-        }
-        
-        response = handle_login(login_event, None)
-        assert response[&#34;statusCode&#34;] == 200
-        
-        token = json.loads(response[&#34;body&#34;])[&#34;token&#34;]
-        
-        # Step 3: Upgrade subscription
-        upgrade_event = {
-            &#34;body&#34;: json.dumps({&#34;tier&#34;: &#34;professional&#34;}),
-            &#34;pathParameters&#34;: {&#34;tenant_id&#34;: tenant_id},
-            &#34;headers&#34;: {&#34;Authorization&#34;: f&#34;Bearer {token}&#34;},
-        }
-        
-        response = handle_upgrade_subscription(upgrade_event, None)
-        assert response[&#34;statusCode&#34;] == 200
-        
-        body = json.loads(response[&#34;body&#34;])
-        assert body[&#34;subscription_tier&#34;] == &#34;professional&#34;
-    
-    def test_login_fails_with_wrong_credentials(self):
-        &#34;&#34;&#34;Login with wrong password should return 401.&#34;&#34;&#34;
-        login_event = {
-            &#34;body&#34;: json.dumps({
-                &#34;email&#34;: &#34;owner@integration.test&#34;,
-                &#34;password&#34;: &#34;WrongPassword&#34;,
-            }),
-            &#34;pathParameters&#34;: {&#34;subdomain&#34;: &#34;integration-test&#34;},
-            &#34;headers&#34;: {},
-            &#34;requestContext&#34;: {&#34;identity&#34;: {&#34;sourceIp&#34;: &#34;127.0.0.1&#34;}},
-        }
-        
-        response = handle_login(login_event, None)
-        assert response[&#34;statusCode&#34;] == 401
-    
-    def test_unauthorized_upgrade_fails(self):
-        &#34;&#34;&#34;Non-owner/admin users cannot upgrade subscription.&#34;&#34;&#34;
-        # Simulate request from member user
-        upgrade_event = {
-            &#34;body&#34;: json.dumps({&#34;tier&#34;: &#34;enterprise&#34;}),
-            &#34;pathParameters&#34;: {&#34;tenant_id&#34;: &#34;tenant-123&#34;},
-            &#34;headers&#34;: {&#34;Authorization&#34;: &#34;Bearer invalid-token&#34;},
-        }
-        
-        response = handle_upgrade_subscription(upgrade_event, None)
-        assert response[&#34;statusCode&#34;] == 401
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Requirements -->
-                        <div>
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Dependencies (requirements.txt)</div>
-                            <div class="px-4 py-3 font-mono text-sm text-slate-300">
-                                <div>boto3&gt;=1.28.0</div>
-                                <div>pydantic&gt;=2.0.0</div>
-                                <div>PyJWT&gt;=2.8.0</div>
-                                <div>mysql-connector-python&gt;=8.0.0</div>
-                                <div>pytest&gt;=7.0.0</div>
-                                <div>faker&gt;=18.0.0</div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Generated Probe Applications -->
 
                     <!-- Test Execution Details -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
@@ -2129,7 +604,7 @@ class TestTenantOnboarding:
                                 <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">1</span>
                                 <div>
                                     <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="https://github.com/aws-quickstart/quickstart-examples" target="_blank" class="text-primary-400 hover:underline">AWS QuickStart Templates</a> and converted to Terraform format.</div>
+                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
                                 </div>
                             </div>
                             <div class="flex gap-3">
@@ -2191,7 +666,7 @@ pytest tests/</code></pre>
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-medium text-white truncate">terraform-aws-lambda-api</h3>
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400">
-                            template
+                            
                         </span>
                     </div>
                     <p class="mt-1 text-sm text-success-400">All tests passed</p>
@@ -2208,934 +683,10 @@ pytest tests/</code></pre>
 
             <div class="details-panel hidden border-t border-slate-700">
                 <div class="p-4 space-y-4">
-                    <div class="bg-slate-700/30 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-slate-300 mb-3">Architecture Source</h4>
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <dt class="text-slate-400">Source:</dt>
-                            <dd class="text-slate-200">Terraform Registry</dd>
-                            <dt class="text-slate-400">Format:</dt>
-                            <dd><span class="px-2 py-0.5 bg-slate-600 rounded text-xs text-slate-200">terraform</span></dd>
-                            <dt class="text-slate-400">URL:</dt>
-                            <dd class="col-span-1">
-                                <a href="https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws" target="_blank" rel="noopener" class="text-primary-400 hover:text-primary-300 break-all inline-flex items-center gap-1">
-                                    https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws
-                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
 
                     <!-- Terraform Infrastructure Code -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Terraform Infrastructure</span>
-                            </div>
-                            <span class="text-xs text-slate-400">Generated from terraform</span>
-                        </div>
-                        <!-- main.tf -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                main.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code># Serverless E-Commerce Order API
 
-resource &#34;aws_dynamodb_table&#34; &#34;orders&#34; {
-  name           = &#34;orders&#34;
-  billing_mode   = &#34;PAY_PER_REQUEST&#34;
-  hash_key       = &#34;order_id&#34;
-  range_key      = &#34;customer_id&#34;
-
-  attribute {
-    name = &#34;order_id&#34;
-    type = &#34;S&#34;
-  }
-
-  attribute {
-    name = &#34;customer_id&#34;
-    type = &#34;S&#34;
-  }
-
-  attribute {
-    name = &#34;status&#34;
-    type = &#34;S&#34;
-  }
-
-  global_secondary_index {
-    name            = &#34;customer-orders-index&#34;
-    hash_key        = &#34;customer_id&#34;
-    range_key       = &#34;order_id&#34;
-    projection_type = &#34;ALL&#34;
-  }
-
-  global_secondary_index {
-    name            = &#34;status-index&#34;
-    hash_key        = &#34;status&#34;
-    projection_type = &#34;KEYS_ONLY&#34;
-  }
-
-  tags = {
-    Environment = var.environment
-  }
-}
-
-resource &#34;aws_dynamodb_table&#34; &#34;inventory&#34; {
-  name           = &#34;inventory&#34;
-  billing_mode   = &#34;PAY_PER_REQUEST&#34;
-  hash_key       = &#34;product_id&#34;
-
-  attribute {
-    name = &#34;product_id&#34;
-    type = &#34;S&#34;
-  }
-
-  tags = {
-    Environment = var.environment
-  }
-}
-
-resource &#34;aws_lambda_function&#34; &#34;api&#34; {
-  function_name = &#34;order-api-handler&#34;
-  runtime       = &#34;python3.11&#34;
-  handler       = &#34;handlers.lambda_handler&#34;
-  role          = aws_iam_role.lambda.arn
-  filename      = &#34;lambda.zip&#34;
-  timeout       = 30
-  memory_size   = 256
-
-  environment {
-    variables = {
-      ORDERS_TABLE    = aws_dynamodb_table.orders.name
-      INVENTORY_TABLE = aws_dynamodb_table.inventory.name
-      ENVIRONMENT     = var.environment
-    }
-  }
-}
-
-resource &#34;aws_api_gateway_rest_api&#34; &#34;main&#34; {
-  name = &#34;order-api&#34;
-}
-
-resource &#34;aws_api_gateway_resource&#34; &#34;orders&#34; {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
-  path_part   = &#34;orders&#34;
-}
-</code></pre>
-                        </div>
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                variables.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code>variable &#34;environment&#34; {
-  type        = string
-  description = &#34;Deployment environment&#34;
-  default     = &#34;dev&#34;
-}
-</code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Generated Python Application -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Generated Python Application</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>4 source files</span>
-                                <span>1 test files</span>
-                                <span>4 dependencies</span>
-                            </div>
-                        </div>
-                        <!-- Source files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Source Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/models.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Domain models for E-Commerce Order API.&#34;&#34;&#34;
-from __future__ import annotations
-
-import uuid
-from dataclasses import dataclass, field
-from datetime import datetime
-from decimal import Decimal
-from enum import Enum
-from typing import Optional
-
-
-class OrderStatus(str, Enum):
-    PENDING = &#34;pending&#34;
-    CONFIRMED = &#34;confirmed&#34;
-    PROCESSING = &#34;processing&#34;
-    SHIPPED = &#34;shipped&#34;
-    DELIVERED = &#34;delivered&#34;
-    CANCELLED = &#34;cancelled&#34;
-
-
-class PaymentStatus(str, Enum):
-    PENDING = &#34;pending&#34;
-    AUTHORIZED = &#34;authorized&#34;
-    CAPTURED = &#34;captured&#34;
-    FAILED = &#34;failed&#34;
-    REFUNDED = &#34;refunded&#34;
-
-
-@dataclass
-class Product:
-    &#34;&#34;&#34;Product in the catalog.&#34;&#34;&#34;
-    product_id: str
-    name: str
-    price: Decimal
-    stock_quantity: int
-    category: str = &#34;&#34;
-    is_active: bool = True
-
-
-@dataclass
-class OrderItem:
-    &#34;&#34;&#34;Line item in an order.&#34;&#34;&#34;
-    product_id: str
-    product_name: str
-    quantity: int
-    unit_price: Decimal
-    
-    @property
-    def subtotal(self) -&gt; Decimal:
-        return self.unit_price * self.quantity
-
-
-@dataclass
-class ShippingAddress:
-    &#34;&#34;&#34;Customer shipping address.&#34;&#34;&#34;
-    street: str
-    city: str
-    state: str
-    postal_code: str
-    country: str = &#34;US&#34;
-
-
-@dataclass
-class Order:
-    &#34;&#34;&#34;Customer order with line items.&#34;&#34;&#34;
-    order_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    customer_id: str = &#34;&#34;
-    customer_email: str = &#34;&#34;
-    items: list[OrderItem] = field(default_factory=list)
-    shipping_address: Optional[ShippingAddress] = None
-    status: OrderStatus = OrderStatus.PENDING
-    payment_status: PaymentStatus = PaymentStatus.PENDING
-    idempotency_key: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
-    
-    @property
-    def subtotal(self) -&gt; Decimal:
-        return sum(item.subtotal for item in self.items)
-    
-    @property
-    def tax(self) -&gt; Decimal:
-        return self.subtotal * Decimal(&#34;0.08&#34;)  # 8% tax
-    
-    @property
-    def total(self) -&gt; Decimal:
-        return self.subtotal + self.tax
-    
-    def to_dynamodb_item(self) -&gt; dict:
-        &#34;&#34;&#34;Convert to DynamoDB item format.&#34;&#34;&#34;
-        return {
-            &#34;order_id&#34;: {&#34;S&#34;: self.order_id},
-            &#34;customer_id&#34;: {&#34;S&#34;: self.customer_id},
-            &#34;customer_email&#34;: {&#34;S&#34;: self.customer_email},
-            &#34;status&#34;: {&#34;S&#34;: self.status.value},
-            &#34;payment_status&#34;: {&#34;S&#34;: self.payment_status.value},
-            &#34;subtotal&#34;: {&#34;N&#34;: str(self.subtotal)},
-            &#34;tax&#34;: {&#34;N&#34;: str(self.tax)},
-            &#34;total&#34;: {&#34;N&#34;: str(self.total)},
-            &#34;items&#34;: {&#34;L&#34;: [
-                {&#34;M&#34;: {
-                    &#34;product_id&#34;: {&#34;S&#34;: item.product_id},
-                    &#34;product_name&#34;: {&#34;S&#34;: item.product_name},
-                    &#34;quantity&#34;: {&#34;N&#34;: str(item.quantity)},
-                    &#34;unit_price&#34;: {&#34;N&#34;: str(item.unit_price)},
-                }} for item in self.items
-            ]},
-            &#34;created_at&#34;: {&#34;S&#34;: self.created_at.isoformat()},
-            &#34;updated_at&#34;: {&#34;S&#34;: self.updated_at.isoformat()},
-        }
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/repositories.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Data access layer for DynamoDB operations.&#34;&#34;&#34;
-from __future__ import annotations
-
-import logging
-from decimal import Decimal
-from typing import Optional
-
-import boto3
-from botocore.exceptions import ClientError
-
-from src.config import settings
-from src.models import Order, OrderItem, OrderStatus, PaymentStatus
-
-logger = logging.getLogger(__name__)
-
-
-class DynamoDBClient:
-    &#34;&#34;&#34;Configured DynamoDB client for LocalStack compatibility.&#34;&#34;&#34;
-    
-    _client = None
-    
-    @classmethod
-    def get_client(cls):
-        if cls._client is None:
-            cls._client = boto3.client(
-                &#34;dynamodb&#34;,
-                endpoint_url=settings.aws_endpoint_url if settings.use_localstack else None,
-                region_name=settings.aws_region,
-            )
-        return cls._client
-
-
-class OrderRepository:
-    &#34;&#34;&#34;Repository for order CRUD operations.&#34;&#34;&#34;
-    
-    def __init__(self):
-        self.client = DynamoDBClient.get_client()
-        self.table_name = settings.orders_table
-    
-    def create(self, order: Order) -&gt; Order:
-        &#34;&#34;&#34;Create a new order with idempotency check.&#34;&#34;&#34;
-        try:
-            # Check idempotency
-            if order.idempotency_key:
-                existing = self.get_by_idempotency_key(order.idempotency_key)
-                if existing:
-                    logger.info(&#34;idempotent_request&#34;, extra={&#34;order_id&#34;: existing.order_id})
-                    return existing
-            
-            self.client.put_item(
-                TableName=self.table_name,
-                Item=order.to_dynamodb_item(),
-                ConditionExpression=&#34;attribute_not_exists(order_id)&#34;,
-            )
-            logger.info(&#34;order_created&#34;, extra={&#34;order_id&#34;: order.order_id})
-            return order
-        except ClientError as e:
-            if e.response[&#34;Error&#34;][&#34;Code&#34;] == &#34;ConditionalCheckFailedException&#34;:
-                raise DuplicateOrderError(f&#34;Order {order.order_id} already exists&#34;)
-            raise
-    
-    def get_by_id(self, order_id: str, customer_id: str) -&gt; Optional[Order]:
-        &#34;&#34;&#34;Retrieve order by composite key.&#34;&#34;&#34;
-        response = self.client.get_item(
-            TableName=self.table_name,
-            Key={
-                &#34;order_id&#34;: {&#34;S&#34;: order_id},
-                &#34;customer_id&#34;: {&#34;S&#34;: customer_id},
-            },
-        )
-        item = response.get(&#34;Item&#34;)
-        return self._item_to_order(item) if item else None
-    
-    def get_by_customer(self, customer_id: str, limit: int = 20) -&gt; list[Order]:
-        &#34;&#34;&#34;Get all orders for a customer using GSI.&#34;&#34;&#34;
-        response = self.client.query(
-            TableName=self.table_name,
-            IndexName=&#34;customer-orders-index&#34;,
-            KeyConditionExpression=&#34;customer_id = :cid&#34;,
-            ExpressionAttributeValues={&#34;:cid&#34;: {&#34;S&#34;: customer_id}},
-            Limit=limit,
-            ScanIndexForward=False,  # Most recent first
-        )
-        return [self._item_to_order(item) for item in response.get(&#34;Items&#34;, [])]
-    
-    def update_status(self, order_id: str, customer_id: str, new_status: OrderStatus) -&gt; Order:
-        &#34;&#34;&#34;Update order status with optimistic locking.&#34;&#34;&#34;
-        response = self.client.update_item(
-            TableName=self.table_name,
-            Key={
-                &#34;order_id&#34;: {&#34;S&#34;: order_id},
-                &#34;customer_id&#34;: {&#34;S&#34;: customer_id},
-            },
-            UpdateExpression=&#34;SET #status = :status, updated_at = :updated&#34;,
-            ExpressionAttributeNames={&#34;#status&#34;: &#34;status&#34;},
-            ExpressionAttributeValues={
-                &#34;:status&#34;: {&#34;S&#34;: new_status.value},
-                &#34;:updated&#34;: {&#34;S&#34;: datetime.utcnow().isoformat()},
-            },
-            ReturnValues=&#34;ALL_NEW&#34;,
-        )
-        return self._item_to_order(response[&#34;Attributes&#34;])
-    
-    def _item_to_order(self, item: dict) -&gt; Order:
-        &#34;&#34;&#34;Convert DynamoDB item to Order model.&#34;&#34;&#34;
-        items = [
-            OrderItem(
-                product_id=i[&#34;M&#34;][&#34;product_id&#34;][&#34;S&#34;],
-                product_name=i[&#34;M&#34;][&#34;product_name&#34;][&#34;S&#34;],
-                quantity=int(i[&#34;M&#34;][&#34;quantity&#34;][&#34;N&#34;]),
-                unit_price=Decimal(i[&#34;M&#34;][&#34;unit_price&#34;][&#34;N&#34;]),
-            )
-            for i in item.get(&#34;items&#34;, {}).get(&#34;L&#34;, [])
-        ]
-        
-        return Order(
-            order_id=item[&#34;order_id&#34;][&#34;S&#34;],
-            customer_id=item[&#34;customer_id&#34;][&#34;S&#34;],
-            customer_email=item.get(&#34;customer_email&#34;, {}).get(&#34;S&#34;, &#34;&#34;),
-            items=items,
-            status=OrderStatus(item[&#34;status&#34;][&#34;S&#34;]),
-            payment_status=PaymentStatus(item.get(&#34;payment_status&#34;, {}).get(&#34;S&#34;, &#34;pending&#34;)),
-        )
-
-
-class InventoryRepository:
-    &#34;&#34;&#34;Repository for inventory management.&#34;&#34;&#34;
-    
-    def __init__(self):
-        self.client = DynamoDBClient.get_client()
-        self.table_name = settings.inventory_table
-    
-    def reserve_stock(self, product_id: str, quantity: int) -&gt; bool:
-        &#34;&#34;&#34;Atomically reserve stock using conditional update.&#34;&#34;&#34;
-        try:
-            self.client.update_item(
-                TableName=self.table_name,
-                Key={&#34;product_id&#34;: {&#34;S&#34;: product_id}},
-                UpdateExpression=&#34;SET stock_quantity = stock_quantity - :qty&#34;,
-                ConditionExpression=&#34;stock_quantity &gt;= :qty&#34;,
-                ExpressionAttributeValues={&#34;:qty&#34;: {&#34;N&#34;: str(quantity)}},
-            )
-            return True
-        except ClientError as e:
-            if e.response[&#34;Error&#34;][&#34;Code&#34;] == &#34;ConditionalCheckFailedException&#34;:
-                return False
-            raise
-    
-    def release_stock(self, product_id: str, quantity: int) -&gt; None:
-        &#34;&#34;&#34;Release reserved stock (e.g., on order cancellation).&#34;&#34;&#34;
-        self.client.update_item(
-            TableName=self.table_name,
-            Key={&#34;product_id&#34;: {&#34;S&#34;: product_id}},
-            UpdateExpression=&#34;SET stock_quantity = stock_quantity + :qty&#34;,
-            ExpressionAttributeValues={&#34;:qty&#34;: {&#34;N&#34;: str(quantity)}},
-        )
-
-
-class DuplicateOrderError(Exception):
-    pass
-
-
-class InsufficientInventoryError(Exception):
-    pass
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/services.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Business logic for order processing.&#34;&#34;&#34;
-from __future__ import annotations
-
-import logging
-from decimal import Decimal
-from typing import Optional
-
-from src.models import Order, OrderItem, OrderStatus, PaymentStatus
-from src.repositories import (
-    OrderRepository,
-    InventoryRepository,
-    InsufficientInventoryError,
-)
-
-logger = logging.getLogger(__name__)
-
-
-class OrderService:
-    &#34;&#34;&#34;Handles order creation, processing, and management.&#34;&#34;&#34;
-    
-    def __init__(self):
-        self.order_repo = OrderRepository()
-        self.inventory_repo = InventoryRepository()
-    
-    def create_order(
-        self,
-        customer_id: str,
-        customer_email: str,
-        items: list[dict],
-        idempotency_key: Optional[str] = None,
-    ) -&gt; Order:
-        &#34;&#34;&#34;Create order with inventory reservation (transactional).&#34;&#34;&#34;
-        # Build order items
-        order_items = [
-            OrderItem(
-                product_id=item[&#34;product_id&#34;],
-                product_name=item[&#34;product_name&#34;],
-                quantity=item[&#34;quantity&#34;],
-                unit_price=Decimal(str(item[&#34;unit_price&#34;])),
-            )
-            for item in items
-        ]
-        
-        # Validate minimum order
-        order = Order(
-            customer_id=customer_id,
-            customer_email=customer_email,
-            items=order_items,
-            idempotency_key=idempotency_key,
-        )
-        
-        if order.total &lt; Decimal(&#34;10.00&#34;):
-            raise MinimumOrderError(&#34;Minimum order value is $10.00&#34;)
-        
-        # Reserve inventory for each item
-        reserved_items = []
-        try:
-            for item in order_items:
-                if not self.inventory_repo.reserve_stock(item.product_id, item.quantity):
-                    raise InsufficientInventoryError(
-                        f&#34;Insufficient stock for {item.product_name}&#34;
-                    )
-                reserved_items.append(item)
-            
-            # Create order
-            order = self.order_repo.create(order)
-            logger.info(&#34;order_created&#34;, extra={
-                &#34;order_id&#34;: order.order_id,
-                &#34;total&#34;: str(order.total),
-                &#34;items_count&#34;: len(order.items),
-            })
-            return order
-            
-        except Exception:
-            # Rollback inventory reservations
-            for item in reserved_items:
-                self.inventory_repo.release_stock(item.product_id, item.quantity)
-            raise
-    
-    def process_payment(
-        self, order_id: str, customer_id: str, payment_token: str
-    ) -&gt; Order:
-        &#34;&#34;&#34;Process payment for an order.&#34;&#34;&#34;
-        order = self.order_repo.get_by_id(order_id, customer_id)
-        if not order:
-            raise OrderNotFoundError(f&#34;Order {order_id} not found&#34;)
-        
-        if order.payment_status != PaymentStatus.PENDING:
-            raise InvalidOrderStateError(
-                f&#34;Cannot process payment for order in {order.payment_status} state&#34;
-            )
-        
-        # Simulate payment processing
-        # In production: call payment gateway
-        payment_success = self._charge_payment(order.total, payment_token)
-        
-        if payment_success:
-            order = self.order_repo.update_status(order_id, customer_id, OrderStatus.CONFIRMED)
-            logger.info(&#34;payment_processed&#34;, extra={&#34;order_id&#34;: order_id})
-        else:
-            order.payment_status = PaymentStatus.FAILED
-            logger.warning(&#34;payment_failed&#34;, extra={&#34;order_id&#34;: order_id})
-        
-        return order
-    
-    def cancel_order(self, order_id: str, customer_id: str, reason: str) -&gt; Order:
-        &#34;&#34;&#34;Cancel order and release inventory.&#34;&#34;&#34;
-        order = self.order_repo.get_by_id(order_id, customer_id)
-        if not order:
-            raise OrderNotFoundError(f&#34;Order {order_id} not found&#34;)
-        
-        if order.status in [OrderStatus.SHIPPED, OrderStatus.DELIVERED]:
-            raise InvalidOrderStateError(&#34;Cannot cancel shipped/delivered orders&#34;)
-        
-        # Release inventory
-        for item in order.items:
-            self.inventory_repo.release_stock(item.product_id, item.quantity)
-        
-        order = self.order_repo.update_status(order_id, customer_id, OrderStatus.CANCELLED)
-        logger.info(&#34;order_cancelled&#34;, extra={&#34;order_id&#34;: order_id, &#34;reason&#34;: reason})
-        return order
-    
-    def _charge_payment(self, amount: Decimal, token: str) -&gt; bool:
-        &#34;&#34;&#34;Simulate payment gateway call.&#34;&#34;&#34;
-        # In production: integrate with Stripe, PayPal, etc.
-        return token != &#34;fail&#34;  # Simulate failure for testing
-
-
-class OrderNotFoundError(Exception):
-    pass
-
-
-class InvalidOrderStateError(Exception):
-    pass
-
-
-class MinimumOrderError(Exception):
-    pass
-</code></pre>
-                            </div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/handlers.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Lambda handlers for API Gateway integration.&#34;&#34;&#34;
-from __future__ import annotations
-
-import json
-import logging
-import uuid
-from typing import Any
-
-from src.services import (
-    OrderService,
-    OrderNotFoundError,
-    InvalidOrderStateError,
-    MinimumOrderError,
-)
-from src.repositories import InsufficientInventoryError
-
-logger = logging.getLogger(__name__)
-
-
-def lambda_handler(event: dict, context: Any) -&gt; dict:
-    &#34;&#34;&#34;Main Lambda entry point - routes to specific handlers.&#34;&#34;&#34;
-    correlation_id = event.get(&#34;headers&#34;, {}).get(
-        &#34;X-Correlation-ID&#34;, str(uuid.uuid4())
-    )
-    
-    logger.info(&#34;request_received&#34;, extra={
-        &#34;correlation_id&#34;: correlation_id,
-        &#34;path&#34;: event.get(&#34;path&#34;),
-        &#34;method&#34;: event.get(&#34;httpMethod&#34;),
-    })
-    
-    path = event.get(&#34;path&#34;, &#34;&#34;)
-    method = event.get(&#34;httpMethod&#34;, &#34;&#34;)
-    
-    try:
-        if path == &#34;/orders&#34; and method == &#34;POST&#34;:
-            return create_order(event)
-        elif path.startswith(&#34;/orders/&#34;) and method == &#34;GET&#34;:
-            return get_order(event)
-        elif path.endswith(&#34;/pay&#34;) and method == &#34;POST&#34;:
-            return process_payment(event)
-        elif path.endswith(&#34;/cancel&#34;) and method == &#34;POST&#34;:
-            return cancel_order(event)
-        else:
-            return api_response(404, {&#34;error&#34;: &#34;Not found&#34;})
-    except Exception as e:
-        logger.exception(&#34;request_failed&#34;, extra={&#34;correlation_id&#34;: correlation_id})
-        return api_response(500, {&#34;error&#34;: &#34;Internal server error&#34;})
-
-
-def create_order(event: dict) -&gt; dict:
-    &#34;&#34;&#34;POST /orders - Create a new order.&#34;&#34;&#34;
-    body = json.loads(event.get(&#34;body&#34;, &#34;{}&#34;))
-    idempotency_key = event.get(&#34;headers&#34;, {}).get(&#34;Idempotency-Key&#34;)
-    
-    # Validate required fields
-    required = [&#34;customer_id&#34;, &#34;customer_email&#34;, &#34;items&#34;]
-    missing = [f for f in required if f not in body]
-    if missing:
-        return api_response(400, {&#34;error&#34;: f&#34;Missing fields: {missing}&#34;})
-    
-    if not body[&#34;items&#34;]:
-        return api_response(400, {&#34;error&#34;: &#34;Order must contain at least one item&#34;})
-    
-    try:
-        service = OrderService()
-        order = service.create_order(
-            customer_id=body[&#34;customer_id&#34;],
-            customer_email=body[&#34;customer_email&#34;],
-            items=body[&#34;items&#34;],
-            idempotency_key=idempotency_key,
-        )
-        
-        return api_response(201, {
-            &#34;order_id&#34;: order.order_id,
-            &#34;status&#34;: order.status.value,
-            &#34;subtotal&#34;: str(order.subtotal),
-            &#34;tax&#34;: str(order.tax),
-            &#34;total&#34;: str(order.total),
-        })
-    except InsufficientInventoryError as e:
-        return api_response(409, {&#34;error&#34;: str(e)})
-    except MinimumOrderError as e:
-        return api_response(400, {&#34;error&#34;: str(e)})
-
-
-def get_order(event: dict) -&gt; dict:
-    &#34;&#34;&#34;GET /orders/{order_id} - Retrieve order details.&#34;&#34;&#34;
-    order_id = event.get(&#34;pathParameters&#34;, {}).get(&#34;order_id&#34;)
-    customer_id = event.get(&#34;queryStringParameters&#34;, {}).get(&#34;customer_id&#34;)
-    
-    if not order_id or not customer_id:
-        return api_response(400, {&#34;error&#34;: &#34;Missing order_id or customer_id&#34;})
-    
-    service = OrderService()
-    order = service.order_repo.get_by_id(order_id, customer_id)
-    
-    if not order:
-        return api_response(404, {&#34;error&#34;: &#34;Order not found&#34;})
-    
-    return api_response(200, {
-        &#34;order_id&#34;: order.order_id,
-        &#34;customer_id&#34;: order.customer_id,
-        &#34;status&#34;: order.status.value,
-        &#34;payment_status&#34;: order.payment_status.value,
-        &#34;items&#34;: [
-            {
-                &#34;product_id&#34;: item.product_id,
-                &#34;product_name&#34;: item.product_name,
-                &#34;quantity&#34;: item.quantity,
-                &#34;unit_price&#34;: str(item.unit_price),
-                &#34;subtotal&#34;: str(item.subtotal),
-            }
-            for item in order.items
-        ],
-        &#34;subtotal&#34;: str(order.subtotal),
-        &#34;tax&#34;: str(order.tax),
-        &#34;total&#34;: str(order.total),
-    })
-
-
-def process_payment(event: dict) -&gt; dict:
-    &#34;&#34;&#34;POST /orders/{order_id}/pay - Process payment.&#34;&#34;&#34;
-    order_id = event.get(&#34;pathParameters&#34;, {}).get(&#34;order_id&#34;)
-    body = json.loads(event.get(&#34;body&#34;, &#34;{}&#34;))
-    
-    try:
-        service = OrderService()
-        order = service.process_payment(
-            order_id=order_id,
-            customer_id=body.get(&#34;customer_id&#34;),
-            payment_token=body.get(&#34;payment_token&#34;),
-        )
-        return api_response(200, {
-            &#34;order_id&#34;: order.order_id,
-            &#34;status&#34;: order.status.value,
-            &#34;payment_status&#34;: order.payment_status.value,
-        })
-    except OrderNotFoundError:
-        return api_response(404, {&#34;error&#34;: &#34;Order not found&#34;})
-    except InvalidOrderStateError as e:
-        return api_response(409, {&#34;error&#34;: str(e)})
-
-
-def cancel_order(event: dict) -&gt; dict:
-    &#34;&#34;&#34;POST /orders/{order_id}/cancel - Cancel order.&#34;&#34;&#34;
-    order_id = event.get(&#34;pathParameters&#34;, {}).get(&#34;order_id&#34;)
-    body = json.loads(event.get(&#34;body&#34;, &#34;{}&#34;))
-    
-    try:
-        service = OrderService()
-        order = service.cancel_order(
-            order_id=order_id,
-            customer_id=body.get(&#34;customer_id&#34;),
-            reason=body.get(&#34;reason&#34;, &#34;Customer requested&#34;),
-        )
-        return api_response(200, {
-            &#34;order_id&#34;: order.order_id,
-            &#34;status&#34;: order.status.value,
-        })
-    except OrderNotFoundError:
-        return api_response(404, {&#34;error&#34;: &#34;Order not found&#34;})
-    except InvalidOrderStateError as e:
-        return api_response(409, {&#34;error&#34;: str(e)})
-
-
-def api_response(status_code: int, body: dict) -&gt; dict:
-    return {
-        &#34;statusCode&#34;: status_code,
-        &#34;headers&#34;: {&#34;Content-Type&#34;: &#34;application/json&#34;},
-        &#34;body&#34;: json.dumps(body),
-    }
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Test files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Test Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    tests/test_order_flow.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Integration tests for order processing flow.&#34;&#34;&#34;
-import json
-import pytest
-from decimal import Decimal
-
-from src.handlers import lambda_handler
-from src.models import OrderStatus
-
-
-class TestOrderCreation:
-    &#34;&#34;&#34;Test order creation scenarios.&#34;&#34;&#34;
-    
-    def test_create_order_calculates_totals_correctly(self):
-        &#34;&#34;&#34;Order totals should include subtotal + 8% tax.&#34;&#34;&#34;
-        event = {
-            &#34;path&#34;: &#34;/orders&#34;,
-            &#34;httpMethod&#34;: &#34;POST&#34;,
-            &#34;headers&#34;: {},
-            &#34;body&#34;: json.dumps({
-                &#34;customer_id&#34;: &#34;cust-123&#34;,
-                &#34;customer_email&#34;: &#34;test@example.com&#34;,
-                &#34;items&#34;: [
-                    {&#34;product_id&#34;: &#34;prod-1&#34;, &#34;product_name&#34;: &#34;Widget&#34;, &#34;quantity&#34;: 2, &#34;unit_price&#34;: 25.00},
-                    {&#34;product_id&#34;: &#34;prod-2&#34;, &#34;product_name&#34;: &#34;Gadget&#34;, &#34;quantity&#34;: 1, &#34;unit_price&#34;: 50.00},
-                ],
-            }),
-        }
-        
-        response = lambda_handler(event, None)
-        body = json.loads(response[&#34;body&#34;])
-        
-        assert response[&#34;statusCode&#34;] == 201
-        assert Decimal(body[&#34;subtotal&#34;]) == Decimal(&#34;100.00&#34;)
-        assert Decimal(body[&#34;tax&#34;]) == Decimal(&#34;8.00&#34;)
-        assert Decimal(body[&#34;total&#34;]) == Decimal(&#34;108.00&#34;)
-    
-    def test_idempotency_returns_same_order(self):
-        &#34;&#34;&#34;Duplicate requests with same idempotency key return same order.&#34;&#34;&#34;
-        idempotency_key = &#34;unique-key-12345&#34;
-        event = {
-            &#34;path&#34;: &#34;/orders&#34;,
-            &#34;httpMethod&#34;: &#34;POST&#34;,
-            &#34;headers&#34;: {&#34;Idempotency-Key&#34;: idempotency_key},
-            &#34;body&#34;: json.dumps({
-                &#34;customer_id&#34;: &#34;cust-123&#34;,
-                &#34;customer_email&#34;: &#34;test@example.com&#34;,
-                &#34;items&#34;: [{&#34;product_id&#34;: &#34;prod-1&#34;, &#34;product_name&#34;: &#34;Widget&#34;, &#34;quantity&#34;: 1, &#34;unit_price&#34;: 20.00}],
-            }),
-        }
-        
-        response1 = lambda_handler(event, None)
-        response2 = lambda_handler(event, None)
-        
-        body1 = json.loads(response1[&#34;body&#34;])
-        body2 = json.loads(response2[&#34;body&#34;])
-        
-        assert body1[&#34;order_id&#34;] == body2[&#34;order_id&#34;]
-    
-    def test_insufficient_inventory_returns_409(self):
-        &#34;&#34;&#34;Order with out-of-stock items should fail.&#34;&#34;&#34;
-        event = {
-            &#34;path&#34;: &#34;/orders&#34;,
-            &#34;httpMethod&#34;: &#34;POST&#34;,
-            &#34;headers&#34;: {},
-            &#34;body&#34;: json.dumps({
-                &#34;customer_id&#34;: &#34;cust-123&#34;,
-                &#34;customer_email&#34;: &#34;test@example.com&#34;,
-                &#34;items&#34;: [{&#34;product_id&#34;: &#34;out-of-stock&#34;, &#34;product_name&#34;: &#34;Rare Item&#34;, &#34;quantity&#34;: 1000, &#34;unit_price&#34;: 10.00}],
-            }),
-        }
-        
-        response = lambda_handler(event, None)
-        assert response[&#34;statusCode&#34;] == 409
-
-
-class TestPaymentProcessing:
-    &#34;&#34;&#34;Test payment flow.&#34;&#34;&#34;
-    
-    def test_payment_updates_order_status(self, sample_order):
-        &#34;&#34;&#34;Successful payment moves order to CONFIRMED.&#34;&#34;&#34;
-        event = {
-            &#34;path&#34;: f&#34;/orders/{sample_order.order_id}/pay&#34;,
-            &#34;httpMethod&#34;: &#34;POST&#34;,
-            &#34;headers&#34;: {},
-            &#34;pathParameters&#34;: {&#34;order_id&#34;: sample_order.order_id},
-            &#34;body&#34;: json.dumps({
-                &#34;customer_id&#34;: sample_order.customer_id,
-                &#34;payment_token&#34;: &#34;valid-token&#34;,
-            }),
-        }
-        
-        response = lambda_handler(event, None)
-        body = json.loads(response[&#34;body&#34;])
-        
-        assert response[&#34;statusCode&#34;] == 200
-        assert body[&#34;status&#34;] == &#34;confirmed&#34;
-    
-    def test_failed_payment_keeps_pending(self, sample_order):
-        &#34;&#34;&#34;Failed payment keeps order in PENDING state.&#34;&#34;&#34;
-        event = {
-            &#34;path&#34;: f&#34;/orders/{sample_order.order_id}/pay&#34;,
-            &#34;httpMethod&#34;: &#34;POST&#34;,
-            &#34;headers&#34;: {},
-            &#34;pathParameters&#34;: {&#34;order_id&#34;: sample_order.order_id},
-            &#34;body&#34;: json.dumps({
-                &#34;customer_id&#34;: sample_order.customer_id,
-                &#34;payment_token&#34;: &#34;fail&#34;,  # Triggers simulated failure
-            }),
-        }
-        
-        response = lambda_handler(event, None)
-        assert response[&#34;statusCode&#34;] == 200
-
-
-class TestOrderCancellation:
-    &#34;&#34;&#34;Test order cancellation.&#34;&#34;&#34;
-    
-    def test_cancel_releases_inventory(self, sample_order):
-        &#34;&#34;&#34;Cancelling order should release reserved inventory.&#34;&#34;&#34;
-        # Implementation verifies inventory is released
-        pass
-    
-    def test_cannot_cancel_shipped_order(self):
-        &#34;&#34;&#34;Shipped orders cannot be cancelled.&#34;&#34;&#34;
-        # Would need to setup shipped order first
-        pass
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Requirements -->
-                        <div>
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Dependencies (requirements.txt)</div>
-                            <div class="px-4 py-3 font-mono text-sm text-slate-300">
-                                <div>boto3&gt;=1.28.0</div>
-                                <div>pydantic&gt;=2.0.0</div>
-                                <div>pytest&gt;=7.0.0</div>
-                                <div>moto&gt;=4.0.0</div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Generated Probe Applications -->
 
                     <!-- Test Execution Details -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
@@ -3150,7 +701,7 @@ class TestOrderCancellation:
                                 <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">1</span>
                                 <div>
                                     <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws" target="_blank" class="text-primary-400 hover:underline">Terraform Registry</a> and converted to Terraform format.</div>
+                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
                                 </div>
                             </div>
                             <div class="flex gap-3">
@@ -3212,7 +763,7 @@ pytest tests/</code></pre>
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-medium text-white truncate">serverless-rest-api</h3>
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400">
-                            template
+                            
                         </span>
                     </div>
                     <p class="mt-1 text-sm text-success-400">All tests passed</p>
@@ -3228,317 +779,10 @@ pytest tests/</code></pre>
 
             <div class="details-panel hidden border-t border-slate-700">
                 <div class="p-4 space-y-4">
-                    <div class="bg-slate-700/30 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-slate-300 mb-3">Architecture Source</h4>
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <dt class="text-slate-400">Source:</dt>
-                            <dd class="text-slate-200">Serverless Framework Examples</dd>
-                            <dt class="text-slate-400">Format:</dt>
-                            <dd><span class="px-2 py-0.5 bg-slate-600 rounded text-xs text-slate-200">serverless</span></dd>
-                            <dt class="text-slate-400">URL:</dt>
-                            <dd class="col-span-1">
-                                <a href="https://github.com/serverless/examples" target="_blank" rel="noopener" class="text-primary-400 hover:text-primary-300 break-all inline-flex items-center gap-1">
-                                    https://github.com/serverless/examples
-                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            </dd>
-                        </dl>
-                    </div>
 
                     <!-- Terraform Infrastructure Code -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Terraform Infrastructure</span>
-                            </div>
-                            <span class="text-xs text-slate-400">Generated from serverless</span>
-                        </div>
-                        <!-- main.tf -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                main.tf
-                            </div>
-                            <pre class="language-hcl overflow-auto"><code># Document Processing Pipeline
 
-resource &#34;aws_s3_bucket&#34; &#34;uploads&#34; {
-  bucket = &#34;document-uploads-${var.environment}&#34;
-}
-
-resource &#34;aws_s3_bucket&#34; &#34;processed&#34; {
-  bucket = &#34;document-processed-${var.environment}&#34;
-}
-
-resource &#34;aws_lambda_function&#34; &#34;processor&#34; {
-  function_name = &#34;document-processor&#34;
-  runtime       = &#34;python3.11&#34;
-  handler       = &#34;handlers.process_document&#34;
-  role          = aws_iam_role.lambda.arn
-  filename      = &#34;lambda.zip&#34;
-  timeout       = 60
-  memory_size   = 512
-}
-
-resource &#34;aws_s3_bucket_notification&#34; &#34;upload_trigger&#34; {
-  bucket = aws_s3_bucket.uploads.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.processor.arn
-    events              = [&#34;s3:ObjectCreated:*&#34;]
-    filter_prefix       = &#34;incoming/&#34;
-  }
-}
-</code></pre>
-                        </div>
-                    </div>
-
-                    <!-- Generated Python Application -->
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Generated Python Application</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>1 source files</span>
-                                <span>1 test files</span>
-                                <span>2 dependencies</span>
-                            </div>
-                        </div>
-                        <!-- Source files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Source Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    src/processor.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Document processing pipeline with S3 integration.&#34;&#34;&#34;
-import hashlib
-import json
-import logging
-import mimetypes
-import os
-from dataclasses import dataclass
-from datetime import datetime
-from enum import Enum
-from typing import Optional
-
-import boto3
-from botocore.exceptions import ClientError
-
-logger = logging.getLogger(__name__)
-
-
-class ProcessingStatus(str, Enum):
-    PENDING = &#34;pending&#34;
-    PROCESSING = &#34;processing&#34;
-    COMPLETED = &#34;completed&#34;
-    FAILED = &#34;failed&#34;
-
-
-@dataclass
-class DocumentMetadata:
-    &#34;&#34;&#34;Extracted document metadata.&#34;&#34;&#34;
-    document_id: str
-    original_filename: str
-    content_type: str
-    size_bytes: int
-    checksum_sha256: str
-    uploaded_at: datetime
-    processed_at: Optional[datetime] = None
-    status: ProcessingStatus = ProcessingStatus.PENDING
-    error_message: Optional[str] = None
-    
-    def to_dict(self) -&gt; dict:
-        return {
-            &#34;document_id&#34;: self.document_id,
-            &#34;original_filename&#34;: self.original_filename,
-            &#34;content_type&#34;: self.content_type,
-            &#34;size_bytes&#34;: self.size_bytes,
-            &#34;checksum_sha256&#34;: self.checksum_sha256,
-            &#34;uploaded_at&#34;: self.uploaded_at.isoformat(),
-            &#34;processed_at&#34;: self.processed_at.isoformat() if self.processed_at else None,
-            &#34;status&#34;: self.status.value,
-            &#34;error_message&#34;: self.error_message,
-        }
-
-
-class DocumentProcessor:
-    &#34;&#34;&#34;Handles document upload, validation, and processing.&#34;&#34;&#34;
-    
-    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
-    ALLOWED_TYPES = [&#34;application/pdf&#34;, &#34;image/png&#34;, &#34;image/jpeg&#34;, &#34;text/plain&#34;]
-    
-    def __init__(self):
-        endpoint_url = os.getenv(&#34;AWS_ENDPOINT_URL&#34;)
-        self.s3 = boto3.client(&#34;s3&#34;, endpoint_url=endpoint_url)
-        self.upload_bucket = os.getenv(&#34;UPLOAD_BUCKET&#34;, &#34;document-uploads&#34;)
-        self.processed_bucket = os.getenv(&#34;PROCESSED_BUCKET&#34;, &#34;document-processed&#34;)
-    
-    def process_upload(self, bucket: str, key: str) -&gt; DocumentMetadata:
-        &#34;&#34;&#34;Process a newly uploaded document.&#34;&#34;&#34;
-        logger.info(&#34;processing_started&#34;, extra={&#34;bucket&#34;: bucket, &#34;key&#34;: key})
-        
-        # Get object metadata
-        try:
-            response = self.s3.head_object(Bucket=bucket, Key=key)
-        except ClientError as e:
-            logger.error(&#34;object_not_found&#34;, extra={&#34;error&#34;: str(e)})
-            raise DocumentNotFoundError(f&#34;Document {key} not found&#34;)
-        
-        size = response[&#34;ContentLength&#34;]
-        content_type = response.get(&#34;ContentType&#34;, &#34;application/octet-stream&#34;)
-        
-        # Validate file size
-        if size &gt; self.MAX_FILE_SIZE:
-            raise FileTooLargeError(f&#34;File exceeds {self.MAX_FILE_SIZE} bytes&#34;)
-        
-        # Validate content type
-        if content_type not in self.ALLOWED_TYPES:
-            raise InvalidContentTypeError(f&#34;Content type {content_type} not allowed&#34;)
-        
-        # Download and compute checksum
-        obj = self.s3.get_object(Bucket=bucket, Key=key)
-        content = obj[&#34;Body&#34;].read()
-        checksum = hashlib.sha256(content).hexdigest()
-        
-        # Create metadata
-        document_id = key.split(&#34;/&#34;)[-1].split(&#34;.&#34;)[0]
-        metadata = DocumentMetadata(
-            document_id=document_id,
-            original_filename=key.split(&#34;/&#34;)[-1],
-            content_type=content_type,
-            size_bytes=size,
-            checksum_sha256=checksum,
-            uploaded_at=datetime.utcnow(),
-        )
-        
-        # Process based on content type
-        try:
-            processed_key = self._process_content(content, metadata)
-            metadata.status = ProcessingStatus.COMPLETED
-            metadata.processed_at = datetime.utcnow()
-            
-            # Store metadata
-            self._store_metadata(metadata)
-            
-            logger.info(&#34;processing_completed&#34;, extra={
-                &#34;document_id&#34;: document_id,
-                &#34;processed_key&#34;: processed_key,
-            })
-            
-        except Exception as e:
-            metadata.status = ProcessingStatus.FAILED
-            metadata.error_message = str(e)
-            self._store_metadata(metadata)
-            raise
-        
-        return metadata
-    
-    def _process_content(self, content: bytes, metadata: DocumentMetadata) -&gt; str:
-        &#34;&#34;&#34;Process document content based on type.&#34;&#34;&#34;
-        if metadata.content_type == &#34;application/pdf&#34;:
-            # Extract text from PDF (simulated)
-            processed = self._extract_pdf_text(content)
-        elif metadata.content_type.startswith(&#34;image/&#34;):
-            # Generate thumbnail (simulated)
-            processed = self._generate_thumbnail(content)
-        else:
-            # Plain text - just copy
-            processed = content
-        
-        # Upload processed content
-        output_key = f&#34;processed/{metadata.document_id}/output&#34;
-        self.s3.put_object(
-            Bucket=self.processed_bucket,
-            Key=output_key,
-            Body=processed,
-            Metadata={&#34;original_checksum&#34;: metadata.checksum_sha256},
-        )
-        return output_key
-    
-    def _extract_pdf_text(self, content: bytes) -&gt; bytes:
-        &#34;&#34;&#34;Simulate PDF text extraction.&#34;&#34;&#34;
-        # In production: use pdfplumber, PyPDF2, or AWS Textract
-        return b&#34;Extracted text from PDF document&#34;
-    
-    def _generate_thumbnail(self, content: bytes) -&gt; bytes:
-        &#34;&#34;&#34;Simulate thumbnail generation.&#34;&#34;&#34;
-        # In production: use Pillow to resize
-        return content[:1000]  # Simulated thumbnail
-    
-    def _store_metadata(self, metadata: DocumentMetadata) -&gt; None:
-        &#34;&#34;&#34;Store document metadata as JSON.&#34;&#34;&#34;
-        self.s3.put_object(
-            Bucket=self.processed_bucket,
-            Key=f&#34;metadata/{metadata.document_id}.json&#34;,
-            Body=json.dumps(metadata.to_dict()),
-            ContentType=&#34;application/json&#34;,
-        )
-
-
-class DocumentNotFoundError(Exception):
-    pass
-
-class FileTooLargeError(Exception):
-    pass
-
-class InvalidContentTypeError(Exception):
-    pass
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Test files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Test Files</div>
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    tests/test_processor.py
-                                </div>
-                                <pre class="language-python overflow-auto"><code>&#34;&#34;&#34;Tests for document processing pipeline.&#34;&#34;&#34;
-import pytest
-from src.processor import DocumentProcessor, FileTooLargeError, InvalidContentTypeError
-
-
-class TestDocumentValidation:
-    def test_rejects_files_over_50mb(self):
-        &#34;&#34;&#34;Files over 50MB should be rejected.&#34;&#34;&#34;
-        pass
-    
-    def test_rejects_executable_files(self):
-        &#34;&#34;&#34;Executable files should be rejected.&#34;&#34;&#34;
-        pass
-    
-    def test_accepts_valid_pdf(self):
-        &#34;&#34;&#34;Valid PDF files should be processed.&#34;&#34;&#34;
-        pass
-</code></pre>
-                            </div>
-                        </div>
-                        <!-- Requirements -->
-                        <div>
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Dependencies (requirements.txt)</div>
-                            <div class="px-4 py-3 font-mono text-sm text-slate-300">
-                                <div>boto3&gt;=1.28.0</div>
-                                <div>pytest&gt;=7.0.0</div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Generated Probe Applications -->
 
                     <!-- Test Execution Details -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
@@ -3553,7 +797,7 @@ class TestDocumentValidation:
                                 <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">1</span>
                                 <div>
                                     <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="https://github.com/serverless/examples" target="_blank" class="text-primary-400 hover:underline">Serverless Framework Examples</a> and converted to Terraform format.</div>
+                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
                                 </div>
                             </div>
                             <div class="flex gap-3">
@@ -3633,10 +877,10 @@ pytest tests/</code></pre>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-success-400">2</span>
+                            <span class="text-sm text-success-400"></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-danger-400">1</span>
+                            <span class="text-sm text-danger-400"></span>
                         </td>
                         <td class="px-4 py-3 text-right">
                             <span class="text-sm font-medium text-white">67%</span>
@@ -3654,10 +898,10 @@ pytest tests/</code></pre>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-success-400">2</span>
+                            <span class="text-sm text-success-400"></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-danger-400">0</span>
+                            <span class="text-sm text-danger-400"></span>
                         </td>
                         <td class="px-4 py-3 text-right">
                             <span class="text-sm font-medium text-white">100%</span>
@@ -3675,10 +919,10 @@ pytest tests/</code></pre>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-success-400">1</span>
+                            <span class="text-sm text-success-400"></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-danger-400">0</span>
+                            <span class="text-sm text-danger-400"></span>
                         </td>
                         <td class="px-4 py-3 text-right">
                             <span class="text-sm font-medium text-white">100%</span>
@@ -3696,10 +940,10 @@ pytest tests/</code></pre>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-success-400">1</span>
+                            <span class="text-sm text-success-400"></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-danger-400">0</span>
+                            <span class="text-sm text-danger-400"></span>
                         </td>
                         <td class="px-4 py-3 text-right">
                             <span class="text-sm font-medium text-white">100%</span>
@@ -3717,10 +961,10 @@ pytest tests/</code></pre>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-success-400">1</span>
+                            <span class="text-sm text-success-400"></span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <span class="text-sm text-danger-400">1</span>
+                            <span class="text-sm text-danger-400"></span>
                         </td>
                         <td class="px-4 py-3 text-right">
                             <span class="text-sm font-medium text-white">50%</span>
@@ -3731,12 +975,6 @@ pytest tests/</code></pre>
         </div>
     </div>
 
-    <div class="mt-4 bg-danger-500/5 border border-danger-500/20 rounded-xl p-4">
-        <h3 class="text-sm font-medium text-danger-400 mb-2">Unsupported Services</h3>
-        <div class="flex flex-wrap gap-2">
-            <span class="px-2 py-1 bg-danger-500/10 text-danger-300 rounded text-sm">rekognition</span>
-        </div>
-    </div>
 </section>
 
 <!-- Run History Section -->
@@ -3757,45 +995,6 @@ pytest tests/</code></pre>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-700">
-                    <tr class="hover:bg-slate-750 transition-colors">
-                        <td class="px-4 py-3">
-                            <a href="/data/runs/run-20251230-test.json" class="text-sm font-mono text-primary-400 hover:text-primary-300">run-20251230...</a>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-slate-300">2025-12-30</td>
-                        <td class="px-4 py-3 text-center text-sm text-slate-300">5</td>
-                        <td class="px-4 py-3 text-center text-sm text-success-400">3</td>
-                        <td class="px-4 py-3 text-center text-sm text-danger-400">1</td>
-                        <td class="px-4 py-3 text-right">
-                            <span class="text-sm font-medium text-white">60%</span>
-                        </td>
-                        <td class="px-4 py-3 text-right text-sm text-slate-400">30m</td>
-                    </tr>
-                    <tr class="hover:bg-slate-750 transition-colors">
-                        <td class="px-4 py-3">
-                            <a href="/data/runs/run-20251229-test.json" class="text-sm font-mono text-primary-400 hover:text-primary-300">run-20251229...</a>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-slate-300">2025-12-29</td>
-                        <td class="px-4 py-3 text-center text-sm text-slate-300">5</td>
-                        <td class="px-4 py-3 text-center text-sm text-success-400">3</td>
-                        <td class="px-4 py-3 text-center text-sm text-danger-400">2</td>
-                        <td class="px-4 py-3 text-right">
-                            <span class="text-sm font-medium text-white">60%</span>
-                        </td>
-                        <td class="px-4 py-3 text-right text-sm text-slate-400">29m</td>
-                    </tr>
-                    <tr class="hover:bg-slate-750 transition-colors">
-                        <td class="px-4 py-3">
-                            <a href="/data/runs/run-20251228-test.json" class="text-sm font-mono text-primary-400 hover:text-primary-300">run-20251228...</a>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-slate-300">2025-12-28</td>
-                        <td class="px-4 py-3 text-center text-sm text-slate-300">4</td>
-                        <td class="px-4 py-3 text-center text-sm text-success-400">2</td>
-                        <td class="px-4 py-3 text-center text-sm text-danger-400">1</td>
-                        <td class="px-4 py-3 text-right">
-                            <span class="text-sm font-medium text-white">50%</span>
-                        </td>
-                        <td class="px-4 py-3 text-right text-sm text-slate-400">25m</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -3830,6 +1029,182 @@ pytest tests/</code></pre>
         function toggleMobileMenu() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         }
+
+        // Content-Addressable Storage: Lazy Loading Utilities
+        const ObjectLoader = {
+            cache: {},
+            baseUrl: '/data',
+
+            async loadObject(type, hash) {
+                const key = `${type}/${hash}`;
+                if (!this.cache[key]) {
+                    try {
+                        const response = await fetch(`${this.baseUrl}/objects/${type}/${hash}.json`);
+                        if (!response.ok) throw new Error(`Failed to load ${type}/${hash}`);
+                        this.cache[key] = await response.json();
+                    } catch (error) {
+                        console.error(`Error loading object ${type}/${hash}:`, error);
+                        return null;
+                    }
+                }
+                return this.cache[key];
+            },
+
+            async loadArchitecture(archHash, tfHash, appHashes) {
+                const promises = [
+                    this.loadObject('arch', archHash),
+                    tfHash ? this.loadObject('tf', tfHash) : Promise.resolve(null),
+                    ...(appHashes || []).map(h => this.loadObject('app', h))
+                ];
+
+                const [arch, tf, ...apps] = await Promise.all(promises);
+                return { arch, tf, apps: apps.filter(Boolean) };
+            }
+        };
+
+        // Expand architecture details on demand
+        async function expandDetails(detailsElement) {
+            const container = detailsElement.closest('[data-arch-hash]');
+            if (!container || container.dataset.loaded === 'true') return;
+
+            const archHash = container.dataset.archHash;
+            const tfHash = container.dataset.tfHash;
+            const appHashes = (container.dataset.appHashes || '').split(',').filter(Boolean);
+
+            const contentDiv = detailsElement.querySelector('.details-content');
+            if (!contentDiv) return;
+
+            // Show loading state
+            contentDiv.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="ml-2 text-slate-400">Loading details...</span>
+                </div>
+            `;
+
+            try {
+                const data = await ObjectLoader.loadArchitecture(archHash, tfHash, appHashes);
+                renderArchitectureDetails(contentDiv, data);
+                container.dataset.loaded = 'true';
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="text-red-400 py-4">
+                        <svg class="inline h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Failed to load details. ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Render architecture details after lazy loading
+        function renderArchitectureDetails(container, data) {
+            let html = '';
+
+            // Source info
+            if (data.arch && data.arch.source_info) {
+                const src = data.arch.source_info;
+                html += `
+                    <div class="mb-4 p-4 bg-slate-800 rounded-lg border-l-4 border-primary-500">
+                        <h4 class="text-sm font-medium text-slate-200 mb-2">Architecture Source</h4>
+                        <dl class="grid grid-cols-2 gap-2 text-sm">
+                            <dt class="text-slate-400">Source:</dt>
+                            <dd class="text-slate-200">${src.source_name || 'Unknown'}</dd>
+                            ${src.source_url ? `
+                            <dt class="text-slate-400">URL:</dt>
+                            <dd><a href="${src.source_url}" target="_blank" class="text-primary-400 hover:underline">${src.source_url.substring(0, 50)}...</a></dd>
+                            ` : ''}
+                            ${src.original_format ? `
+                            <dt class="text-slate-400">Format:</dt>
+                            <dd class="text-slate-200">${src.original_format}</dd>
+                            ` : ''}
+                        </dl>
+                    </div>
+                `;
+            }
+
+            // Terraform code
+            if (data.tf && data.tf.main_tf) {
+                html += `
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-slate-200 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                            Terraform Code
+                        </h4>
+                        <pre class="language-hcl overflow-auto max-h-64 text-xs"><code>${escapeHtml(data.tf.main_tf)}</code></pre>
+                    </div>
+                `;
+            }
+
+            // Generated apps
+            if (data.apps && data.apps.length > 0) {
+                html += `<h4 class="text-sm font-medium text-slate-200 mb-2">Generated Probe Apps (${data.apps.length})</h4>`;
+                for (const app of data.apps) {
+                    const badgeColor = {
+                        'api_parity': 'bg-blue-500/20 text-blue-400',
+                        'edge_cases': 'bg-orange-500/20 text-orange-400',
+                        'integration': 'bg-purple-500/20 text-purple-400',
+                        'stress': 'bg-red-500/20 text-red-400'
+                    }[app.probe_type] || 'bg-slate-500/20 text-slate-400';
+
+                    html += `
+                        <div class="mb-3 p-3 bg-slate-800 rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs ${badgeColor}">${app.probe_type}</span>
+                                <span class="text-sm text-slate-200">${app.probe_name}</span>
+                            </div>
+                            ${app.probed_features ? `
+                            <div class="flex flex-wrap gap-1 mb-2">
+                                ${app.probed_features.slice(0, 5).map(f => `<span class="px-1.5 py-0.5 bg-slate-700 rounded text-xs text-slate-300">${f}</span>`).join('')}
+                            </div>
+                            ` : ''}
+                            <details class="text-xs">
+                                <summary class="cursor-pointer text-slate-400 hover:text-slate-200">View source files</summary>
+                                <div class="mt-2">
+                                    ${Object.entries(app.source_files || {}).map(([filename, content]) => `
+                                        <div class="mb-2">
+                                            <div class="text-slate-400 font-mono mb-1">${filename}</div>
+                                            <pre class="language-python overflow-auto max-h-48"><code>${escapeHtml(content)}</code></pre>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </details>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = html || '<div class="text-slate-400 py-4">No additional details available.</div>';
+
+            // Re-highlight code blocks
+            if (window.Prism) {
+                container.querySelectorAll('pre code').forEach(block => Prism.highlightElement(block));
+            }
+        }
+
+        // Escape HTML for safe rendering
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Setup details toggle handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('details.lazy-load').forEach(details => {
+                details.addEventListener('toggle', function() {
+                    if (this.open) {
+                        expandDetails(this);
+                    }
+                });
+            });
+        });
     </script>
 
 <script>
@@ -3837,7 +1212,7 @@ pytest tests/</code></pre>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('trendChart');
     if (ctx) {
-        const trendData = {"labels": ["Dec 28", "Dec 29", "Dec 30"], "pass_rates": [50, 60, 60], "totals": [4, 5, 5]};
+        const trendData = {};
         new Chart(ctx, {
             type: 'line',
             data: {
