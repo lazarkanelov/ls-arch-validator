@@ -8,7 +8,7 @@
     "source_id": "serverless-examples",
     "source_name": "Serverless Framework Examples",
     "source_type": "template",
-    "source_url": "https://github.com/serverless/examples",
+    "source_url": "https://github.com/serverless/examples/tree/v4/aws-python-rest-api-with-dynamodb",
     "original_format": "serverless"
   }
 }

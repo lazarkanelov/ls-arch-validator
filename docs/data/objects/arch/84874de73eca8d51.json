@@ -9,7 +9,7 @@
     "source_id": "aws-architecture-center",
     "source_name": "AWS Architecture Center",
     "source_type": "diagram",
-    "source_url": "https://aws.amazon.com/architecture/",
+    "source_url": "https://docs.aws.amazon.com/whitepapers/latest/microservices-on-aws/microservices-on-aws.html#containerized-microservices",
     "original_format": "diagram",
     "diagram_confidence": 0.85,
     "synthesis_notes": "Inferred ECS cluster from container icons. ALB placement determined from load balancer symbol."

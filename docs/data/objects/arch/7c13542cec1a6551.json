@@ -9,7 +9,7 @@
     "source_id": "aws-solutions",
     "source_name": "AWS Solutions Library",
     "source_type": "template",
-    "source_url": "https://aws.amazon.com/solutions/",
+    "source_url": "https://aws.amazon.com/solutions/implementations/serverless-image-handler/",
     "original_format": "cloudformation"
   }
 }

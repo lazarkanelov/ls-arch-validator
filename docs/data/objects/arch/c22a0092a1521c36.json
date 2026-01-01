@@ -9,7 +9,7 @@
     "source_id": "terraform-registry",
     "source_name": "Terraform Registry",
     "source_type": "template",
-    "source_url": "https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws",
+    "source_url": "https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws/latest/examples/complete",
     "original_format": "terraform"
   }
 }
