@@ -100,7 +100,18 @@
       ],
       "error_summary": "ECS task failed to start",
       "test_failures": [
-        "test_ecs_service_running"
+        {
+          "test_name": "test_ecs_service_running",
+          "test_file": "tests/test_ecs_integration.py",
+          "line_number": 47,
+          "error_type": "AssertionError",
+          "error_message": "ECS service 'microservices-api' has 0 running tasks, expected >= 1",
+          "traceback": "tests/test_ecs_integration.py:47: in test_ecs_service_running\n    assert running_count >= 1, f\"ECS service '{service_name}' has {running_count} running tasks, expected >= 1\"\nE   AssertionError: ECS service 'microservices-api' has 0 running tasks, expected >= 1",
+          "test_code": "def test_ecs_service_running(ecs_client):\n    \"\"\"Verify ECS service has running tasks\"\"\"\n    service_name = \"microservices-api\"\n    cluster_name = \"microservices-cluster\"\n    \n    response = ecs_client.describe_services(\n        cluster=cluster_name,\n        services=[service_name]\n    )\n    \n    service = response[\"services\"][0]\n    running_count = service[\"runningCount\"]\n    desired_count = service[\"desiredCount\"]\n    \n    # This is where it fails - LocalStack ECS doesn't fully start tasks\n    assert running_count >= 1, f\"ECS service '{service_name}' has {running_count} running tasks, expected >= 1\"",
+          "localstack_logs": "2024-12-28 14:35:22 INFO  --- ecs: CreateService for 'microservices-api'\n2024-12-28 14:35:22 INFO  --- ecs: Task definition registered: microservices-task:1\n2024-12-28 14:35:23 WARN  --- ecs: Container image pull skipped (LocalStack limitation)\n2024-12-28 14:35:23 WARN  --- ecs: Task failed to transition to RUNNING state\n2024-12-28 14:35:23 ERROR --- ecs: Service 'microservices-api' stuck at 0 running tasks",
+          "root_cause": "LocalStack ECS does not fully simulate container task execution. Tasks are created but never transition to RUNNING state because LocalStack doesn't actually pull and run Docker images for ECS tasks.",
+          "localstack_issue": "https://github.com/localstack/localstack/issues/8234"
+        }
       ]
     },
     {
