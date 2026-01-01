@@ -79,12 +79,16 @@ async def generate_all(
         token_budget=tracker.budget.budget,
     )
 
-    for arch in architectures:
+    for i, arch in enumerate(architectures):
         # Check token budget
         if tracker.exhausted:
             logger.warning("token_budget_exhausted", remaining=tracker.remaining)
             result.skipped.append(arch.id)
             continue
+
+        # Add delay between API calls to avoid rate limiting (except for first)
+        if i > 0:
+            await asyncio.sleep(2.0)  # 2 second delay between calls
 
         try:
             # Generate application

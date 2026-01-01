@@ -42,6 +42,10 @@ on:
         description: 'Create GitHub issues for failures'
         type: boolean
         default: true
+      max_per_source:
+        description: 'Maximum architectures per source (reduces API calls)'
+        type: number
+        default: 5
 
 env:
   PYTHON_VERSION: '3.11'
@@ -103,6 +107,7 @@ jobs:
           # Build command arguments
           ARGS="--parallelism ${{ inputs.parallelism || 4 }}"
           ARGS="$ARGS --localstack-version ${{ inputs.localstack_version || 'latest' }}"
+          ARGS="$ARGS --max-per-source ${{ inputs.max_per_source || 5 }}"
 
           if [ "${{ inputs.skip_mining }}" = "true" ]; then
             ARGS="$ARGS --skip-mining"

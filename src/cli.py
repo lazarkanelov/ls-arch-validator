@@ -651,6 +651,12 @@ def report(
     default="latest",
     help="LocalStack image tag",
 )
+@click.option(
+    "--max-per-source",
+    type=int,
+    default=10,
+    help="Maximum architectures per source (default: 10)",
+)
 @pass_context
 def run(
     ctx: Context,
@@ -662,6 +668,7 @@ def run(
     dashboard_url: str,
     parallelism: int,
     localstack_version: str,
+    max_per_source: int,
 ) -> None:
     """Run full pipeline (mine -> generate -> validate -> report)."""
     import asyncio
@@ -705,6 +712,7 @@ def run(
                 mine_all(
                     cache_dir=ctx.cache_dir,
                     include_diagrams=True,
+                    max_per_source=max_per_source,
                 )
             )
 
