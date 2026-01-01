@@ -6,10 +6,10 @@
     "rds"
   ],
   "source_info": {
-    "source_id": "aws-architecture-center",
-    "source_name": "AWS Architecture Center",
+    "source_id": "aws-samples",
+    "source_name": "AWS Samples - SaaS Reference Architecture",
     "source_type": "diagram",
-    "source_url": "https://docs.aws.amazon.com/whitepapers/latest/microservices-on-aws/microservices-on-aws.html#containerized-microservices",
+    "source_url": "https://github.com/aws-samples/saas-reference-architecture-ecs",
     "image_url": "https://raw.githubusercontent.com/aws-samples/saas-reference-architecture-ecs/main/images/archi-high-level.png",
     "original_format": "diagram",
     "diagram_confidence": 0.85,
