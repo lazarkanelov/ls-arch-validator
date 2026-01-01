@@ -235,20 +235,26 @@ class TokenTracker:
         )
         self._budget.record_usage(usage)
 
-    def record_from_response(self, usage: dict) -> None:
+    def record_from_response(self, usage) -> None:
         """
         Record token usage from an API response.
 
         Args:
-            usage: Usage dict from response (e.g., response.usage)
+            usage: Usage object or dict from response (e.g., response.usage)
         """
+        # Handle both object attributes and dict access
+        def get_value(obj, key, default=0):
+            if hasattr(obj, key):
+                return getattr(obj, key, default) or default
+            elif isinstance(obj, dict):
+                return obj.get(key, default) or default
+            return default
+
         self.record(
-            input_tokens=getattr(usage, "input_tokens", 0) or usage.get("input_tokens", 0),
-            output_tokens=getattr(usage, "output_tokens", 0) or usage.get("output_tokens", 0),
-            cache_read_tokens=getattr(usage, "cache_read_input_tokens", 0)
-            or usage.get("cache_read_input_tokens", 0),
-            cache_write_tokens=getattr(usage, "cache_creation_input_tokens", 0)
-            or usage.get("cache_creation_input_tokens", 0),
+            input_tokens=get_value(usage, "input_tokens"),
+            output_tokens=get_value(usage, "output_tokens"),
+            cache_read_tokens=get_value(usage, "cache_read_input_tokens"),
+            cache_write_tokens=get_value(usage, "cache_creation_input_tokens"),
         )
 
     @property

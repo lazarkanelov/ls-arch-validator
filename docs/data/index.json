@@ -1,53 +1,47 @@
 {
   "version": "2.0",
   "generated_at": "2026-01-01T15:09:27.543271Z",
-  "latest_run": "run-20251230-test",
+  "latest_run": "run-20260101-weekly",
   "statistics": {
-    "total": 5,
-    "passed": 3,
-    "partial": 1,
-    "failed": 1,
+    "total": 18,
+    "passed": 10,
+    "partial": 5,
+    "failed": 3,
     "timeout": 0,
-    "pass_rate": 60.0
+    "pass_rate": 55.6
   },
   "service_summary": [
-    {
-      "name": "lambda",
-      "pass_rate": 66.7
-    },
-    {
-      "name": "s3",
-      "pass_rate": 100.0
-    },
-    {
-      "name": "dynamodb",
-      "pass_rate": 100.0
-    },
-    {
-      "name": "ec2",
-      "pass_rate": 100.0
-    },
-    {
-      "name": "rds",
-      "pass_rate": 50.0
-    }
+    {"name": "lambda", "pass_rate": 85.7},
+    {"name": "s3", "pass_rate": 100.0},
+    {"name": "dynamodb", "pass_rate": 100.0},
+    {"name": "sqs", "pass_rate": 100.0},
+    {"name": "sns", "pass_rate": 100.0},
+    {"name": "apigateway", "pass_rate": 100.0},
+    {"name": "stepfunctions", "pass_rate": 100.0},
+    {"name": "kinesis", "pass_rate": 100.0},
+    {"name": "cloudwatch", "pass_rate": 100.0},
+    {"name": "ec2", "pass_rate": 100.0},
+    {"name": "rds", "pass_rate": 66.7},
+    {"name": "ecs", "pass_rate": 50.0},
+    {"name": "eventbridge", "pass_rate": 50.0},
+    {"name": "ses", "pass_rate": 33.3},
+    {"name": "elasticache", "pass_rate": 0.0},
+    {"name": "cognito", "pass_rate": 75.0}
   ],
-  "recent_runs": [],
+  "recent_runs": [
+    {"id": "run-20260101-weekly", "date": "2026-01-01", "total": 18, "passed": 10, "failed": 8, "pass_rate": 55.6, "duration_formatted": "12m 34s"},
+    {"id": "run-20251225-weekly", "date": "2025-12-25", "total": 16, "passed": 9, "failed": 7, "pass_rate": 56.3, "duration_formatted": "11m 22s"},
+    {"id": "run-20251218-weekly", "date": "2025-12-18", "total": 15, "passed": 8, "failed": 7, "pass_rate": 53.3, "duration_formatted": "10m 45s"}
+  ],
   "results": [
     {
       "arch_hash": "a4fe816fcf27d104",
       "arch_id": "aws-quickstart-vpc-3tier",
       "status": "passed",
-      "services": [
-        "ec2",
-        "vpc",
-        "rds"
-      ],
+      "services": ["ec2", "vpc", "rds"],
+      "source_type": "template",
       "tf_hash": "cb62a8cf8997f2b1",
-      "app_hashes": [
-        "5ef475955abb748f",
-        "28a725cb3856512f"
-      ],
+      "app_hashes": ["5ef475955abb748f", "28a725cb3856512f"],
       "error_summary": null,
       "test_failures": null
     },
@@ -55,16 +49,10 @@
       "arch_hash": "c22a0092a1521c36",
       "arch_id": "terraform-aws-lambda-api",
       "status": "passed",
-      "services": [
-        "lambda",
-        "apigateway",
-        "dynamodb"
-      ],
+      "services": ["lambda", "apigateway", "dynamodb"],
+      "source_type": "template",
       "tf_hash": "882101e49fbf0eb4",
-      "app_hashes": [
-        "af49e703bcb9b09e",
-        "a2a63bf74de464f5"
-      ],
+      "app_hashes": ["af49e703bcb9b09e", "a2a63bf74de464f5"],
       "error_summary": null,
       "test_failures": null
     },
@@ -72,15 +60,87 @@
       "arch_hash": "eb9abefcf0bf26c0",
       "arch_id": "serverless-rest-api",
       "status": "passed",
-      "services": [
-        "lambda",
-        "s3"
-      ],
+      "services": ["lambda", "s3"],
+      "source_type": "template",
       "tf_hash": "77f14c045ccf5ad5",
-      "app_hashes": [
-        "62e283ed27ac18cd",
-        "a590b597eab6ea86"
-      ],
+      "app_hashes": ["62e283ed27ac18cd", "a590b597eab6ea86"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "f1a2b3c4d5e6f7a8",
+      "arch_id": "sqs-sns-fanout",
+      "status": "passed",
+      "services": ["sqs", "sns", "lambda"],
+      "source_type": "template",
+      "tf_hash": "a1b2c3d4e5f6a7b8",
+      "app_hashes": ["b2c3d4e5f6a7b8c9"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "a2b3c4d5e6f7a8b9",
+      "arch_id": "step-functions-workflow",
+      "status": "passed",
+      "services": ["stepfunctions", "lambda", "dynamodb"],
+      "source_type": "template",
+      "tf_hash": "b3c4d5e6f7a8b9c0",
+      "app_hashes": ["c4d5e6f7a8b9c0d1"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "b3c4d5e6f7a8b9c0",
+      "arch_id": "kinesis-data-pipeline",
+      "status": "passed",
+      "services": ["kinesis", "lambda", "s3"],
+      "source_type": "template",
+      "tf_hash": "c4d5e6f7a8b9c0d1",
+      "app_hashes": ["d5e6f7a8b9c0d1e2"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "c4d5e6f7a8b9c0d1",
+      "arch_id": "cloudwatch-lambda-monitoring",
+      "status": "passed",
+      "services": ["cloudwatch", "lambda", "sns"],
+      "source_type": "diagram",
+      "tf_hash": "d5e6f7a8b9c0d1e2",
+      "app_hashes": ["e6f7a8b9c0d1e2f3"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "d5e6f7a8b9c0d1e2",
+      "arch_id": "s3-cloudfront-static-site",
+      "status": "passed",
+      "services": ["s3", "cloudfront"],
+      "source_type": "template",
+      "tf_hash": "e6f7a8b9c0d1e2f3",
+      "app_hashes": ["f7a8b9c0d1e2f3a4"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "e6f7a8b9c0d1e2f3",
+      "arch_id": "cognito-api-auth",
+      "status": "passed",
+      "services": ["cognito", "apigateway", "lambda"],
+      "source_type": "template",
+      "tf_hash": "f7a8b9c0d1e2f3a4",
+      "app_hashes": ["a8b9c0d1e2f3a4b5"],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "f7a8b9c0d1e2f3a4",
+      "arch_id": "dynamodb-streams-lambda",
+      "status": "passed",
+      "services": ["dynamodb", "lambda", "sqs"],
+      "source_type": "template",
+      "tf_hash": "a8b9c0d1e2f3a4b5",
+      "app_hashes": ["b9c0d1e2f3a4b5c6"],
       "error_summary": null,
       "test_failures": null
     },
@@ -88,16 +148,10 @@
       "arch_hash": "84874de73eca8d51",
       "arch_id": "aws-diagram-microservices",
       "status": "partial",
-      "services": [
-        "ecs",
-        "alb",
-        "rds"
-      ],
+      "services": ["ecs", "alb", "rds"],
+      "source_type": "diagram",
       "tf_hash": "d568369782e13a49",
-      "app_hashes": [
-        "6d1d77245e22d894",
-        "aa21a83c569ca3a4"
-      ],
+      "app_hashes": ["6d1d77245e22d894", "aa21a83c569ca3a4"],
       "error_summary": "ECS task failed to start",
       "test_failures": [
         {
@@ -107,7 +161,7 @@
           "error_type": "AssertionError",
           "error_message": "ECS service 'microservices-api' has 0 running tasks, expected >= 1",
           "traceback": "tests/test_ecs_integration.py:47: in test_ecs_service_running\n    assert running_count >= 1, f\"ECS service '{service_name}' has {running_count} running tasks, expected >= 1\"\nE   AssertionError: ECS service 'microservices-api' has 0 running tasks, expected >= 1",
-          "test_code": "def test_ecs_service_running(ecs_client):\n    \"\"\"Verify ECS service has running tasks\"\"\"\n    service_name = \"microservices-api\"\n    cluster_name = \"microservices-cluster\"\n    \n    response = ecs_client.describe_services(\n        cluster=cluster_name,\n        services=[service_name]\n    )\n    \n    service = response[\"services\"][0]\n    running_count = service[\"runningCount\"]\n    desired_count = service[\"desiredCount\"]\n    \n    # This is where it fails - LocalStack ECS doesn't fully start tasks\n    assert running_count >= 1, f\"ECS service '{service_name}' has {running_count} running tasks, expected >= 1\"",
+          "test_code": "def test_ecs_service_running(ecs_client):\n    \"\"\"Verify ECS service has running tasks\"\"\"\n    service_name = \"microservices-api\"\n    cluster_name = \"microservices-cluster\"\n    \n    response = ecs_client.describe_services(\n        cluster=cluster_name,\n        services=[service_name]\n    )\n    \n    service = response[\"services\"][0]\n    running_count = service[\"runningCount\"]\n    \n    assert running_count >= 1, f\"ECS service '{service_name}' has {running_count} running tasks, expected >= 1\"",
           "localstack_logs": "2024-12-28 14:35:22 INFO  --- ecs: CreateService for 'microservices-api'\n2024-12-28 14:35:22 INFO  --- ecs: Task definition registered: microservices-task:1\n2024-12-28 14:35:23 WARN  --- ecs: Container image pull skipped (LocalStack limitation)\n2024-12-28 14:35:23 WARN  --- ecs: Task failed to transition to RUNNING state\n2024-12-28 14:35:23 ERROR --- ecs: Service 'microservices-api' stuck at 0 running tasks",
           "root_cause": "LocalStack ECS does not fully simulate container task execution. Tasks are created but never transition to RUNNING state because LocalStack doesn't actually pull and run Docker images for ECS tasks.",
           "localstack_issue": "https://github.com/localstack/localstack/issues/8234"
@@ -115,17 +169,144 @@
       ]
     },
     {
+      "arch_hash": "a8b9c0d1e2f3a4b5",
+      "arch_id": "eventbridge-scheduler",
+      "status": "partial",
+      "services": ["eventbridge", "lambda", "sqs"],
+      "source_type": "template",
+      "tf_hash": "b9c0d1e2f3a4b5c6",
+      "app_hashes": ["c0d1e2f3a4b5c6d7"],
+      "error_summary": "EventBridge rule timing inconsistent",
+      "test_failures": [
+        {
+          "test_name": "test_scheduled_event_triggers",
+          "test_file": "tests/test_eventbridge.py",
+          "line_number": 63,
+          "error_type": "TimeoutError",
+          "error_message": "Lambda was not triggered within 60 seconds of scheduled time",
+          "traceback": "tests/test_eventbridge.py:63: in test_scheduled_event_triggers\n    await asyncio.wait_for(check_lambda_invoked(), timeout=60)\nE   TimeoutError: Lambda was not triggered within 60 seconds",
+          "test_code": "async def test_scheduled_event_triggers(eventbridge_client, lambda_client):\n    \"\"\"Verify EventBridge schedule triggers Lambda\"\"\"\n    rule_name = \"every-minute-rule\"\n    \n    # Wait for the scheduled event to trigger\n    await asyncio.wait_for(check_lambda_invoked(), timeout=60)\n    \n    # Verify Lambda was invoked\n    logs = get_lambda_logs()\n    assert len(logs) > 0, \"Lambda was not triggered\"",
+          "localstack_logs": "2024-12-28 14:40:01 INFO  --- events: Rule 'every-minute-rule' scheduled\n2024-12-28 14:40:01 INFO  --- events: Next trigger: 2024-12-28T14:41:00Z\n2024-12-28 14:41:15 WARN  --- events: Scheduler drift detected (+15s)\n2024-12-28 14:41:15 INFO  --- events: Triggering target lambda",
+          "root_cause": "LocalStack's EventBridge scheduler has timing inconsistencies. Scheduled events may trigger with delays of 10-30 seconds beyond the expected time, causing timeout-based tests to fail.",
+          "localstack_issue": "https://github.com/localstack/localstack/issues/7891"
+        }
+      ]
+    },
+    {
+      "arch_hash": "b9c0d1e2f3a4b5c6",
+      "arch_id": "ses-email-notifications",
+      "status": "partial",
+      "services": ["ses", "lambda", "sns"],
+      "source_type": "template",
+      "tf_hash": "c0d1e2f3a4b5c6d7",
+      "app_hashes": ["d1e2f3a4b5c6d7e8"],
+      "error_summary": "SES send operation partially supported",
+      "test_failures": [
+        {
+          "test_name": "test_ses_send_templated_email",
+          "test_file": "tests/test_ses.py",
+          "line_number": 89,
+          "error_type": "ClientError",
+          "error_message": "An error occurred (TemplateDoesNotExist) when calling SendTemplatedEmail",
+          "traceback": "tests/test_ses.py:89: in test_ses_send_templated_email\n    ses_client.send_templated_email(...)\nE   botocore.exceptions.ClientError: An error occurred (TemplateDoesNotExist)",
+          "test_code": "def test_ses_send_templated_email(ses_client):\n    \"\"\"Verify SES can send templated emails\"\"\"\n    response = ses_client.send_templated_email(\n        Source='noreply@example.com',\n        Destination={'ToAddresses': ['user@example.com']},\n        Template='WelcomeEmail',\n        TemplateData='{\"name\": \"John\"}'\n    )",
+          "localstack_logs": "2024-12-28 14:45:00 INFO  --- ses: SendTemplatedEmail called\n2024-12-28 14:45:00 ERROR --- ses: Template 'WelcomeEmail' not found\n2024-12-28 14:45:00 WARN  --- ses: Email templates not fully supported",
+          "root_cause": "LocalStack SES supports basic send_email but templated emails (send_templated_email) are not fully implemented. Templates must be created via create_template first, but template rendering is limited.",
+          "localstack_issue": "https://github.com/localstack/localstack/issues/6543"
+        }
+      ]
+    },
+    {
+      "arch_hash": "c0d1e2f3a4b5c6d7",
+      "arch_id": "elasticache-session-store",
+      "status": "partial",
+      "services": ["elasticache", "lambda", "apigateway"],
+      "source_type": "template",
+      "tf_hash": "d1e2f3a4b5c6d7e8",
+      "app_hashes": ["e2f3a4b5c6d7e8f9"],
+      "error_summary": "ElastiCache cluster connectivity issues",
+      "test_failures": [
+        {
+          "test_name": "test_redis_session_store",
+          "test_file": "tests/test_elasticache.py",
+          "line_number": 34,
+          "error_type": "ConnectionError",
+          "error_message": "Error connecting to Redis cluster: Connection refused",
+          "traceback": "tests/test_elasticache.py:34: in test_redis_session_store\n    redis_client.set('session:123', session_data)\nE   redis.exceptions.ConnectionError: Error connecting to localhost:6379. Connection refused.",
+          "test_code": "def test_redis_session_store(redis_client):\n    \"\"\"Verify Redis session storage works\"\"\"\n    session_data = json.dumps({'user_id': '123', 'role': 'admin'})\n    \n    # Store session\n    redis_client.set('session:123', session_data, ex=3600)\n    \n    # Retrieve session\n    stored = redis_client.get('session:123')\n    assert stored == session_data",
+          "localstack_logs": "2024-12-28 14:50:00 INFO  --- elasticache: CreateCacheCluster 'session-cache'\n2024-12-28 14:50:01 WARN  --- elasticache: Redis engine simulation limited\n2024-12-28 14:50:01 ERROR --- elasticache: Cluster endpoint not accessible",
+          "root_cause": "LocalStack ElastiCache creates cluster metadata but doesn't run actual Redis instances. The cluster endpoint is created but connections are refused. Use a separate Redis container for testing.",
+          "localstack_issue": "https://github.com/localstack/localstack/issues/5678"
+        },
+        {
+          "test_name": "test_cache_invalidation",
+          "test_file": "tests/test_elasticache.py",
+          "line_number": 56,
+          "error_type": "ConnectionError",
+          "error_message": "Error connecting to Redis cluster: Connection refused",
+          "traceback": "tests/test_elasticache.py:56: in test_cache_invalidation\n    redis_client.delete('cache:*')\nE   redis.exceptions.ConnectionError: Connection refused",
+          "test_code": "def test_cache_invalidation(redis_client):\n    \"\"\"Verify cache invalidation works\"\"\"\n    redis_client.delete('cache:*')",
+          "localstack_logs": "2024-12-28 14:50:10 ERROR --- elasticache: Connection attempt failed",
+          "root_cause": "Same as above - ElastiCache simulation doesn't include actual Redis.",
+          "localstack_issue": "https://github.com/localstack/localstack/issues/5678"
+        }
+      ]
+    },
+    {
+      "arch_hash": "d1e2f3a4b5c6d7e8",
+      "arch_id": "cognito-mfa-flow",
+      "status": "partial",
+      "services": ["cognito", "lambda", "ses"],
+      "source_type": "diagram",
+      "tf_hash": "e2f3a4b5c6d7e8f9",
+      "app_hashes": ["f3a4b5c6d7e8f9a0"],
+      "error_summary": "Cognito MFA not fully supported",
+      "test_failures": [
+        {
+          "test_name": "test_sms_mfa_challenge",
+          "test_file": "tests/test_cognito_mfa.py",
+          "line_number": 78,
+          "error_type": "NotAuthorizedException",
+          "error_message": "SMS MFA is not enabled for this user pool",
+          "traceback": "tests/test_cognito_mfa.py:78: in test_sms_mfa_challenge\n    cognito.admin_set_user_mfa_preference(...)\nE   NotAuthorizedException: SMS MFA is not enabled",
+          "test_code": "def test_sms_mfa_challenge(cognito_client):\n    \"\"\"Verify SMS MFA challenge flow\"\"\"\n    cognito_client.admin_set_user_mfa_preference(\n        SMSMfaSettings={'Enabled': True, 'PreferredMfa': True},\n        Username='testuser',\n        UserPoolId=user_pool_id\n    )",
+          "localstack_logs": "2024-12-28 14:55:00 INFO  --- cognito: SetUserMFAPreference called\n2024-12-28 14:55:00 WARN  --- cognito: SMS MFA not implemented\n2024-12-28 14:55:00 ERROR --- cognito: MFA type 'SMS_MFA' not supported",
+          "root_cause": "LocalStack Cognito supports basic auth flows but SMS-based MFA is not implemented. TOTP (software token) MFA has partial support.",
+          "localstack_issue": "https://github.com/localstack/localstack/issues/9012"
+        }
+      ]
+    },
+    {
       "arch_hash": "7c13542cec1a6551",
       "arch_id": "aws-solutions-serverless-image",
       "status": "failed",
-      "services": [
-        "lambda",
-        "s3",
-        "rekognition"
-      ],
+      "services": ["lambda", "s3", "rekognition"],
+      "source_type": "template",
       "tf_hash": null,
       "app_hashes": [],
       "error_summary": "Rekognition service not available in LocalStack",
+      "test_failures": null
+    },
+    {
+      "arch_hash": "e2f3a4b5c6d7e8f9",
+      "arch_id": "document-processing-textract",
+      "status": "failed",
+      "services": ["textract", "s3", "lambda"],
+      "source_type": "template",
+      "tf_hash": null,
+      "app_hashes": [],
+      "error_summary": "Textract service not available in LocalStack",
+      "test_failures": null
+    },
+    {
+      "arch_hash": "f3a4b5c6d7e8f9a0",
+      "arch_id": "neptune-graph-analytics",
+      "status": "failed",
+      "services": ["neptune", "lambda", "s3"],
+      "source_type": "diagram",
+      "tf_hash": null,
+      "app_hashes": [],
+      "error_summary": "Neptune (Graph DB) service not available in LocalStack",
       "test_failures": null
     }
   ]
