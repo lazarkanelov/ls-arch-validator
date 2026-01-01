@@ -496,15 +496,46 @@ class CodeSynthesizer:
         try:
             return json.loads(json_str)
         except json.JSONDecodeError as e:
-            # Try to salvage partial JSON by finding complete file entries
             logger.warning("json_parse_failed", error=str(e), content_length=len(content))
 
-            # Check if response was truncated (common issue)
-            if content.endswith("...") or len(content) > 7000:
-                logger.warning("response_likely_truncated", content_length=len(content))
+            # Try to extract code blocks as fallback
+            files = self._extract_code_blocks(content)
+            if files:
+                logger.info("extracted_code_blocks", file_count=len(files))
+                return {
+                    "files": files,
+                    "requirements": ["boto3", "pytest", "localstack-client"],
+                    "probed_features": [],
+                }
 
-            # Return empty but valid structure
             return {"files": {}, "requirements": [], "probed_features": []}
+
+    def _extract_code_blocks(self, content: str) -> dict[str, str]:
+        """
+        Extract Python code blocks as fallback when JSON parsing fails.
+
+        Args:
+            content: Response text with code blocks
+
+        Returns:
+            Dict of filename to code content
+        """
+        files = {}
+
+        # Find all Python code blocks with optional filename comments
+        pattern = r"```python\s*(?:#\s*(\S+\.py))?\s*\n(.*?)```"
+        matches = re.findall(pattern, content, re.DOTALL)
+
+        for i, (filename, code) in enumerate(matches):
+            if not filename:
+                # Generate filename based on content
+                if "test_" in code or "def test" in code:
+                    filename = f"tests/test_probe_{i}.py"
+                else:
+                    filename = f"src/probes/probe_{i}.py"
+            files[filename] = code.strip()
+
+        return files
 
     def create_sample_app(
         self,
