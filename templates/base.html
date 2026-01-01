@@ -194,14 +194,15 @@
         // Content-Addressable Storage: Lazy Loading Utilities
         const ObjectLoader = {
             cache: {},
-            baseUrl: '{{ base_url }}/data',
+            // Use relative path to work on both localhost and GitHub Pages
+            baseUrl: 'data',
 
             async loadObject(type, hash) {
                 const key = `${type}/${hash}`;
                 if (!this.cache[key]) {
                     try {
                         const response = await fetch(`${this.baseUrl}/objects/${type}/${hash}.json`);
-                        if (!response.ok) throw new Error(`Failed to load ${type}/${hash}`);
+                        if (!response.ok) throw new Error(`Failed to load ${type}/${hash}: ${response.status}`);
                         this.cache[key] = await response.json();
                     } catch (error) {
                         console.error(`Error loading object ${type}/${hash}:`, error);

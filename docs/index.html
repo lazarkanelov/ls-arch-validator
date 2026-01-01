@@ -142,7 +142,7 @@
                             <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            2026-01-01 15:42 UTC
+                            2026-01-01 16:38 UTC
                         </span>
 
                         <a href="/data/index.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
@@ -891,14 +891,15 @@ ls-arch-validator test --architecture serverless-rest-api</code></pre>
         // Content-Addressable Storage: Lazy Loading Utilities
         const ObjectLoader = {
             cache: {},
-            baseUrl: '/data',
+            // Use relative path to work on both localhost and GitHub Pages
+            baseUrl: 'data',
 
             async loadObject(type, hash) {
                 const key = `${type}/${hash}`;
                 if (!this.cache[key]) {
                     try {
                         const response = await fetch(`${this.baseUrl}/objects/${type}/${hash}.json`);
-                        if (!response.ok) throw new Error(`Failed to load ${type}/${hash}`);
+                        if (!response.ok) throw new Error(`Failed to load ${type}/${hash}: ${response.status}`);
                         this.cache[key] = await response.json();
                     } catch (error) {
                         console.error(`Error loading object ${type}/${hash}:`, error);
