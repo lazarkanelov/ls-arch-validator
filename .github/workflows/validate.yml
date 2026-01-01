@@ -10,9 +10,9 @@ on:
       - 'templates/**'
       - '.github/workflows/validate.yml'
 
-  # Scheduled run at 3 AM UTC daily
+  # Weekly run on Mondays at 3 AM UTC
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 3 * * 1'
 
   # Manual trigger with options
   workflow_dispatch:

@@ -142,7 +142,7 @@
                             <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            2026-01-01 15:14 UTC
+                            2026-01-01 15:42 UTC
                         </span>
 
                         <a href="/data/index.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
@@ -317,7 +317,13 @@
 
     <div class="space-y-3" id="results-list">
         <!-- Failed/Partial Results -->
-        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="partial">
+        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"
+             data-status="partial"
+             data-arch-hash="84874de73eca8d51"
+             data-tf-hash="d568369782e13a49"
+             data-app-hashes="6d1d77245e22d894,aa21a83c569ca3a4"
+             data-error-summary="ECS task failed to start"
+             data-test-failures="test_ecs_service_running">
             <button class="w-full flex items-center gap-4 p-4 text-left hover:bg-slate-750 transition-colors" onclick="toggleDetails(this)">
                 <!-- Status indicator -->
                 <div class="flex-shrink-0">
@@ -352,87 +358,46 @@
                 </svg>
             </button>
 
-            <!-- Expandable details -->
+            <!-- Expandable details - uses lazy loading from CAS -->
             <div class="details-panel hidden border-t border-slate-700">
-                <div class="p-4 space-y-4">
-                    <!-- Error details -->
-
+                <div class="p-4 space-y-4 details-content">
+                    <!-- Error summary (from inline data) -->
                     <div class="bg-warning-500/5 border border-warning-500/20 rounded-lg p-4">
-                        <h4 class="text-sm font-medium text-warning-400 mb-2">Failed Tests (1)</h4>
-                        <ul class="space-y-1">
+                        <h4 class="text-sm font-medium text-warning-400 mb-2">
+Test Failure                        </h4>
+                        <p class="text-sm text-slate-300">ECS task failed to start</p>
+                        <ul class="mt-2 space-y-1">
                             <li class="flex items-center gap-2 text-sm text-slate-300">
-                                <svg class="w-4 h-4 text-warning-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="w-4 h-4 text-warning-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
-                                test_ecs_service_running
+                                <code class="text-xs bg-slate-800 px-2 py-0.5 rounded">test_ecs_service_running</code>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Source info -->
+                    <!-- Lazy-loaded content placeholder -->
+                    <div class="lazy-content" data-loaded="false">
+                        <div class="flex items-center justify-center py-8">
+                            <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-slate-400">Loading technical details...</span>
+                        </div>
+                    </div>
 
-                    <!-- Terraform Infrastructure Code -->
-
-                    <!-- Generated Probe Applications -->
-
-                    <!-- Test Execution Details -->
+                    <!-- Reproduction steps -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
                         <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            How This Test Was Conducted
+                            Reproduce Locally
                         </h4>
-                        <div class="space-y-3 text-sm text-slate-300">
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">1</span>
-                                <div>
-                                    <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">2</span>
-                                <div>
-                                    <div class="font-medium text-white">Python App Generated</div>
-                                    <div class="text-slate-400">A Python application was generated that uses the AWS services defined in this architecture (ecs, alb, rds).</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">3</span>
-                                <div>
-                                    <div class="font-medium text-white">LocalStack Deployment</div>
-                                    <div class="text-slate-400">The Terraform infrastructure was deployed to LocalStack using <code class="px-1 bg-slate-800 rounded">terraform apply</code>.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">4</span>
-                                <div>
-                                    <div class="font-medium text-white">Tests Executed</div>
-                                    <div class="text-slate-400">The generated Python tests were run against the LocalStack environment using <code class="px-1 bg-slate-800 rounded">pytest</code>.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Reproduction steps -->
-                        <div class="mt-4 pt-4 border-t border-slate-600">
-                            <h5 class="text-sm font-medium text-slate-300 mb-2">Reproduce This Test Locally</h5>
-                            <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># 1. Start LocalStack
+                        <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># Start LocalStack and run this test
 docker run -d --name localstack -p 4566:4566 localstack/localstack
-
-# 2. Clone and setup
-git clone https://github.com/lazarkanelov/ls-arch-validator.git
-cd ls-arch-validator
-
-# 3. Run the specific architecture test
-python -m ls_arch_validator test --architecture aws-diagram-microservices
-
-# 4. Or manually with Terraform
-cd architectures/aws-diagram-microservices
-terraform init
-terraform apply -auto-approve
-pytest tests/</code></pre>
-                        </div>
+ls-arch-validator test --architecture aws-diagram-microservices</code></pre>
                     </div>
 
                     <!-- Action buttons -->
@@ -441,7 +406,13 @@ pytest tests/</code></pre>
                 </div>
             </div>
         </div>
-        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="partial">
+        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"
+             data-status="failed"
+             data-arch-hash="7c13542cec1a6551"
+             data-tf-hash=""
+             data-app-hashes=""
+             data-error-summary="Rekognition service not available in LocalStack"
+             data-test-failures="">
             <button class="w-full flex items-center gap-4 p-4 text-left hover:bg-slate-750 transition-colors" onclick="toggleDetails(this)">
                 <!-- Status indicator -->
                 <div class="flex-shrink-0">
@@ -476,76 +447,38 @@ pytest tests/</code></pre>
                 </svg>
             </button>
 
-            <!-- Expandable details -->
+            <!-- Expandable details - uses lazy loading from CAS -->
             <div class="details-panel hidden border-t border-slate-700">
-                <div class="p-4 space-y-4">
-                    <!-- Error details -->
+                <div class="p-4 space-y-4 details-content">
+                    <!-- Error summary (from inline data) -->
+                    <div class="bg-danger-500/5 border border-danger-500/20 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-danger-400 mb-2">
+Infrastructure Error                        </h4>
+                        <p class="text-sm text-slate-300">Rekognition service not available in LocalStack</p>
+                    </div>
 
+                    <!-- Lazy-loaded content placeholder -->
+                    <div class="lazy-content" data-loaded="false">
+                        <div class="flex items-center justify-center py-8">
+                            <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-slate-400">Loading technical details...</span>
+                        </div>
+                    </div>
 
-                    <!-- Source info -->
-
-                    <!-- Terraform Infrastructure Code -->
-
-                    <!-- Generated Probe Applications -->
-
-                    <!-- Test Execution Details -->
+                    <!-- Reproduction steps -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
                         <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            How This Test Was Conducted
+                            Reproduce Locally
                         </h4>
-                        <div class="space-y-3 text-sm text-slate-300">
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">1</span>
-                                <div>
-                                    <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">2</span>
-                                <div>
-                                    <div class="font-medium text-white">Python App Generated</div>
-                                    <div class="text-slate-400">A Python application was generated that uses the AWS services defined in this architecture (lambda, s3, rekognition).</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">3</span>
-                                <div>
-                                    <div class="font-medium text-white">LocalStack Deployment</div>
-                                    <div class="text-slate-400">The Terraform infrastructure was deployed to LocalStack using <code class="px-1 bg-slate-800 rounded">terraform apply</code>.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center text-xs font-bold">4</span>
-                                <div>
-                                    <div class="font-medium text-white">Tests Executed</div>
-                                    <div class="text-slate-400">The generated Python tests were run against the LocalStack environment using <code class="px-1 bg-slate-800 rounded">pytest</code>.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Reproduction steps -->
-                        <div class="mt-4 pt-4 border-t border-slate-600">
-                            <h5 class="text-sm font-medium text-slate-300 mb-2">Reproduce This Test Locally</h5>
-                            <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># 1. Start LocalStack
+                        <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># Start LocalStack and run this test
 docker run -d --name localstack -p 4566:4566 localstack/localstack
-
-# 2. Clone and setup
-git clone https://github.com/lazarkanelov/ls-arch-validator.git
-cd ls-arch-validator
-
-# 3. Run the specific architecture test
-python -m ls_arch_validator test --architecture aws-solutions-serverless-image
-
-# 4. Or manually with Terraform
-cd architectures/aws-solutions-serverless-image
-terraform init
-terraform apply -auto-approve
-pytest tests/</code></pre>
-                        </div>
+ls-arch-validator test --architecture aws-solutions-serverless-image</code></pre>
                     </div>
 
                     <!-- Action buttons -->
@@ -556,7 +489,11 @@ pytest tests/</code></pre>
         </div>
 
         <!-- Passing Results -->
-        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="passed">
+        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"
+             data-status="passed"
+             data-arch-hash="a4fe816fcf27d104"
+             data-tf-hash="cb62a8cf8997f2b1"
+             data-app-hashes="5ef475955abb748f,28a725cb3856512f">
             <button class="w-full flex items-center gap-4 p-4 text-left hover:bg-slate-750 transition-colors" onclick="toggleDetails(this)">
                 <div class="flex-shrink-0">
                     <span class="flex h-10 w-10 items-center justify-center rounded-full bg-success-500/10 ring-1 ring-success-500/20">
@@ -584,76 +521,51 @@ pytest tests/</code></pre>
                 </svg>
             </button>
 
+            <!-- Expandable details - uses lazy loading from CAS -->
             <div class="details-panel hidden border-t border-slate-700">
-                <div class="p-4 space-y-4">
+                <div class="p-4 space-y-4 details-content">
+                    <!-- Success badge -->
+                    <div class="bg-success-500/5 border border-success-500/20 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-success-400 mb-1 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            All Tests Passed
+                        </h4>
+                        <p class="text-sm text-slate-300">This architecture is fully compatible with LocalStack.</p>
+                    </div>
 
-                    <!-- Terraform Infrastructure Code -->
+                    <!-- Lazy-loaded content placeholder -->
+                    <div class="lazy-content" data-loaded="false">
+                        <div class="flex items-center justify-center py-8">
+                            <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-slate-400">Loading technical details...</span>
+                        </div>
+                    </div>
 
-                    <!-- Generated Probe Applications -->
-
-                    <!-- Test Execution Details -->
+                    <!-- Reproduction steps -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
                         <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            How This Test Was Conducted
+                            Reproduce Locally
                         </h4>
-                        <div class="space-y-3 text-sm text-slate-300">
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">1</span>
-                                <div>
-                                    <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">2</span>
-                                <div>
-                                    <div class="font-medium text-white">Python App Generated</div>
-                                    <div class="text-slate-400">A Python application was generated that uses the AWS services defined in this architecture (ec2, vpc, rds).</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">3</span>
-                                <div>
-                                    <div class="font-medium text-white">LocalStack Deployment</div>
-                                    <div class="text-slate-400">The Terraform infrastructure was deployed to LocalStack using <code class="px-1 bg-slate-800 rounded">terraform apply</code>.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">4</span>
-                                <div>
-                                    <div class="font-medium text-white">Tests Executed</div>
-                                    <div class="text-slate-400">The generated Python tests were run against the LocalStack environment using <code class="px-1 bg-slate-800 rounded">pytest</code>. All tests passed!</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Reproduction steps -->
-                        <div class="mt-4 pt-4 border-t border-slate-600">
-                            <h5 class="text-sm font-medium text-slate-300 mb-2">Reproduce This Test Locally</h5>
-                            <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># 1. Start LocalStack
+                        <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># Start LocalStack and run this test
 docker run -d --name localstack -p 4566:4566 localstack/localstack
-
-# 2. Clone and setup
-git clone https://github.com/lazarkanelov/ls-arch-validator.git
-cd ls-arch-validator
-
-# 3. Run the specific architecture test
-python -m ls_arch_validator test --architecture aws-quickstart-vpc-3tier
-
-# 4. Or manually with Terraform
-cd architectures/aws-quickstart-vpc-3tier
-terraform init
-terraform apply -auto-approve
-pytest tests/</code></pre>
-                        </div>
+ls-arch-validator test --architecture aws-quickstart-vpc-3tier</code></pre>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="passed">
+        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"
+             data-status="passed"
+             data-arch-hash="c22a0092a1521c36"
+             data-tf-hash="882101e49fbf0eb4"
+             data-app-hashes="af49e703bcb9b09e,a2a63bf74de464f5">
             <button class="w-full flex items-center gap-4 p-4 text-left hover:bg-slate-750 transition-colors" onclick="toggleDetails(this)">
                 <div class="flex-shrink-0">
                     <span class="flex h-10 w-10 items-center justify-center rounded-full bg-success-500/10 ring-1 ring-success-500/20">
@@ -681,76 +593,51 @@ pytest tests/</code></pre>
                 </svg>
             </button>
 
+            <!-- Expandable details - uses lazy loading from CAS -->
             <div class="details-panel hidden border-t border-slate-700">
-                <div class="p-4 space-y-4">
+                <div class="p-4 space-y-4 details-content">
+                    <!-- Success badge -->
+                    <div class="bg-success-500/5 border border-success-500/20 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-success-400 mb-1 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            All Tests Passed
+                        </h4>
+                        <p class="text-sm text-slate-300">This architecture is fully compatible with LocalStack.</p>
+                    </div>
 
-                    <!-- Terraform Infrastructure Code -->
+                    <!-- Lazy-loaded content placeholder -->
+                    <div class="lazy-content" data-loaded="false">
+                        <div class="flex items-center justify-center py-8">
+                            <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-slate-400">Loading technical details...</span>
+                        </div>
+                    </div>
 
-                    <!-- Generated Probe Applications -->
-
-                    <!-- Test Execution Details -->
+                    <!-- Reproduction steps -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
                         <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            How This Test Was Conducted
+                            Reproduce Locally
                         </h4>
-                        <div class="space-y-3 text-sm text-slate-300">
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">1</span>
-                                <div>
-                                    <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">2</span>
-                                <div>
-                                    <div class="font-medium text-white">Python App Generated</div>
-                                    <div class="text-slate-400">A Python application was generated that uses the AWS services defined in this architecture (lambda, apigateway, dynamodb).</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">3</span>
-                                <div>
-                                    <div class="font-medium text-white">LocalStack Deployment</div>
-                                    <div class="text-slate-400">The Terraform infrastructure was deployed to LocalStack using <code class="px-1 bg-slate-800 rounded">terraform apply</code>.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">4</span>
-                                <div>
-                                    <div class="font-medium text-white">Tests Executed</div>
-                                    <div class="text-slate-400">The generated Python tests were run against the LocalStack environment using <code class="px-1 bg-slate-800 rounded">pytest</code>. All tests passed!</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Reproduction steps -->
-                        <div class="mt-4 pt-4 border-t border-slate-600">
-                            <h5 class="text-sm font-medium text-slate-300 mb-2">Reproduce This Test Locally</h5>
-                            <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># 1. Start LocalStack
+                        <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># Start LocalStack and run this test
 docker run -d --name localstack -p 4566:4566 localstack/localstack
-
-# 2. Clone and setup
-git clone https://github.com/lazarkanelov/ls-arch-validator.git
-cd ls-arch-validator
-
-# 3. Run the specific architecture test
-python -m ls_arch_validator test --architecture terraform-aws-lambda-api
-
-# 4. Or manually with Terraform
-cd architectures/terraform-aws-lambda-api
-terraform init
-terraform apply -auto-approve
-pytest tests/</code></pre>
-                        </div>
+ls-arch-validator test --architecture terraform-aws-lambda-api</code></pre>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden" data-status="passed">
+        <div class="result-item bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"
+             data-status="passed"
+             data-arch-hash="eb9abefcf0bf26c0"
+             data-tf-hash="77f14c045ccf5ad5"
+             data-app-hashes="62e283ed27ac18cd,a590b597eab6ea86">
             <button class="w-full flex items-center gap-4 p-4 text-left hover:bg-slate-750 transition-colors" onclick="toggleDetails(this)">
                 <div class="flex-shrink-0">
                     <span class="flex h-10 w-10 items-center justify-center rounded-full bg-success-500/10 ring-1 ring-success-500/20">
@@ -777,71 +664,42 @@ pytest tests/</code></pre>
                 </svg>
             </button>
 
+            <!-- Expandable details - uses lazy loading from CAS -->
             <div class="details-panel hidden border-t border-slate-700">
-                <div class="p-4 space-y-4">
+                <div class="p-4 space-y-4 details-content">
+                    <!-- Success badge -->
+                    <div class="bg-success-500/5 border border-success-500/20 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-success-400 mb-1 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            All Tests Passed
+                        </h4>
+                        <p class="text-sm text-slate-300">This architecture is fully compatible with LocalStack.</p>
+                    </div>
 
-                    <!-- Terraform Infrastructure Code -->
+                    <!-- Lazy-loaded content placeholder -->
+                    <div class="lazy-content" data-loaded="false">
+                        <div class="flex items-center justify-center py-8">
+                            <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-slate-400">Loading technical details...</span>
+                        </div>
+                    </div>
 
-                    <!-- Generated Probe Applications -->
-
-                    <!-- Test Execution Details -->
+                    <!-- Reproduction steps -->
                     <div class="bg-slate-700/30 rounded-lg p-4">
                         <h4 class="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            How This Test Was Conducted
+                            Reproduce Locally
                         </h4>
-                        <div class="space-y-3 text-sm text-slate-300">
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">1</span>
-                                <div>
-                                    <div class="font-medium text-white">Architecture Scraped</div>
-                                    <div class="text-slate-400">The architecture was scraped from <a href="#" target="_blank" class="text-primary-400 hover:underline">source</a> and converted to Terraform format.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">2</span>
-                                <div>
-                                    <div class="font-medium text-white">Python App Generated</div>
-                                    <div class="text-slate-400">A Python application was generated that uses the AWS services defined in this architecture (lambda, s3).</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">3</span>
-                                <div>
-                                    <div class="font-medium text-white">LocalStack Deployment</div>
-                                    <div class="text-slate-400">The Terraform infrastructure was deployed to LocalStack using <code class="px-1 bg-slate-800 rounded">terraform apply</code>.</div>
-                                </div>
-                            </div>
-                            <div class="flex gap-3">
-                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-success-500/20 text-success-400 flex items-center justify-center text-xs font-bold">4</span>
-                                <div>
-                                    <div class="font-medium text-white">Tests Executed</div>
-                                    <div class="text-slate-400">The generated Python tests were run against the LocalStack environment using <code class="px-1 bg-slate-800 rounded">pytest</code>. All tests passed!</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Reproduction steps -->
-                        <div class="mt-4 pt-4 border-t border-slate-600">
-                            <h5 class="text-sm font-medium text-slate-300 mb-2">Reproduce This Test Locally</h5>
-                            <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># 1. Start LocalStack
+                        <pre class="bg-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto"><code># Start LocalStack and run this test
 docker run -d --name localstack -p 4566:4566 localstack/localstack
-
-# 2. Clone and setup
-git clone https://github.com/lazarkanelov/ls-arch-validator.git
-cd ls-arch-validator
-
-# 3. Run the specific architecture test
-python -m ls_arch_validator test --architecture serverless-rest-api
-
-# 4. Or manually with Terraform
-cd architectures/serverless-rest-api
-terraform init
-terraform apply -auto-approve
-pytest tests/</code></pre>
-                        </div>
+ls-arch-validator test --architecture serverless-rest-api</code></pre>
                     </div>
                 </div>
             </div>
@@ -1279,15 +1137,194 @@ document.addEventListener('DOMContentLoaded', function() {
     Prism.highlightAll();
 });
 
-// Toggle details panel
+// Toggle details panel with lazy loading
 function toggleDetails(button) {
-    const panel = button.parentElement.querySelector('.details-panel');
+    const resultItem = button.closest('.result-item');
+    const panel = resultItem.querySelector('.details-panel');
     const icon = button.querySelector('.expand-icon');
+
     panel.classList.toggle('hidden');
     icon.classList.toggle('rotate-180');
-    // Re-highlight code when shown
+
+    // Trigger lazy loading when shown
     if (!panel.classList.contains('hidden')) {
+        const lazyContent = panel.querySelector('.lazy-content');
+        if (lazyContent && lazyContent.dataset.loaded !== 'true') {
+            loadArchitectureDetails(resultItem, lazyContent);
+        }
         Prism.highlightAllUnder(panel);
+    }
+}
+
+// Load architecture details from CAS
+async function loadArchitectureDetails(resultItem, container) {
+    const archHash = resultItem.dataset.archHash;
+    const tfHash = resultItem.dataset.tfHash;
+    const appHashes = (resultItem.dataset.appHashes || '').split(',').filter(Boolean);
+
+    if (!archHash) {
+        container.innerHTML = '<div class="text-slate-400 py-4">No additional details available.</div>';
+        container.dataset.loaded = 'true';
+        return;
+    }
+
+    try {
+        const data = await ObjectLoader.loadArchitecture(archHash, tfHash, appHashes);
+        renderFullDetails(container, data, tfHash);
+        container.dataset.loaded = 'true';
+    } catch (error) {
+        container.innerHTML = `
+            <div class="text-red-400 py-4">
+                <svg class="inline h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Failed to load details: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Render full architecture details
+function renderFullDetails(container, data, tfHash) {
+    let html = '';
+
+    // Source info
+    if (data.arch && data.arch.source_info) {
+        const src = data.arch.source_info;
+        html += `
+            <div class="mb-4 p-4 bg-slate-800 rounded-lg border-l-4 border-primary-500">
+                <h4 class="text-sm font-medium text-slate-200 mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Architecture Source
+                </h4>
+                <dl class="grid grid-cols-2 gap-2 text-sm">
+                    <dt class="text-slate-400">Source:</dt>
+                    <dd class="text-slate-200">${escapeHtml(src.source_name || 'Unknown')}</dd>
+                    ${src.original_format ? `
+                    <dt class="text-slate-400">Format:</dt>
+                    <dd><span class="px-2 py-0.5 bg-slate-600 rounded text-xs text-slate-200">${escapeHtml(src.original_format)}</span></dd>
+                    ` : ''}
+                    ${src.source_url ? `
+                    <dt class="text-slate-400">URL:</dt>
+                    <dd><a href="${escapeHtml(src.source_url)}" target="_blank" class="text-primary-400 hover:underline break-all">${escapeHtml(src.source_url)}</a></dd>
+                    ` : ''}
+                </dl>
+            </div>
+        `;
+    }
+
+    // Terraform code
+    if (data.tf && data.tf.main_tf) {
+        html += `
+            <div class="mb-4 bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
+                <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                    <span class="text-sm font-medium text-white">Terraform Infrastructure</span>
+                </div>
+                <div class="border-b border-slate-700">
+                    <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        main.tf
+                    </div>
+                    <pre class="language-hcl overflow-auto max-h-96"><code>${escapeHtml(data.tf.main_tf)}</code></pre>
+                </div>
+                ${data.tf.variables_tf ? `
+                <div class="border-b border-slate-700">
+                    <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono">variables.tf</div>
+                    <pre class="language-hcl overflow-auto max-h-64"><code>${escapeHtml(data.tf.variables_tf)}</code></pre>
+                </div>
+                ` : ''}
+                ${data.tf.outputs_tf ? `
+                <div>
+                    <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono">outputs.tf</div>
+                    <pre class="language-hcl overflow-auto max-h-64"><code>${escapeHtml(data.tf.outputs_tf)}</code></pre>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    } else if (!tfHash) {
+        html += `
+            <div class="mb-4 p-4 bg-danger-500/5 border border-danger-500/20 rounded-lg">
+                <h4 class="text-sm font-medium text-danger-400 mb-1">No Terraform Generated</h4>
+                <p class="text-sm text-slate-400">This architecture failed before Terraform could be generated. Check the error details above.</p>
+            </div>
+        `;
+    }
+
+    // Generated apps
+    if (data.apps && data.apps.length > 0) {
+        html += `
+            <div class="mb-4">
+                <h4 class="text-sm font-medium text-slate-200 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                    Generated Probe Applications (${data.apps.length})
+                </h4>
+        `;
+
+        for (const app of data.apps) {
+            const badgeColor = {
+                'api_parity': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                'edge_cases': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+                'integration': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                'stress': 'bg-red-500/20 text-red-400 border-red-500/30'
+            }[app.probe_type] || 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+
+            html += `
+                <div class="mb-3 bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+                    <div class="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-1 rounded border text-xs font-medium ${badgeColor}">${escapeHtml(app.probe_type)}</span>
+                            <span class="text-sm text-slate-200">${escapeHtml(app.probe_name || 'Probe App')}</span>
+                        </div>
+                        <span class="text-xs text-slate-400">${Object.keys(app.source_files || {}).length} files</span>
+                    </div>
+                    ${app.probed_features && app.probed_features.length > 0 ? `
+                    <div class="px-4 py-2 border-b border-slate-700/50 flex flex-wrap gap-1">
+                        ${app.probed_features.slice(0, 6).map(f => `<span class="px-1.5 py-0.5 bg-slate-700 rounded text-xs text-slate-300">${escapeHtml(f)}</span>`).join('')}
+                        ${app.probed_features.length > 6 ? `<span class="px-1.5 py-0.5 text-xs text-slate-400">+${app.probed_features.length - 6} more</span>` : ''}
+                    </div>
+                    ` : ''}
+                    ${Object.entries(app.source_files || {}).map(([filename, content]) => `
+                    <div class="border-b border-slate-700/50 last:border-b-0">
+                        <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
+                            <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            ${escapeHtml(filename)}
+                        </div>
+                        <pre class="language-python overflow-auto max-h-80"><code>${escapeHtml(content)}</code></pre>
+                    </div>
+                    `).join('')}
+                    ${Object.entries(app.test_files || {}).map(([filename, content]) => `
+                    <div class="border-b border-slate-700/50 last:border-b-0">
+                        <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
+                            <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            ${escapeHtml(filename)}
+                        </div>
+                        <pre class="language-python overflow-auto max-h-80"><code>${escapeHtml(content)}</code></pre>
+                    </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        html += '</div>';
+    }
+
+    container.innerHTML = html || '<div class="text-slate-400 py-4">No additional details available.</div>';
+
+    // Re-highlight code blocks
+    if (window.Prism) {
+        container.querySelectorAll('pre code').forEach(block => Prism.highlightElement(block));
     }
 }
 
