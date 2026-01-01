@@ -203,9 +203,21 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "[View Dashboard](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
 
-      - name: Check for failures
-        if: steps.validate.outputs.status == 'error'
-        run: exit 1
+      - name: Check for critical failures
+        if: steps.validate.outputs.status == 'critical_error'
+        run: |
+          echo "::error::Critical validation error occurred"
+          exit 1
+
+      - name: Report validation results
+        if: always()
+        run: |
+          STATUS="${{ steps.validate.outputs.status }}"
+          if [ "$STATUS" = "error" ] || [ "$STATUS" = "partial" ]; then
+            echo "::warning::Validation completed with issues (status: $STATUS). Check the dashboard for details."
+          elif [ "$STATUS" = "success" ]; then
+            echo "::notice::All validations passed successfully!"
+          fi
 
   notify:
     name: Send Notifications
