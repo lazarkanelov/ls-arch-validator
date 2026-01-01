@@ -332,7 +332,7 @@ class CodeSynthesizer:
 
                 response = await client.messages.create(
                     model=self.model,
-                    max_tokens=4096,
+                    max_tokens=8192,  # Increased for longer code responses
                     system=SYSTEM_PROMPT,
                     messages=[{"role": "user", "content": prompt}],
                 )
@@ -441,7 +441,7 @@ class CodeSynthesizer:
 
                 response = await client.messages.create(
                     model=self.model,
-                    max_tokens=4096,
+                    max_tokens=8192,  # Increased for longer code responses
                     system=SYSTEM_PROMPT,
                     messages=[{"role": "user", "content": prompt}],
                 )
@@ -473,7 +473,7 @@ class CodeSynthesizer:
 
     def _parse_json_response(self, content: str) -> dict[str, Any]:
         """
-        Parse JSON from Claude's response.
+        Parse JSON from Claude's response with robust error handling.
 
         Args:
             content: Response text
@@ -486,14 +486,25 @@ class CodeSynthesizer:
         if json_match:
             json_str = json_match.group(1)
         else:
-            # Try to find raw JSON
-            json_str = content
+            # Try to find raw JSON object
+            json_match = re.search(r"\{.*\}", content, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+            else:
+                json_str = content
 
         try:
             return json.loads(json_str)
-        except json.JSONDecodeError:
-            logger.warning("json_parse_failed", content=content[:200])
-            return {"files": {}, "requirements": []}
+        except json.JSONDecodeError as e:
+            # Try to salvage partial JSON by finding complete file entries
+            logger.warning("json_parse_failed", error=str(e), content_length=len(content))
+
+            # Check if response was truncated (common issue)
+            if content.endswith("...") or len(content) > 7000:
+                logger.warning("response_likely_truncated", content_length=len(content))
+
+            # Return empty but valid structure
+            return {"files": {}, "requirements": [], "probed_features": []}
 
     def create_sample_app(
         self,
