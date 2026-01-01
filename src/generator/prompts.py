@@ -189,19 +189,46 @@ Package initialization with logging setup
    - Support `AWS_ENDPOINT_URL` environment variable
    - Handle LocalStack-specific quirks gracefully (don't crash on missing features)
 
-Output the code as a JSON object with the following structure:
+## Output Format
+
+Output each file as a separate markdown code block with the filename as a header.
+Use this EXACT format (do not embed code in JSON):
+
+### FILE: src/probes.py
+```python
+# Your probe code here
+```
+
+### FILE: src/validators.py
+```python
+# Your validator code here
+```
+
+### FILE: src/fixtures.py
+```python
+# Your fixtures code here
+```
+
+### FILE: src/reporters.py
+```python
+# Your reporters code here
+```
+
+### FILE: src/config.py
+```python
+# Your config code here
+```
+
+### FILE: src/__init__.py
+```python
+# Package init here
+```
+
+### METADATA
 ```json
 {{
-  "files": {{
-    "src/probes.py": "...",
-    "src/validators.py": "...",
-    "src/fixtures.py": "...",
-    "src/reporters.py": "...",
-    "src/config.py": "...",
-    "src/__init__.py": "..."
-  }},
-  "requirements": ["boto3>=1.28.0", "pydantic>=2.0.0", "..."],
-  "probed_features": ["dynamodb_transactions", "s3_versioning", "..."]
+  "requirements": ["boto3>=1.28.0", "pydantic>=2.0.0"],
+  "probed_features": ["dynamodb_transactions", "s3_versioning"]
 }}
 ```"""
 
@@ -337,20 +364,51 @@ Tests should output structured results for reporting:
 - Pass/Fail status
 - Reproduction command
 
-Output as JSON:
+## Output Format
+
+Output each file as a separate markdown code block with the filename as a header.
+Use this EXACT format (do not embed code in JSON):
+
+### FILE: tests/conftest.py
+```python
+# Your conftest code here
+```
+
+### FILE: tests/test_dynamodb_parity.py
+```python
+# Your DynamoDB tests here
+```
+
+### FILE: tests/test_s3_parity.py
+```python
+# Your S3 tests here
+```
+
+### FILE: tests/test_lambda_parity.py
+```python
+# Your Lambda tests here
+```
+
+### FILE: tests/test_sqs_parity.py
+```python
+# Your SQS tests here
+```
+
+### FILE: tests/test_api_gateway_parity.py
+```python
+# Your API Gateway tests here
+```
+
+### FILE: tests/test_cross_service.py
+```python
+# Your cross-service tests here
+```
+
+### METADATA
 ```json
 {{
-  "files": {{
-    "tests/conftest.py": "...",
-    "tests/test_dynamodb_parity.py": "...",
-    "tests/test_s3_parity.py": "...",
-    "tests/test_lambda_parity.py": "...",
-    "tests/test_sqs_parity.py": "...",
-    "tests/test_api_gateway_parity.py": "...",
-    "tests/test_cross_service.py": "..."
-  }},
-  "requirements": ["pytest>=7.0.0", "pytest-asyncio>=0.21.0", "moto>=4.0.0", "..."],
-  "tested_features": ["dynamodb_transactions", "s3_versioning", "lambda_dlq", "..."]
+  "requirements": ["pytest>=7.0.0", "pytest-asyncio>=0.21.0"],
+  "tested_features": ["dynamodb_transactions", "s3_versioning", "lambda_dlq"]
 }}
 ```"""
 
@@ -570,16 +628,35 @@ Configuration:
 Package initialization
 
 ## Output Format
+
+Output each file as a separate markdown code block with the filename as a header.
+Use this EXACT format (do not embed code in JSON):
+
+### FILE: src/probes/{probe_type}_probe.py
+```python
+# Your probe code here
+```
+
+### FILE: src/fixtures.py
+```python
+# Your fixtures code here
+```
+
+### FILE: src/config.py
+```python
+# Your config code here
+```
+
+### FILE: src/__init__.py
+```python
+# Package init here
+```
+
+### METADATA
 ```json
 {{
-  "files": {{
-    "src/probes/{probe_type}_probe.py": "...",
-    "src/fixtures.py": "...",
-    "src/config.py": "...",
-    "src/__init__.py": "..."
-  }},
-  "requirements": ["boto3>=1.28.0", "pytest>=7.0.0", "..."],
-  "probed_features": ["feature1", "feature2", "..."],
+  "requirements": ["boto3>=1.28.0", "pytest>=7.0.0"],
+  "probed_features": ["feature1", "feature2"],
   "probe_name": "{probe_name}"
 }}
 ```"""

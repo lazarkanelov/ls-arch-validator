@@ -473,46 +473,125 @@ class CodeSynthesizer:
 
     def _parse_json_response(self, content: str) -> dict[str, Any]:
         """
-        Parse JSON from Claude's response with robust error handling.
+        Parse response from Claude with support for markdown file format.
+
+        The expected format is:
+        ### FILE: path/to/file.py
+        ```python
+        code here
+        ```
+
+        ### METADATA
+        ```json
+        {"requirements": [...], "probed_features": [...]}
+        ```
 
         Args:
             content: Response text
 
         Returns:
-            Parsed JSON or empty dict
+            Parsed response with files, requirements, probed_features
         """
-        # Try to extract JSON from markdown code block
+        # First, try the new markdown format with ### FILE: headers
+        files = self._extract_markdown_files(content)
+        metadata = self._extract_metadata(content)
+
+        if files:
+            logger.debug("parsed_markdown_format", file_count=len(files))
+            return {
+                "files": files,
+                "requirements": metadata.get("requirements", ["boto3", "pytest"]),
+                "probed_features": metadata.get("probed_features", []),
+                "probe_name": metadata.get("probe_name", ""),
+                "tested_features": metadata.get("tested_features", []),
+            }
+
+        # Fallback: try to extract JSON from markdown code block
         json_match = re.search(r"```json\s*(.*?)\s*```", content, re.DOTALL)
         if json_match:
             json_str = json_match.group(1)
-        else:
-            # Try to find raw JSON object
-            json_match = re.search(r"\{.*\}", content, re.DOTALL)
-            if json_match:
-                json_str = json_match.group(0)
-            else:
-                json_str = content
+            try:
+                result = json.loads(json_str)
+                if "files" in result:
+                    logger.debug("parsed_json_format", file_count=len(result.get("files", {})))
+                    return result
+            except json.JSONDecodeError as e:
+                logger.warning("json_parse_failed", error=str(e), content_length=len(content))
 
-        try:
-            return json.loads(json_str)
-        except json.JSONDecodeError as e:
-            logger.warning("json_parse_failed", error=str(e), content_length=len(content))
+        # Fallback: try to extract plain code blocks
+        files = self._extract_code_blocks(content)
+        if files:
+            logger.info("extracted_code_blocks_fallback", file_count=len(files))
+            return {
+                "files": files,
+                "requirements": ["boto3", "pytest", "localstack-client"],
+                "probed_features": [],
+            }
 
-            # Try to extract code blocks as fallback
-            files = self._extract_code_blocks(content)
-            if files:
-                logger.info("extracted_code_blocks", file_count=len(files))
-                return {
-                    "files": files,
-                    "requirements": ["boto3", "pytest", "localstack-client"],
-                    "probed_features": [],
-                }
+        logger.warning("no_code_extracted", content_length=len(content))
+        return {"files": {}, "requirements": [], "probed_features": []}
 
-            return {"files": {}, "requirements": [], "probed_features": []}
+    def _extract_markdown_files(self, content: str) -> dict[str, str]:
+        """
+        Extract files from markdown format with ### FILE: headers.
+
+        Expected format:
+        ### FILE: path/to/file.py
+        ```python
+        code here
+        ```
+
+        Args:
+            content: Response text with markdown file blocks
+
+        Returns:
+            Dict of filename to code content
+        """
+        files = {}
+
+        # Pattern to match ### FILE: filename followed by a code block
+        # Supports both ### FILE: and ## FILE: formats
+        pattern = r"#{2,3}\s*FILE:\s*(\S+)\s*\n```(?:python|py)?\s*\n(.*?)```"
+        matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
+
+        for filename, code in matches:
+            # Clean up the filename (remove quotes if present)
+            filename = filename.strip().strip('"').strip("'")
+            files[filename] = code.strip()
+
+        return files
+
+    def _extract_metadata(self, content: str) -> dict[str, Any]:
+        """
+        Extract metadata JSON from ### METADATA section.
+
+        Expected format:
+        ### METADATA
+        ```json
+        {"requirements": [...], "probed_features": [...]}
+        ```
+
+        Args:
+            content: Response text
+
+        Returns:
+            Metadata dict or empty dict
+        """
+        # Pattern to match ### METADATA followed by a JSON code block
+        pattern = r"#{2,3}\s*METADATA\s*\n```json\s*\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
+
+        if match:
+            try:
+                return json.loads(match.group(1))
+            except json.JSONDecodeError as e:
+                logger.warning("metadata_parse_failed", error=str(e))
+
+        return {}
 
     def _extract_code_blocks(self, content: str) -> dict[str, str]:
         """
-        Extract Python code blocks as fallback when JSON parsing fails.
+        Extract Python code blocks as fallback when other parsing fails.
 
         Args:
             content: Response text with code blocks
