@@ -623,6 +623,23 @@ function renderFullDetails(container, data, tfHash) {
                     <dt class="text-slate-400">URL:</dt>
                     <dd><a href="${escapeHtml(src.source_url)}" target="_blank" class="text-primary-400 hover:underline break-all">${escapeHtml(src.source_url)}</a></dd>
                     ` : ''}
+                    ${src.image_url ? `
+                    <dt class="text-slate-400">Image:</dt>
+                    <dd><a href="${escapeHtml(src.image_url)}" target="_blank" class="text-pink-400 hover:underline break-all flex items-center gap-1">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        ${escapeHtml(src.image_url)}
+                    </a></dd>
+                    ` : ''}
+                    ${src.diagram_confidence ? `
+                    <dt class="text-slate-400">Confidence:</dt>
+                    <dd><span class="px-2 py-0.5 bg-pink-500/20 text-pink-400 rounded text-xs">${(src.diagram_confidence * 100).toFixed(0)}%</span></dd>
+                    ` : ''}
+                    ${src.synthesis_notes ? `
+                    <dt class="text-slate-400 col-span-2 mt-2">Synthesis Notes:</dt>
+                    <dd class="text-slate-300 col-span-2 text-xs italic">${escapeHtml(src.synthesis_notes)}</dd>
+                    ` : ''}
                 </dl>
             </div>
         `;
