@@ -14,6 +14,7 @@ from src import __version__
 from src.models import Architecture, ValidationRun
 from src.reporter.aggregator import ResultsAggregator
 from src.reporter.downloads import AppDownloadGenerator
+from src.reporter.storage import IndexBuilder, ObjectStore
 from src.reporter.trends import TrendAnalyzer
 from src.utils.cache import AppCache
 from src.utils.logging import get_logger
@@ -481,3 +482,227 @@ class SiteGenerator:
                     pass
 
         return archives
+
+    def generate_cas(
+        self,
+        run: ValidationRun,
+        architectures: dict[str, Architecture],
+        app_cache: Optional[AppCache] = None,
+    ) -> Path:
+        """
+        Generate dashboard using Content-Addressable Storage format.
+
+        This is the new storage format that:
+        - Stores objects by content hash (deduplication)
+        - Creates lightweight index.json (~3KB vs 127KB)
+        - Supports lazy loading of details
+
+        Args:
+            run: ValidationRun to generate dashboard for
+            architectures: Dict of architecture_id -> Architecture objects
+            app_cache: App cache for retrieving generated code
+
+        Returns:
+            Path to the generated index.json
+        """
+        logger.info(
+            "generate_cas_started",
+            run_id=run.id,
+            architecture_count=len(architectures),
+        )
+
+        # Ensure output directories exist
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        data_dir = self.output_dir / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+
+        # Initialize object store
+        store = ObjectStore(data_dir)
+        builder = IndexBuilder(store)
+
+        # Load app data from cache
+        app_data: dict[str, dict] = {}
+        if app_cache:
+            for arch_id, arch in architectures.items():
+                if arch.content_hash:
+                    loaded = app_cache.load_app(arch.content_hash)
+                    if loaded:
+                        app_data[arch.content_hash] = loaded
+
+        # Build result refs
+        results = []
+        for arch_result in run.results:
+            arch = architectures.get(arch_result.architecture_id)
+            if not arch:
+                continue
+
+            # Get terraform code
+            terraform_code = None
+            if hasattr(arch, "terraform") and arch.terraform:
+                terraform_code = {
+                    "main_tf": arch.terraform.main_tf,
+                    "variables_tf": getattr(arch.terraform, "variables_tf", None),
+                    "outputs_tf": getattr(arch.terraform, "outputs_tf", None),
+                }
+
+            # Get generated apps from cache
+            generated_apps = []
+            if arch.content_hash and arch.content_hash in app_data:
+                cached_app = app_data[arch.content_hash]
+                # Support both single app and multiple apps
+                if isinstance(cached_app.get("apps"), list):
+                    generated_apps = cached_app["apps"]
+                elif cached_app.get("source_files"):
+                    generated_apps = [cached_app]
+
+            # Get source info
+            source_info = None
+            if hasattr(arch, "source_info") and arch.source_info:
+                source_info = (
+                    arch.source_info
+                    if isinstance(arch.source_info, dict)
+                    else arch.source_info.__dict__
+                )
+
+            # Build result with refs
+            result_ref = builder.build_result_ref(
+                arch_id=arch_result.architecture_id,
+                services=list(arch.services) if arch.services else [],
+                source_info=source_info,
+                terraform_code=terraform_code,
+                generated_apps=generated_apps,
+                status=arch_result.status,
+                error_summary=arch_result.error_summary if hasattr(arch_result, "error_summary") else None,
+                test_failures=arch_result.failed_tests if hasattr(arch_result, "failed_tests") else None,
+            )
+            results.append(result_ref)
+
+            # Also store per-architecture result
+            store.put_result(
+                run_id=run.id,
+                arch_hash=result_ref["arch_hash"],
+                status=arch_result.status,
+                error_summary=result_ref.get("error_summary"),
+                test_results=[
+                    {"name": t, "status": "failed"}
+                    for t in (result_ref.get("test_failures") or [])
+                ],
+            )
+
+        # Calculate statistics
+        stats = run.statistics
+        statistics = {
+            "total": stats.total if stats else len(results),
+            "passed": stats.passed if stats else 0,
+            "partial": stats.partial if stats else 0,
+            "failed": stats.failed if stats else 0,
+            "pass_rate": stats.pass_rate if stats else 0,
+        }
+
+        # Get service coverage
+        service_counts: dict[str, dict] = {}
+        for result in results:
+            for service in result.get("services", []):
+                if service not in service_counts:
+                    service_counts[service] = {"total": 0, "passed": 0}
+                service_counts[service]["total"] += 1
+                if result["status"] == "passed":
+                    service_counts[service]["passed"] += 1
+
+        service_coverage = [
+            {
+                "name": name,
+                "total": counts["total"],
+                "passed": counts["passed"],
+                "pass_rate": (counts["passed"] / counts["total"] * 100) if counts["total"] > 0 else 0,
+            }
+            for name, counts in sorted(service_counts.items())
+        ]
+
+        # Build index
+        index_data = builder.build_index(
+            run_id=run.id,
+            statistics=statistics,
+            results=results,
+            service_coverage=service_coverage,
+            recent_runs=[],  # TODO: Load from history
+        )
+
+        # Save index
+        index_path = builder.save_index(index_data)
+
+        # Save run manifest
+        store.put_run(
+            run_id=run.id,
+            started_at=run.started_at,
+            completed_at=run.completed_at,
+            status=run.status,
+            localstack_version=run.localstack_version,
+            statistics=statistics,
+            architecture_refs=[r["arch_hash"] for r in results],
+        )
+
+        # Copy assets and render dashboard
+        self._copy_assets()
+        self._render_dashboard_v2(index_data)
+
+        logger.info(
+            "generate_cas_completed",
+            index_path=str(index_path),
+            object_stats=store.get_stats(),
+        )
+
+        return index_path
+
+    def _render_dashboard_v2(self, index_data: dict[str, Any]) -> Path:
+        """
+        Render dashboard HTML for CAS format.
+
+        Uses index.json data with lazy loading for details.
+
+        Args:
+            index_data: Index data from IndexBuilder
+
+        Returns:
+            Path to rendered index.html
+        """
+        template = self.env.get_template("index.html")
+
+        # Transform index data for template
+        # The template expects failures/passing lists, we provide results
+        failures = []
+        passing = []
+
+        for result in index_data.get("results", []):
+            item = {
+                "architecture_id": result["arch_id"],
+                "services": result["services"],
+                "arch_hash": result["arch_hash"],
+                "tf_hash": result.get("tf_hash"),
+                "app_hashes": result.get("app_hashes", []),
+                "error_summary": result.get("error_summary"),
+                "test_failures": result.get("test_failures"),
+            }
+
+            if result["status"] in ("failed", "partial"):
+                failures.append(item)
+            else:
+                passing.append(item)
+
+        context = {
+            "base_url": self.base_url,
+            "version": __version__,
+            "last_updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "run_id": index_data.get("latest_run", ""),
+            "statistics": index_data.get("statistics", {}),
+            "failures": failures,
+            "passing": passing,
+            "service_coverage": index_data.get("service_summary", []),
+            "use_lazy_loading": True,  # Flag for template to use lazy loading
+        }
+
+        html = template.render(**context)
+        index_path = self.output_dir / "index.html"
+        index_path.write_text(html)
+
+        return index_path

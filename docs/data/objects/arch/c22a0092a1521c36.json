@@ -1,0 +1,15 @@
+{
+  "arch_id": "terraform-aws-lambda-api",
+  "services": [
+    "apigateway",
+    "dynamodb",
+    "lambda"
+  ],
+  "source_info": {
+    "source_id": "terraform-registry",
+    "source_name": "Terraform Registry",
+    "source_type": "template",
+    "source_url": "https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws",
+    "original_format": "terraform"
+  }
+}

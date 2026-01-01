@@ -1,0 +1,17 @@
+{
+  "arch_id": "aws-diagram-microservices",
+  "services": [
+    "alb",
+    "ecs",
+    "rds"
+  ],
+  "source_info": {
+    "source_id": "aws-architecture-center",
+    "source_name": "AWS Architecture Center",
+    "source_type": "diagram",
+    "source_url": "https://aws.amazon.com/architecture/",
+    "original_format": "diagram",
+    "diagram_confidence": 0.85,
+    "synthesis_notes": "Inferred ECS cluster from container icons. ALB placement determined from load balancer symbol."
+  }
+}

@@ -79,6 +79,15 @@ class ArchitectureStatus(Enum):
     READY = "ready"  # Has generated sample app, ready for validation
 
 
+class ProbeType(Enum):
+    """Type of probe application for discovering LocalStack gaps."""
+
+    API_PARITY = "api_parity"  # Tests advanced API parameters and response formats
+    EDGE_CASES = "edge_cases"  # Tests edge cases: large payloads, unicode, limits
+    INTEGRATION = "integration"  # Tests cross-service integrations and triggers
+    STRESS = "stress"  # Tests concurrent operations, race conditions, throttling
+
+
 class ArchitectureSourceType(Enum):
     """Origin type of an architecture."""
 
@@ -227,10 +236,14 @@ class Architecture:
 @dataclass
 class SampleApp:
     """
-    A generated application that exercises an architecture.
+    A generated probe application that tests LocalStack compatibility.
 
     Attributes:
         architecture_id: Reference to Architecture.id
+        app_id: Unique identifier for this specific app (architecture_id + probe_type)
+        probe_type: Type of probe (api_parity, edge_cases, integration, stress)
+        probe_name: Human-readable name describing what this app tests
+        probed_features: List of specific features being tested
         source_code: Filename to content mapping for application source
         test_code: Filename to content mapping for test files
         requirements: Python package requirements
@@ -242,19 +255,32 @@ class SampleApp:
     """
 
     architecture_id: str
-    source_code: dict[str, str]  # filename -> content
-    test_code: dict[str, str]  # test filename -> content
-    requirements: list[str]
+    app_id: str = ""  # Will be set to "{architecture_id}_{probe_type}"
+    probe_type: ProbeType = ProbeType.API_PARITY
+    probe_name: str = ""  # e.g., "DynamoDB API Parity Probe"
+    probed_features: list[str] = field(default_factory=list)  # e.g., ["transactions", "streams", "gsi"]
+    source_code: dict[str, str] = field(default_factory=dict)  # filename -> content
+    test_code: dict[str, str] = field(default_factory=dict)  # test filename -> content
+    requirements: list[str] = field(default_factory=list)
     compile_status: str = "pending"  # "success", "failed", "pending"
     compile_errors: Optional[str] = None
     generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    prompt_version: str = "1.0"
+    prompt_version: str = "2.0"  # Updated version for multi-app support
     token_usage: int = 0
+
+    def __post_init__(self):
+        """Set app_id if not provided."""
+        if not self.app_id:
+            self.app_id = f"{self.architecture_id}_{self.probe_type.value}"
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
             "architecture_id": self.architecture_id,
+            "app_id": self.app_id,
+            "probe_type": self.probe_type.value,
+            "probe_name": self.probe_name,
+            "probed_features": self.probed_features,
             "source_code": self.source_code,
             "test_code": self.test_code,
             "requirements": self.requirements,
@@ -270,6 +296,10 @@ class SampleApp:
         """Create from dictionary."""
         return cls(
             architecture_id=data["architecture_id"],
+            app_id=data.get("app_id", ""),
+            probe_type=ProbeType(data.get("probe_type", "api_parity")),
+            probe_name=data.get("probe_name", ""),
+            probed_features=data.get("probed_features", []),
             source_code=data.get("source_code", {}),
             test_code=data.get("test_code", {}),
             requirements=data.get("requirements", []),
@@ -280,6 +310,6 @@ class SampleApp:
                 if data.get("generated_at")
                 else datetime.now(timezone.utc)
             ),
-            prompt_version=data.get("prompt_version", "1.0"),
+            prompt_version=data.get("prompt_version", "2.0"),
             token_usage=data.get("token_usage", 0),
         )

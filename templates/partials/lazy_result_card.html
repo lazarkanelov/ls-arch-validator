@@ -1,0 +1,99 @@
+{# Lazy-loading result card for CAS format #}
+{% macro render_result_card(result, status_class="") %}
+<div class="result-card bg-slate-800 rounded-lg overflow-hidden border border-slate-700 mb-4"
+     data-arch-hash="{{ result.arch_hash }}"
+     data-tf-hash="{{ result.tf_hash or '' }}"
+     data-app-hashes="{{ result.app_hashes | join(',') if result.app_hashes else '' }}">
+
+    <!-- Result Header -->
+    <div class="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <!-- Status indicator -->
+            {% if result.status == 'passed' or status_class == 'passed' %}
+            <span class="flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
+            {% elif result.status == 'partial' or status_class == 'partial' %}
+            <span class="flex h-2.5 w-2.5 rounded-full bg-yellow-500"></span>
+            {% else %}
+            <span class="flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+            {% endif %}
+
+            <div>
+                <h3 class="text-sm font-medium text-white">{{ result.architecture_id }}</h3>
+                <div class="flex flex-wrap gap-1 mt-1">
+                    {% for service in (result.services or [])[:5] %}
+                    <span class="px-1.5 py-0.5 bg-slate-700 rounded text-xs text-slate-300">{{ service }}</span>
+                    {% endfor %}
+                    {% if result.services and result.services | length > 5 %}
+                    <span class="px-1.5 py-0.5 bg-slate-700 rounded text-xs text-slate-400">+{{ result.services | length - 5 }} more</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Probe count badge -->
+        {% if result.app_hashes %}
+        <span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
+            {{ result.app_hashes | length }} probe{{ 's' if result.app_hashes | length > 1 else '' }}
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- Error summary (for failures) -->
+    {% if result.error_summary %}
+    <div class="px-4 py-2 bg-red-500/10 border-b border-slate-700">
+        <p class="text-sm text-red-300">{{ result.error_summary }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Test failures -->
+    {% if result.test_failures %}
+    <div class="px-4 py-2 bg-yellow-500/10 border-b border-slate-700">
+        <div class="flex items-center gap-2 text-sm text-yellow-300">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span>{{ result.test_failures | length }} test failure{{ 's' if result.test_failures | length > 1 else '' }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Expandable details (lazy loaded) -->
+    <details class="lazy-load">
+        <summary class="px-4 py-3 cursor-pointer text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-700/30 flex items-center justify-between">
+            <span class="flex items-center gap-2">
+                <svg class="w-4 h-4 transition-transform details-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                View Details
+            </span>
+            <span class="text-xs text-slate-500">Click to load source info, Terraform, and probe apps</span>
+        </summary>
+        <div class="details-content px-4 py-4 border-t border-slate-700">
+            <!-- Content loaded via JavaScript -->
+            <div class="text-slate-400 text-sm">Loading...</div>
+        </div>
+    </details>
+</div>
+{% endmacro %}
+
+{# Render a list of results with lazy loading #}
+{% macro render_results_list(results, title, empty_message="No results") %}
+<div class="results-list">
+    {% if title %}
+    <h3 class="text-lg font-medium text-white mb-4">{{ title }}</h3>
+    {% endif %}
+
+    {% if results %}
+        {% for result in results %}
+            {{ render_result_card(result) }}
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-8 text-slate-400">
+            <svg class="mx-auto h-12 w-12 text-slate-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p>{{ empty_message }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}

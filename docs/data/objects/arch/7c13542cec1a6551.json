@@ -1,0 +1,15 @@
+{
+  "arch_id": "aws-solutions-serverless-image",
+  "services": [
+    "lambda",
+    "rekognition",
+    "s3"
+  ],
+  "source_info": {
+    "source_id": "aws-solutions",
+    "source_name": "AWS Solutions Library",
+    "source_type": "template",
+    "source_url": "https://aws.amazon.com/solutions/",
+    "original_format": "cloudformation"
+  }
+}

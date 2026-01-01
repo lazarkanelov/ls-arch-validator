@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "partials/probe_apps.html" import render_probe_apps %}
 
 {% block title %}Dashboard - LocalStack Architecture Validator{% endblock %}
 
@@ -337,66 +338,12 @@
                     </div>
                     {% endif %}
 
-                    <!-- Generated Python Application -->
-                    {% if failure.generated_app %}
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Generated Python Application</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>{{ failure.generated_app.source_file_count|default(failure.generated_app.source_files|length) }} source files</span>
-                                <span>{{ failure.generated_app.test_file_count|default(failure.generated_app.test_files|length if failure.generated_app.test_files else 0) }} test files</span>
-                                <span>{{ failure.generated_app.requirements|length }} dependencies</span>
-                            </div>
-                        </div>
-                        <!-- Source files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Source Files</div>
-                            {% for filename, content in failure.generated_app.source_files.items() %}
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    {{ filename }}
-                                </div>
-                                <pre class="language-python overflow-auto"><code>{{ content }}</code></pre>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        <!-- Test files -->
-                        {% if failure.generated_app.test_files %}
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Test Files</div>
-                            {% for filename, content in failure.generated_app.test_files.items() %}
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    {{ filename }}
-                                </div>
-                                <pre class="language-python overflow-auto"><code>{{ content }}</code></pre>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                        <!-- Requirements -->
-                        {% if failure.generated_app.requirements %}
-                        <div>
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Dependencies (requirements.txt)</div>
-                            <div class="px-4 py-3 font-mono text-sm text-slate-300">
-                                {% for req in failure.generated_app.requirements %}
-                                <div>{{ req }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+                    <!-- Generated Probe Applications -->
+                    {% if failure.generated_apps %}
+                    {{ render_probe_apps(failure.generated_apps) }}
+                    {% elif failure.generated_app %}
+                    {# Backwards compatibility: single app format #}
+                    {{ render_probe_apps([failure.generated_app]) }}
                     {% endif %}
 
                     <!-- Test Execution Details -->
@@ -590,66 +537,12 @@ pytest tests/</code></pre>
                     </div>
                     {% endif %}
 
-                    <!-- Generated Python Application -->
-                    {% if passing_item.generated_app %}
-                    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
-                        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                                </svg>
-                                <span class="text-sm font-medium text-white">Generated Python Application</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>{{ passing_item.generated_app.source_file_count|default(passing_item.generated_app.source_files|length) }} source files</span>
-                                <span>{{ passing_item.generated_app.test_file_count|default(passing_item.generated_app.test_files|length if passing_item.generated_app.test_files else 0) }} test files</span>
-                                <span>{{ passing_item.generated_app.requirements|length }} dependencies</span>
-                            </div>
-                        </div>
-                        <!-- Source files -->
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Source Files</div>
-                            {% for filename, content in passing_item.generated_app.source_files.items() %}
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    {{ filename }}
-                                </div>
-                                <pre class="language-python overflow-auto"><code>{{ content }}</code></pre>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        <!-- Test files -->
-                        {% if passing_item.generated_app.test_files %}
-                        <div class="border-b border-slate-700">
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Test Files</div>
-                            {% for filename, content in passing_item.generated_app.test_files.items() %}
-                            <div class="border-b border-slate-700/50 last:border-b-0">
-                                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    {{ filename }}
-                                </div>
-                                <pre class="language-python overflow-auto"><code>{{ content }}</code></pre>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                        <!-- Requirements -->
-                        {% if passing_item.generated_app.requirements %}
-                        <div>
-                            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium">Dependencies (requirements.txt)</div>
-                            <div class="px-4 py-3 font-mono text-sm text-slate-300">
-                                {% for req in passing_item.generated_app.requirements %}
-                                <div>{{ req }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+                    <!-- Generated Probe Applications -->
+                    {% if passing_item.generated_apps %}
+                    {{ render_probe_apps(passing_item.generated_apps) }}
+                    {% elif passing_item.generated_app %}
+                    {# Backwards compatibility: single app format #}
+                    {{ render_probe_apps([passing_item.generated_app]) }}
                     {% endif %}
 
                     <!-- Test Execution Details -->

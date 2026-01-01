@@ -1,0 +1,15 @@
+{
+  "arch_id": "aws-quickstart-vpc-3tier",
+  "services": [
+    "ec2",
+    "rds",
+    "vpc"
+  ],
+  "source_info": {
+    "source_id": "aws-quickstarts",
+    "source_name": "AWS QuickStart Templates",
+    "source_type": "template",
+    "source_url": "https://github.com/aws-quickstart/quickstart-examples",
+    "original_format": "cloudformation"
+  }
+}

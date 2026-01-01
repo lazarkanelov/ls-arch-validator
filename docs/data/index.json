@@ -1,0 +1,121 @@
+{
+  "version": "2.0",
+  "generated_at": "2026-01-01T15:09:27.543271Z",
+  "latest_run": "run-20251230-test",
+  "statistics": {
+    "total": 5,
+    "passed": 3,
+    "partial": 1,
+    "failed": 1,
+    "timeout": 0,
+    "pass_rate": 60.0
+  },
+  "service_summary": [
+    {
+      "name": "lambda",
+      "pass_rate": 66.7
+    },
+    {
+      "name": "s3",
+      "pass_rate": 100.0
+    },
+    {
+      "name": "dynamodb",
+      "pass_rate": 100.0
+    },
+    {
+      "name": "ec2",
+      "pass_rate": 100.0
+    },
+    {
+      "name": "rds",
+      "pass_rate": 50.0
+    }
+  ],
+  "recent_runs": [],
+  "results": [
+    {
+      "arch_hash": "a4fe816fcf27d104",
+      "arch_id": "aws-quickstart-vpc-3tier",
+      "status": "passed",
+      "services": [
+        "ec2",
+        "vpc",
+        "rds"
+      ],
+      "tf_hash": "cb62a8cf8997f2b1",
+      "app_hashes": [
+        "5ef475955abb748f",
+        "28a725cb3856512f"
+      ],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "c22a0092a1521c36",
+      "arch_id": "terraform-aws-lambda-api",
+      "status": "passed",
+      "services": [
+        "lambda",
+        "apigateway",
+        "dynamodb"
+      ],
+      "tf_hash": "882101e49fbf0eb4",
+      "app_hashes": [
+        "af49e703bcb9b09e",
+        "a2a63bf74de464f5"
+      ],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "eb9abefcf0bf26c0",
+      "arch_id": "serverless-rest-api",
+      "status": "passed",
+      "services": [
+        "lambda",
+        "s3"
+      ],
+      "tf_hash": "77f14c045ccf5ad5",
+      "app_hashes": [
+        "62e283ed27ac18cd",
+        "a590b597eab6ea86"
+      ],
+      "error_summary": null,
+      "test_failures": null
+    },
+    {
+      "arch_hash": "84874de73eca8d51",
+      "arch_id": "aws-diagram-microservices",
+      "status": "partial",
+      "services": [
+        "ecs",
+        "alb",
+        "rds"
+      ],
+      "tf_hash": "d568369782e13a49",
+      "app_hashes": [
+        "6d1d77245e22d894",
+        "aa21a83c569ca3a4"
+      ],
+      "error_summary": "ECS task failed to start",
+      "test_failures": [
+        "test_ecs_service_running"
+      ]
+    },
+    {
+      "arch_hash": "7c13542cec1a6551",
+      "arch_id": "aws-solutions-serverless-image",
+      "status": "failed",
+      "services": [
+        "lambda",
+        "s3",
+        "rekognition"
+      ],
+      "tf_hash": null,
+      "app_hashes": [],
+      "error_summary": "Rekognition service not available in LocalStack",
+      "test_failures": null
+    }
+  ]
+}

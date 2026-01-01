@@ -64,9 +64,12 @@ class TerraformCodeInfo:
 
 @dataclass
 class GeneratedAppInfo:
-    """Information about generated application code."""
+    """Information about a generated probe application."""
 
     content_hash: str
+    probe_type: str = "api_parity"  # api_parity, edge_cases, integration, stress
+    probe_name: str = ""
+    probed_features: list[str] = field(default_factory=list)
     source_files: dict[str, str] = field(default_factory=dict)
     test_files: dict[str, str] = field(default_factory=dict)
     requirements: list[str] = field(default_factory=list)
@@ -76,6 +79,9 @@ class GeneratedAppInfo:
         """Convert to dictionary."""
         return {
             "content_hash": self.content_hash,
+            "probe_type": self.probe_type,
+            "probe_name": self.probe_name,
+            "probed_features": self.probed_features,
             "source_files": self.source_files,
             "test_files": self.test_files,
             "requirements": self.requirements,
@@ -127,6 +133,8 @@ class FailureInfo:
     issue_url: Optional[str] = None
     source_info: Optional[ArchitectureSourceInfo] = None
     terraform_code: Optional[TerraformCodeInfo] = None
+    generated_apps: list[GeneratedAppInfo] = field(default_factory=list)
+    # Legacy single app support
     generated_app: Optional[GeneratedAppInfo] = None
 
     def to_dict(self) -> dict:
@@ -145,6 +153,9 @@ class FailureInfo:
             result["source_info"] = self.source_info.to_dict()
         if self.terraform_code:
             result["terraform_code"] = self.terraform_code.to_dict()
+        if self.generated_apps:
+            result["generated_apps"] = [app.to_dict() for app in self.generated_apps]
+        # Legacy single app support for backwards compatibility
         if self.generated_app:
             result["generated_app"] = self.generated_app.to_dict()
         return result
@@ -159,6 +170,8 @@ class PassingInfo:
     services: list[str]
     source_info: Optional[ArchitectureSourceInfo] = None
     terraform_code: Optional[TerraformCodeInfo] = None
+    generated_apps: list[GeneratedAppInfo] = field(default_factory=list)
+    # Legacy single app support
     generated_app: Optional[GeneratedAppInfo] = None
 
     def to_dict(self) -> dict:
@@ -172,6 +185,9 @@ class PassingInfo:
             result["source_info"] = self.source_info.to_dict()
         if self.terraform_code:
             result["terraform_code"] = self.terraform_code.to_dict()
+        if self.generated_apps:
+            result["generated_apps"] = [app.to_dict() for app in self.generated_apps]
+        # Legacy single app support for backwards compatibility
         if self.generated_app:
             result["generated_app"] = self.generated_app.to_dict()
         return result
@@ -282,14 +298,14 @@ class ResultsAggregator:
                     source_info = self._build_source_info(arch)
                     terraform_code = self._build_terraform_code(arch)
 
-                # Get generated app info
-                generated_app = None
+                # Get generated apps info (multiple probes)
+                generated_apps = []
                 if architectures and result.architecture_id in architectures:
                     arch = architectures[result.architecture_id]
-                    if arch.content_hash and app_data and arch.content_hash in app_data:
-                        generated_app = self._build_generated_app_info(
+                    if arch.content_hash:
+                        generated_apps = self._build_generated_apps(
                             arch.content_hash,
-                            app_data[arch.content_hash],
+                            app_data,
                             base_download_url,
                         )
 
@@ -319,7 +335,7 @@ class ResultsAggregator:
                     issue_url=getattr(result, 'issue_url', None),
                     source_info=source_info,
                     terraform_code=terraform_code,
-                    generated_app=generated_app,
+                    generated_apps=generated_apps,
                 )
                 failures.append(failure)
 
@@ -354,14 +370,14 @@ class ResultsAggregator:
                     source_info = self._build_source_info(arch)
                     terraform_code = self._build_terraform_code(arch)
 
-                # Get generated app info
-                generated_app = None
+                # Get generated apps info (multiple probes)
+                generated_apps = []
                 if architectures and result.architecture_id in architectures:
                     arch = architectures[result.architecture_id]
-                    if arch.content_hash and app_data and arch.content_hash in app_data:
-                        generated_app = self._build_generated_app_info(
+                    if arch.content_hash:
+                        generated_apps = self._build_generated_apps(
                             arch.content_hash,
-                            app_data[arch.content_hash],
+                            app_data,
                             base_download_url,
                         )
 
@@ -372,7 +388,7 @@ class ResultsAggregator:
                         services=list(result.services),
                         source_info=source_info,
                         terraform_code=terraform_code,
-                        generated_app=generated_app,
+                        generated_apps=generated_apps,
                     )
                 )
 
@@ -589,12 +605,59 @@ class ResultsAggregator:
         content_hash: str,
         app_data_dict: dict,
         base_download_url: str,
+        probe_type: str = "api_parity",
     ) -> GeneratedAppInfo:
         """Build generated app info from app cache data."""
         return GeneratedAppInfo(
             content_hash=content_hash,
+            probe_type=app_data_dict.get("probe_type", probe_type),
+            probe_name=app_data_dict.get("probe_name", ""),
+            probed_features=app_data_dict.get("probed_features", []),
             source_files=app_data_dict.get("source_code", {}),
             test_files=app_data_dict.get("test_code", {}),
             requirements=app_data_dict.get("requirements", []),
             download_url=f"{base_download_url}/{content_hash}.zip" if base_download_url else None,
         )
+
+    def _build_generated_apps(
+        self,
+        content_hash: str,
+        app_data: Optional[dict],
+        base_download_url: str,
+    ) -> list[GeneratedAppInfo]:
+        """
+        Build list of generated apps from app cache data.
+
+        Supports both:
+        - New format: app_data keyed by "{content_hash}_{probe_type}"
+        - Legacy format: app_data keyed by content_hash only
+        """
+        apps = []
+        probe_types = ["api_parity", "edge_cases", "integration", "stress"]
+
+        if not app_data:
+            return apps
+
+        # Try new format first: look for probe-specific keys
+        for probe_type in probe_types:
+            probe_key = f"{content_hash}_{probe_type}"
+            if probe_key in app_data:
+                app_info = self._build_generated_app_info(
+                    probe_key,
+                    app_data[probe_key],
+                    base_download_url,
+                    probe_type,
+                )
+                apps.append(app_info)
+
+        # Fallback to legacy format if no probe-specific apps found
+        if not apps and content_hash in app_data:
+            app_info = self._build_generated_app_info(
+                content_hash,
+                app_data[content_hash],
+                base_download_url,
+                "api_parity",
+            )
+            apps.append(app_info)
+
+        return apps

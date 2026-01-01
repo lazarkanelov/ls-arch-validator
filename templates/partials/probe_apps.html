@@ -1,0 +1,140 @@
+{# Display multiple probe applications for an architecture #}
+{% macro render_probe_apps(apps) %}
+{% if apps and apps|length > 0 %}
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+            <span class="text-sm font-medium text-white">Generated Probe Applications ({{ apps|length }})</span>
+        </div>
+        <span class="text-xs text-slate-400">Testing LocalStack AWS compatibility</span>
+    </div>
+
+    {% for app in apps %}
+    <div class="bg-slate-850 rounded-lg overflow-hidden border border-slate-700">
+        <!-- Probe Header -->
+        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <!-- Probe Type Badge -->
+                    {% set badge_colors = {
+                        'api_parity': 'bg-blue-500/20 text-blue-400 ring-blue-500/30',
+                        'edge_cases': 'bg-orange-500/20 text-orange-400 ring-orange-500/30',
+                        'integration': 'bg-purple-500/20 text-purple-400 ring-purple-500/30',
+                        'stress': 'bg-red-500/20 text-red-400 ring-red-500/30'
+                    } %}
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ring-1 {{ badge_colors.get(app.probe_type, 'bg-slate-500/20 text-slate-400 ring-slate-500/30') }}">
+                        {% if app.probe_type == 'api_parity' %}
+                        <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        API Parity
+                        {% elif app.probe_type == 'edge_cases' %}
+                        <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        Edge Cases
+                        {% elif app.probe_type == 'integration' %}
+                        <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        </svg>
+                        Integration
+                        {% elif app.probe_type == 'stress' %}
+                        <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Stress Test
+                        {% else %}
+                        {{ app.probe_type }}
+                        {% endif %}
+                    </span>
+                    <span class="text-sm font-medium text-white">{{ app.probe_name }}</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-slate-400">
+                    <span>{{ app.source_files|length if app.source_files else 0 }} source files</span>
+                    <span>{{ app.test_files|length if app.test_files else 0 }} test files</span>
+                </div>
+            </div>
+
+            <!-- Probed Features -->
+            {% if app.probed_features %}
+            <div class="mt-2 flex flex-wrap gap-1">
+                {% for feature in app.probed_features[:8] %}
+                <span class="px-2 py-0.5 bg-slate-700/50 rounded text-xs text-slate-300">{{ feature }}</span>
+                {% endfor %}
+                {% if app.probed_features|length > 8 %}
+                <span class="px-2 py-0.5 bg-slate-700/50 rounded text-xs text-slate-400">+{{ app.probed_features|length - 8 }} more</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Source Files -->
+        {% if app.source_files %}
+        <div class="border-b border-slate-700">
+            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium flex items-center gap-2">
+                <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                </svg>
+                Source Files
+            </div>
+            {% for filename, content in app.source_files.items() %}
+            <div class="border-b border-slate-700/50 last:border-b-0">
+                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
+                    <svg class="w-4 h-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    {{ filename }}
+                </div>
+                <pre class="language-python overflow-auto max-h-96"><code>{{ content }}</code></pre>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Test Files -->
+        {% if app.test_files %}
+        <div class="border-b border-slate-700">
+            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium flex items-center gap-2">
+                <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Test Files
+            </div>
+            {% for filename, content in app.test_files.items() %}
+            <div class="border-b border-slate-700/50 last:border-b-0">
+                <div class="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 font-mono flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    {{ filename }}
+                </div>
+                <pre class="language-python overflow-auto max-h-96"><code>{{ content }}</code></pre>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Requirements -->
+        {% if app.requirements %}
+        <div>
+            <div class="px-4 py-2 bg-slate-700/30 text-xs text-slate-300 font-medium flex items-center gap-2">
+                <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Dependencies (requirements.txt)
+            </div>
+            <div class="px-4 py-3 font-mono text-sm text-slate-300">
+                {% for req in app.requirements %}
+                <div>{{ req }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endmacro %}

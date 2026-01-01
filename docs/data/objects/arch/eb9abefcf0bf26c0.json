@@ -1,0 +1,14 @@
+{
+  "arch_id": "serverless-rest-api",
+  "services": [
+    "lambda",
+    "s3"
+  ],
+  "source_info": {
+    "source_id": "serverless-examples",
+    "source_name": "Serverless Framework Examples",
+    "source_type": "template",
+    "source_url": "https://github.com/serverless/examples",
+    "original_format": "serverless"
+  }
+}

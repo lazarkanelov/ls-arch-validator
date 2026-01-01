@@ -148,7 +148,7 @@
                         </span>
                         {% endif %}
 
-                        <a href="{{ base_url }}/data/latest.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
+                        <a href="{{ base_url }}/data/index.json" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition-colors" download>
                             <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
@@ -190,6 +190,182 @@
         function toggleMobileMenu() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         }
+
+        // Content-Addressable Storage: Lazy Loading Utilities
+        const ObjectLoader = {
+            cache: {},
+            baseUrl: '{{ base_url }}/data',
+
+            async loadObject(type, hash) {
+                const key = `${type}/${hash}`;
+                if (!this.cache[key]) {
+                    try {
+                        const response = await fetch(`${this.baseUrl}/objects/${type}/${hash}.json`);
+                        if (!response.ok) throw new Error(`Failed to load ${type}/${hash}`);
+                        this.cache[key] = await response.json();
+                    } catch (error) {
+                        console.error(`Error loading object ${type}/${hash}:`, error);
+                        return null;
+                    }
+                }
+                return this.cache[key];
+            },
+
+            async loadArchitecture(archHash, tfHash, appHashes) {
+                const promises = [
+                    this.loadObject('arch', archHash),
+                    tfHash ? this.loadObject('tf', tfHash) : Promise.resolve(null),
+                    ...(appHashes || []).map(h => this.loadObject('app', h))
+                ];
+
+                const [arch, tf, ...apps] = await Promise.all(promises);
+                return { arch, tf, apps: apps.filter(Boolean) };
+            }
+        };
+
+        // Expand architecture details on demand
+        async function expandDetails(detailsElement) {
+            const container = detailsElement.closest('[data-arch-hash]');
+            if (!container || container.dataset.loaded === 'true') return;
+
+            const archHash = container.dataset.archHash;
+            const tfHash = container.dataset.tfHash;
+            const appHashes = (container.dataset.appHashes || '').split(',').filter(Boolean);
+
+            const contentDiv = detailsElement.querySelector('.details-content');
+            if (!contentDiv) return;
+
+            // Show loading state
+            contentDiv.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <svg class="animate-spin h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="ml-2 text-slate-400">Loading details...</span>
+                </div>
+            `;
+
+            try {
+                const data = await ObjectLoader.loadArchitecture(archHash, tfHash, appHashes);
+                renderArchitectureDetails(contentDiv, data);
+                container.dataset.loaded = 'true';
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="text-red-400 py-4">
+                        <svg class="inline h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Failed to load details. ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Render architecture details after lazy loading
+        function renderArchitectureDetails(container, data) {
+            let html = '';
+
+            // Source info
+            if (data.arch && data.arch.source_info) {
+                const src = data.arch.source_info;
+                html += `
+                    <div class="mb-4 p-4 bg-slate-800 rounded-lg border-l-4 border-primary-500">
+                        <h4 class="text-sm font-medium text-slate-200 mb-2">Architecture Source</h4>
+                        <dl class="grid grid-cols-2 gap-2 text-sm">
+                            <dt class="text-slate-400">Source:</dt>
+                            <dd class="text-slate-200">${src.source_name || 'Unknown'}</dd>
+                            ${src.source_url ? `
+                            <dt class="text-slate-400">URL:</dt>
+                            <dd><a href="${src.source_url}" target="_blank" class="text-primary-400 hover:underline">${src.source_url.substring(0, 50)}...</a></dd>
+                            ` : ''}
+                            ${src.original_format ? `
+                            <dt class="text-slate-400">Format:</dt>
+                            <dd class="text-slate-200">${src.original_format}</dd>
+                            ` : ''}
+                        </dl>
+                    </div>
+                `;
+            }
+
+            // Terraform code
+            if (data.tf && data.tf.main_tf) {
+                html += `
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-slate-200 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                            Terraform Code
+                        </h4>
+                        <pre class="language-hcl overflow-auto max-h-64 text-xs"><code>${escapeHtml(data.tf.main_tf)}</code></pre>
+                    </div>
+                `;
+            }
+
+            // Generated apps
+            if (data.apps && data.apps.length > 0) {
+                html += `<h4 class="text-sm font-medium text-slate-200 mb-2">Generated Probe Apps (${data.apps.length})</h4>`;
+                for (const app of data.apps) {
+                    const badgeColor = {
+                        'api_parity': 'bg-blue-500/20 text-blue-400',
+                        'edge_cases': 'bg-orange-500/20 text-orange-400',
+                        'integration': 'bg-purple-500/20 text-purple-400',
+                        'stress': 'bg-red-500/20 text-red-400'
+                    }[app.probe_type] || 'bg-slate-500/20 text-slate-400';
+
+                    html += `
+                        <div class="mb-3 p-3 bg-slate-800 rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs ${badgeColor}">${app.probe_type}</span>
+                                <span class="text-sm text-slate-200">${app.probe_name}</span>
+                            </div>
+                            ${app.probed_features ? `
+                            <div class="flex flex-wrap gap-1 mb-2">
+                                ${app.probed_features.slice(0, 5).map(f => `<span class="px-1.5 py-0.5 bg-slate-700 rounded text-xs text-slate-300">${f}</span>`).join('')}
+                            </div>
+                            ` : ''}
+                            <details class="text-xs">
+                                <summary class="cursor-pointer text-slate-400 hover:text-slate-200">View source files</summary>
+                                <div class="mt-2">
+                                    ${Object.entries(app.source_files || {}).map(([filename, content]) => `
+                                        <div class="mb-2">
+                                            <div class="text-slate-400 font-mono mb-1">${filename}</div>
+                                            <pre class="language-python overflow-auto max-h-48"><code>${escapeHtml(content)}</code></pre>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </details>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = html || '<div class="text-slate-400 py-4">No additional details available.</div>';
+
+            // Re-highlight code blocks
+            if (window.Prism) {
+                container.querySelectorAll('pre code').forEach(block => Prism.highlightElement(block));
+            }
+        }
+
+        // Escape HTML for safe rendering
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Setup details toggle handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('details.lazy-load').forEach(details => {
+                details.addEventListener('toggle', function() {
+                    if (this.open) {
+                        expandDetails(this);
+                    }
+                });
+            });
+        });
     </script>
 
     {% block scripts %}{% endblock %}

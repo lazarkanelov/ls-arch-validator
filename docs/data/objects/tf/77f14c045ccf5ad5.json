@@ -1,0 +1,5 @@
+{
+  "main_tf": "# Document Processing Pipeline\n\nresource \"aws_s3_bucket\" \"uploads\" {\n  bucket = \"document-uploads-${var.environment}\"\n}\n\nresource \"aws_s3_bucket\" \"processed\" {\n  bucket = \"document-processed-${var.environment}\"\n}\n\nresource \"aws_lambda_function\" \"processor\" {\n  function_name = \"document-processor\"\n  runtime       = \"python3.11\"\n  handler       = \"handlers.process_document\"\n  role          = aws_iam_role.lambda.arn\n  filename      = \"lambda.zip\"\n  timeout       = 60\n  memory_size   = 512\n}\n\nresource \"aws_s3_bucket_notification\" \"upload_trigger\" {\n  bucket = aws_s3_bucket.uploads.id\n\n  lambda_function {\n    lambda_function_arn = aws_lambda_function.processor.arn\n    events              = [\"s3:ObjectCreated:*\"]\n    filter_prefix       = \"incoming/\"\n  }\n}\n",
+  "variables_tf": null,
+  "outputs_tf": null
+}
