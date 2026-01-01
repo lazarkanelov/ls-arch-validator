@@ -88,7 +88,7 @@ async def generate_all(
 
         # Add delay between API calls to avoid rate limiting (except for first)
         if i > 0:
-            await asyncio.sleep(2.0)  # 2 second delay between calls
+            await asyncio.sleep(5.0)  # 5 second delay between calls to stay under rate limits
 
         try:
             # Generate application

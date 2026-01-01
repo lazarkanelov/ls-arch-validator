@@ -90,14 +90,19 @@ class CodeSynthesizer:
         self._client = None
 
     async def _get_client(self):
-        """Get or create Anthropic client."""
+        """Get or create Anthropic client with conservative rate limit settings."""
         if self._client is None:
             import anthropic
 
             if not self.api_key:
                 raise ValueError("ANTHROPIC_API_KEY not set")
 
-            self._client = anthropic.AsyncAnthropic(api_key=self.api_key)
+            # Configure client with conservative retry settings
+            self._client = anthropic.AsyncAnthropic(
+                api_key=self.api_key,
+                max_retries=5,  # More retries for rate limits
+                timeout=120.0,  # 2 minute timeout per request
+            )
 
         return self._client
 
@@ -152,7 +157,12 @@ class CodeSynthesizer:
         # Analyze infrastructure once for all probes
         analysis = self.analyzer.analyze(architecture.main_tf)
 
-        for probe_type in probe_types:
+        for i, probe_type in enumerate(probe_types):
+            # Add delay between probe types to avoid rate limiting
+            if i > 0:
+                import asyncio
+                await asyncio.sleep(3.0)  # 3 second delay between probes
+
             cache_key = f"{architecture.content_hash}_{probe_type.value}"
 
             # Check cache
@@ -302,7 +312,7 @@ class CodeSynthesizer:
         probe_type: ProbeType,
     ) -> dict[str, Any]:
         """
-        Generate probe code using Claude.
+        Generate probe code using Claude with robust retry logic.
 
         Args:
             prompt: The probe-specific prompt
@@ -311,34 +321,56 @@ class CodeSynthesizer:
         Returns:
             Dict with files, requirements, probed_features
         """
-        try:
-            client = await self._get_client()
+        import asyncio
 
-            response = await client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}],
-            )
+        max_retries = 3
+        base_delay = 10  # Start with 10 second delay
 
-            # Track token usage
-            tracker = TokenTracker.get_instance()
-            tracker.record_from_response(response.usage)
+        for attempt in range(max_retries):
+            try:
+                client = await self._get_client()
 
-            # Parse response
-            content = response.content[0].text
-            result = self._parse_json_response(content)
-            result["tokens"] = response.usage.input_tokens + response.usage.output_tokens
+                response = await client.messages.create(
+                    model=self.model,
+                    max_tokens=4096,
+                    system=SYSTEM_PROMPT,
+                    messages=[{"role": "user", "content": prompt}],
+                )
 
-            # Set probe name from config if not in response
-            if not result.get("probe_name") and probe_type in PROBE_CONFIGS:
-                result["probe_name"] = PROBE_CONFIGS[probe_type]["name"]
+                # Track token usage
+                tracker = TokenTracker.get_instance()
+                tracker.record_from_response(response.usage)
 
-            return result
+                # Parse response
+                content = response.content[0].text
+                result = self._parse_json_response(content)
+                result["tokens"] = response.usage.input_tokens + response.usage.output_tokens
 
-        except Exception as e:
-            logger.error("probe_generation_failed", probe_type=probe_type.value, error=str(e))
-            return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
+                # Set probe name from config if not in response
+                if not result.get("probe_name") and probe_type in PROBE_CONFIGS:
+                    result["probe_name"] = PROBE_CONFIGS[probe_type]["name"]
+
+                return result
+
+            except Exception as e:
+                error_str = str(e)
+                is_rate_limit = "429" in error_str or "rate" in error_str.lower()
+
+                if attempt < max_retries - 1 and is_rate_limit:
+                    # Exponential backoff for rate limits
+                    delay = base_delay * (2 ** attempt)
+                    logger.warning(
+                        "rate_limit_retry",
+                        probe_type=probe_type.value,
+                        attempt=attempt + 1,
+                        delay=delay,
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error("probe_generation_failed", probe_type=probe_type.value, error=error_str)
+                    return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
+
+        return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
 
     async def _generate_source_code(
         self,
@@ -388,7 +420,7 @@ class CodeSynthesizer:
         app_code: str,
     ) -> dict[str, Any]:
         """
-        Generate test code using Claude.
+        Generate test code using Claude with robust retry logic.
 
         Args:
             analysis: Infrastructure analysis
@@ -397,32 +429,47 @@ class CodeSynthesizer:
         Returns:
             Dict with test files and requirements
         """
+        import asyncio
+
         prompt = format_test_prompt(analysis, app_code)
+        max_retries = 3
+        base_delay = 10
 
-        try:
-            client = await self._get_client()
+        for attempt in range(max_retries):
+            try:
+                client = await self._get_client()
 
-            response = await client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}],
-            )
+                response = await client.messages.create(
+                    model=self.model,
+                    max_tokens=4096,
+                    system=SYSTEM_PROMPT,
+                    messages=[{"role": "user", "content": prompt}],
+                )
 
-            # Track token usage
-            tracker = TokenTracker.get_instance()
-            tracker.record_from_response(response.usage)
+                # Track token usage
+                tracker = TokenTracker.get_instance()
+                tracker.record_from_response(response.usage)
 
-            # Parse response
-            content = response.content[0].text
-            result = self._parse_json_response(content)
-            result["tokens"] = response.usage.input_tokens + response.usage.output_tokens
+                # Parse response
+                content = response.content[0].text
+                result = self._parse_json_response(content)
+                result["tokens"] = response.usage.input_tokens + response.usage.output_tokens
 
-            return result
+                return result
 
-        except Exception as e:
-            logger.error("test_generation_failed", error=str(e))
-            return {"files": {}, "requirements": [], "tokens": 0}
+            except Exception as e:
+                error_str = str(e)
+                is_rate_limit = "429" in error_str or "rate" in error_str.lower()
+
+                if attempt < max_retries - 1 and is_rate_limit:
+                    delay = base_delay * (2 ** attempt)
+                    logger.warning("rate_limit_retry_tests", attempt=attempt + 1, delay=delay)
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error("test_generation_failed", error=error_str)
+                    return {"files": {}, "requirements": [], "tokens": 0}
+
+        return {"files": {}, "requirements": [], "tokens": 0}
 
     def _parse_json_response(self, content: str) -> dict[str, Any]:
         """

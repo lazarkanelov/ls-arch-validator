@@ -654,8 +654,8 @@ def report(
 @click.option(
     "--max-per-source",
     type=int,
-    default=10,
-    help="Maximum architectures per source (default: 10)",
+    default=3,
+    help="Maximum architectures per source (default: 3, keeps API calls low)",
 )
 @pass_context
 def run(
