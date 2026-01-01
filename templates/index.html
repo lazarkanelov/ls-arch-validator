@@ -661,13 +661,24 @@ function renderFullDetails(container, data, tfHash) {
                 ` : ''}
             </div>
         `;
-    } else if (!tfHash) {
-        html += `
-            <div class="mb-4 p-4 bg-danger-500/5 border border-danger-500/20 rounded-lg">
-                <h4 class="text-sm font-medium text-danger-400 mb-1">No Terraform Generated</h4>
-                <p class="text-sm text-slate-400">This architecture failed before Terraform could be generated. Check the error details above.</p>
-            </div>
-        `;
+    } else {
+        // Only show "no terraform" message if we expected terraform but didn't get it
+        // (tfHash was provided but data.tf is null/empty)
+        if (tfHash && tfHash.length > 0) {
+            html += `
+                <div class="mb-4 p-4 bg-warning-500/5 border border-warning-500/20 rounded-lg">
+                    <h4 class="text-sm font-medium text-warning-400 mb-1">Terraform Loading Failed</h4>
+                    <p class="text-sm text-slate-400">Could not load Terraform code. Try refreshing the page.</p>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="mb-4 p-4 bg-danger-500/5 border border-danger-500/20 rounded-lg">
+                    <h4 class="text-sm font-medium text-danger-400 mb-1">No Terraform Generated</h4>
+                    <p class="text-sm text-slate-400">This architecture failed before Terraform could be generated. The service may not be supported in LocalStack.</p>
+                </div>
+            `;
+        }
     }
 
     // Generated apps

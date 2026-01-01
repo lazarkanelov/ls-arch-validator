@@ -214,9 +214,9 @@
 
             async loadArchitecture(archHash, tfHash, appHashes) {
                 const promises = [
-                    this.loadObject('arch', archHash),
-                    tfHash ? this.loadObject('tf', tfHash) : Promise.resolve(null),
-                    ...(appHashes || []).map(h => this.loadObject('app', h))
+                    archHash ? this.loadObject('arch', archHash) : Promise.resolve(null),
+                    (tfHash && tfHash.length > 0) ? this.loadObject('tf', tfHash) : Promise.resolve(null),
+                    ...(appHashes || []).filter(h => h && h.length > 0).map(h => this.loadObject('app', h))
                 ];
 
                 const [arch, tf, ...apps] = await Promise.all(promises);
