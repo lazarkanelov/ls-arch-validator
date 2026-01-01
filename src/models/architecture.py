@@ -12,60 +12,66 @@ class SourceType(Enum):
     """Type of template source."""
 
     GITHUB_REPO = "github_repo"
+    GITHUB = "github_repo"  # Alias for backwards compatibility
     TERRAFORM_REGISTRY = "terraform_registry"
+    REGISTRY = "terraform_registry"  # Alias for backwards compatibility
     DIAGRAM = "diagram"
 
 
 @dataclass
 class TemplateSource:
     """
-    Represents a repository or registry from which infrastructure templates are mined.
+    Represents an extracted infrastructure template with its source information.
 
     Attributes:
-        id: Unique identifier (e.g., "aws-quickstart", "terraform-registry")
-        name: Human-readable name
         source_type: Type of source (github, registry, diagram)
-        url: Base URL or repo URL
-        last_mined_at: Timestamp of last mining operation
-        last_commit_sha: Git commit SHA for GitHub sources
-        enabled: Whether this source is enabled for mining
+        source_name: Name of the source (e.g., "aws-quickstarts", "terraform-registry")
+        source_url: URL to the original source
+        template_path: Path to the template file within the source
+        template_id: Unique identifier for this template
+        raw_content: Raw template content (YAML, JSON, HCL, etc.)
+        version: Version of the template (for registry sources)
+        commit_sha: Git commit SHA (for GitHub sources)
+        metadata: Additional metadata about the template
     """
 
-    id: str
-    name: str
     source_type: SourceType
-    url: str
-    last_mined_at: Optional[datetime] = None
-    last_commit_sha: Optional[str] = None
-    enabled: bool = True
+    source_name: str
+    source_url: str
+    template_path: str
+    template_id: str
+    raw_content: str
+    version: Optional[str] = None
+    commit_sha: Optional[str] = None
+    metadata: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
-            "id": self.id,
-            "name": self.name,
             "source_type": self.source_type.value,
-            "url": self.url,
-            "last_mined_at": self.last_mined_at.isoformat() if self.last_mined_at else None,
-            "last_commit_sha": self.last_commit_sha,
-            "enabled": self.enabled,
+            "source_name": self.source_name,
+            "source_url": self.source_url,
+            "template_path": self.template_path,
+            "template_id": self.template_id,
+            "raw_content": self.raw_content,
+            "version": self.version,
+            "commit_sha": self.commit_sha,
+            "metadata": self.metadata,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> "TemplateSource":
         """Create from dictionary."""
         return cls(
-            id=data["id"],
-            name=data["name"],
             source_type=SourceType(data["source_type"]),
-            url=data["url"],
-            last_mined_at=(
-                datetime.fromisoformat(data["last_mined_at"])
-                if data.get("last_mined_at")
-                else None
-            ),
-            last_commit_sha=data.get("last_commit_sha"),
-            enabled=data.get("enabled", True),
+            source_name=data["source_name"],
+            source_url=data["source_url"],
+            template_path=data["template_path"],
+            template_id=data["template_id"],
+            raw_content=data["raw_content"],
+            version=data.get("version"),
+            commit_sha=data.get("commit_sha"),
+            metadata=data.get("metadata", {}),
         )
 
 

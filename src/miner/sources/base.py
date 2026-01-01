@@ -177,18 +177,38 @@ class GitHubSourceExtractor(SourceExtractor):
             )
             await process.communicate()
         else:
-            # Clone new repo
+            # Clone new repo - try multiple branches
             self.logger.debug("cloning_repo", url=self.repo_url, path=str(repo_path))
             repo_path.parent.mkdir(parents=True, exist_ok=True)
-            process = await asyncio.create_subprocess_exec(
-                "git", "clone", "--depth", "1", "-b", self.branch,
-                self.repo_url, str(repo_path),
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await process.communicate()
-            if process.returncode != 0:
-                raise RuntimeError(f"Failed to clone repo: {stderr.decode()}")
+
+            # Try specified branch first, then common fallbacks
+            branches_to_try = [self.branch]
+            if self.branch == "main":
+                branches_to_try.append("master")
+            elif self.branch == "master":
+                branches_to_try.append("main")
+
+            cloned = False
+            last_error = ""
+            for branch in branches_to_try:
+                process = await asyncio.create_subprocess_exec(
+                    "git", "clone", "--depth", "1", "-b", branch,
+                    self.repo_url, str(repo_path),
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                stdout, stderr = await process.communicate()
+                if process.returncode == 0:
+                    cloned = True
+                    break
+                last_error = stderr.decode()
+                # Remove failed clone attempt
+                if repo_path.exists():
+                    import shutil
+                    shutil.rmtree(repo_path)
+
+            if not cloned:
+                raise RuntimeError(f"Failed to clone repo: {last_error}")
 
         self._repo_path = repo_path
         return repo_path

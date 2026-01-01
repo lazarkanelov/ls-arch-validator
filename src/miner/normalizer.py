@@ -48,7 +48,7 @@ KNOWN_LIMITATIONS = {
 class NormalizationResult:
     """Result of normalizing a template."""
 
-    main_tf: str
+    main_tf: str = ""
     variables_tf: Optional[str] = None
     outputs_tf: Optional[str] = None
     services: set[str] = field(default_factory=set)
@@ -142,27 +142,27 @@ class TemplateNormalizer:
     def extract_metadata(
         self,
         terraform_content: str,
-        source_metadata: dict[str, Any],
+        original_format: str = "terraform",
     ) -> ArchitectureMetadata:
         """
         Extract metadata from a template.
 
         Args:
             terraform_content: Terraform HCL content
-            source_metadata: Metadata from the source
+            original_format: Original template format
 
         Returns:
             ArchitectureMetadata
         """
         services = self._detect_services(terraform_content)
         resource_count = self._count_resources(terraform_content)
-        complexity = self._calculate_complexity(terraform_content, services)
+        complexity = ArchitectureMetadata.calculate_complexity(resource_count, list(services))
 
         return ArchitectureMetadata(
-            services=services,
+            services=list(services),
             resource_count=resource_count,
-            complexity_score=complexity,
-            source_metadata=source_metadata,
+            complexity=complexity,
+            original_format=original_format,
         )
 
     def create_architecture(
@@ -172,6 +172,7 @@ class TemplateNormalizer:
         source_type: ArchitectureSourceType,
         source_name: str,
         source_url: str,
+        original_format: str = "terraform",
     ) -> Architecture:
         """
         Create an Architecture object from normalized result.
@@ -182,14 +183,21 @@ class TemplateNormalizer:
             source_type: Source type
             source_name: Source name
             source_url: Source URL
+            original_format: Original template format
 
         Returns:
             Architecture object
         """
+        resource_count = self._count_resources(normalized.main_tf)
+        complexity = ArchitectureMetadata.calculate_complexity(
+            resource_count, list(normalized.services)
+        )
+
         metadata = ArchitectureMetadata(
-            services=normalized.services,
-            resource_count=self._count_resources(normalized.main_tf),
-            complexity_score=normalized.complexity_score,
+            services=list(normalized.services),
+            resource_count=resource_count,
+            complexity=complexity,
+            original_format=original_format,
         )
 
         return Architecture(

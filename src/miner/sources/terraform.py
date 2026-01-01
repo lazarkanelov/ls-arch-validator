@@ -225,9 +225,23 @@ class TerraformRegistryExtractor(RegistrySourceExtractor):
         """
         import asyncio
         import tempfile
+        import re
 
         try:
             import httpx
+
+            # Handle git:: prefixed URLs from Terraform Registry
+            if url.startswith("git::"):
+                url = url[5:]  # Remove git:: prefix
+
+            # Handle GitHub URLs with ?ref= parameter
+            # Convert to archive download URL
+            if "github.com" in url and "?ref=" in url:
+                match = re.match(r"https://github\.com/([^/]+)/([^?]+)\?ref=(.+)", url)
+                if match:
+                    owner, repo, ref = match.groups()
+                    # Use GitHub archive API to download as tarball
+                    url = f"https://github.com/{owner}/{repo}/archive/{ref}.tar.gz"
 
             async with httpx.AsyncClient(follow_redirects=True) as client:
                 response = await client.get(url)

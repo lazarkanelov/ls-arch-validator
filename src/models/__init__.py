@@ -5,6 +5,7 @@ from src.models.architecture import (
     ArchitectureMetadata,
     ArchitectureSourceType,
     ArchitectureStatus,
+    ProbeType,
     SampleApp,
     SourceType,
     TemplateSource,
@@ -36,6 +37,7 @@ __all__ = [
     "ArchitectureSourceType",
     "ArchitectureMetadata",
     "Architecture",
+    "ProbeType",
     "SampleApp",
     # Result models
     "RunStatistics",
