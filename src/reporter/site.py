@@ -100,25 +100,61 @@ class SiteGenerator:
         )
 
         # Get dashboard data
-        if run is not None:
-            dashboard_data = self._prepare_data_from_run(
-                run, data_output_dir, architectures, app_cache
+        try:
+            if run is not None:
+                dashboard_data = self._prepare_data_from_run(
+                    run, data_output_dir, architectures, app_cache
+                )
+            elif data_dir is not None:
+                dashboard_data = self._load_data_from_files(data_dir)
+            else:
+                # Try to load from output directory's data folder
+                dashboard_data = self._load_data_from_files(data_output_dir)
+
+            # Render dashboard
+            index_path = self._render_dashboard(dashboard_data)
+
+            logger.info(
+                "site_generated",
+                output_path=str(index_path),
+                has_run=run is not None,
             )
-        elif data_dir is not None:
-            dashboard_data = self._load_data_from_files(data_dir)
-        else:
-            # Try to load from output directory's data folder
-            dashboard_data = self._load_data_from_files(data_output_dir)
 
-        # Render dashboard
-        index_path = self._render_dashboard(dashboard_data)
+            return index_path
+        except Exception as e:
+            logger.error("dashboard_generation_failed", error=str(e))
+            # Create a minimal fallback page
+            index_path = self._create_fallback_page(str(e))
+            return index_path
 
-        logger.info(
-            "site_generated",
-            output_path=str(index_path),
-            has_run=run is not None,
-        )
-
+    def _create_fallback_page(self, error_message: str) -> Path:
+        """Create a minimal fallback page when generation fails."""
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LocalStack Architecture Validator - Error</title>
+    <style>
+        body {{ font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
+        .container {{ max-width: 600px; margin: 0 auto; text-align: center; }}
+        h1 {{ color: #f87171; }}
+        .error {{ background: #1e293b; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }}
+        code {{ font-size: 0.9rem; color: #94a3b8; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard Generation Error</h1>
+        <p>The validation pipeline ran but failed to generate the dashboard.</p>
+        <div class="error">
+            <code>{error_message}</code>
+        </div>
+        <p>Check the workflow logs for more details.</p>
+    </div>
+</body>
+</html>"""
+        index_path = self.output_dir / "index.html"
+        index_path.write_text(html)
         return index_path
 
     def _prepare_data_from_run(
