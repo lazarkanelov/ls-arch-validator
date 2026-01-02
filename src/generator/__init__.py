@@ -80,15 +80,21 @@ async def generate_all(
     )
 
     for i, arch in enumerate(architectures):
+        logger.info(
+            "processing_architecture",
+            index=i + 1,
+            total=len(architectures),
+            arch_id=arch.id,
+        )
+
         # Check token budget
         if tracker.exhausted:
             logger.warning("token_budget_exhausted", remaining=tracker.remaining)
             result.skipped.append(arch.id)
             continue
 
-        # Add delay between API calls to avoid rate limiting (except for first)
-        if i > 0:
-            await asyncio.sleep(5.0)  # 5 second delay between calls to stay under rate limits
+        # Note: Rate limiting delays are handled inside the synthesizer
+        # Each API call waits 35 seconds before executing (for Tier 1 limits)
 
         try:
             # Generate application
