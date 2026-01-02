@@ -412,6 +412,8 @@ class ArchitectureProcessor:
 
     async def _handle_generating(self, arch_state: ArchitectureState) -> None:
         """Handle architecture in GENERATING state - call Claude API."""
+        import os
+
         arch_id = arch_state.arch_id
         arch = arch_state.architecture or self._architectures.get(arch_id)
 
@@ -423,7 +425,20 @@ class ArchitectureProcessor:
             )
             return
 
+        # Check for API key
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            error_msg = "ANTHROPIC_API_KEY not set - cannot generate probe apps"
+            logger.error("api_key_missing", arch_id=arch_id)
+            self.machine.handle_error(
+                arch_id,
+                ValueError(error_msg),
+                recoverable=False,
+            )
+            return
+
         try:
+            logger.info("generating_probe_app", arch_id=arch_id)
+
             # Call Claude API to generate probe app
             synthesis = await self.synthesizer.synthesize(
                 arch,
@@ -689,6 +704,28 @@ class ArchitectureProcessor:
     def _compile_results(self) -> ValidationRun:
         """Compile all results into a ValidationRun."""
         from src.models import RunStatistics
+
+        # Add error results for architectures that failed during processing
+        for arch_state in self.machine._states.values():
+            if arch_state.state == ArchState.ERROR:
+                error_result = ArchitectureResult(
+                    architecture_id=arch_state.arch_id,
+                    status=ResultStatus.FAILED,
+                    passed_tests=[],
+                    failed_tests=[],
+                    error_summary=arch_state.context.error_message or "Processing failed",
+                )
+                self._results.append(error_result)
+            elif arch_state.state == ArchState.SKIPPED:
+                # Also include skipped architectures
+                skip_result = ArchitectureResult(
+                    architecture_id=arch_state.arch_id,
+                    status=ResultStatus.FAILED,
+                    passed_tests=[],
+                    failed_tests=[],
+                    error_summary=arch_state.context.error_message or "Skipped",
+                )
+                self._results.append(skip_result)
 
         stats = RunStatistics(
             total=self.machine.stats.total,
