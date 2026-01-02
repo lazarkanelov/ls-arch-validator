@@ -431,6 +431,79 @@ class ResultStatus(Enum):
     TIMEOUT = "timeout"  # Exceeded time limit
 
 
+class PipelineStatus(Enum):
+    """
+    Explicit status for the validation pipeline.
+
+    Replaces the ambiguous "completed" status with granular statuses
+    that distinguish between different completion and failure modes.
+    """
+
+    # Running states
+    PENDING = "pending"
+    RUNNING = "running"
+
+    # Success states
+    COMPLETED_SUCCESS = "completed_success"  # All stages succeeded with results
+    COMPLETED_PARTIAL = "completed_partial"  # Pipeline ran but some tests failed
+    COMPLETED_EMPTY = "completed_empty"  # Pipeline ran but 0 architectures processed
+
+    # Failure states - guards (preconditions)
+    FAILED_GUARD_API_KEY = "failed_guard_api_key"
+    FAILED_GUARD_TEMPLATES = "failed_guard_templates"
+    FAILED_GUARD_DOCKER = "failed_guard_docker"
+    FAILED_GUARD_OUTPUT = "failed_guard_output"
+
+    # Failure states - stages
+    FAILED_MINING = "failed_mining"
+    FAILED_GENERATION = "failed_generation"
+    FAILED_VALIDATION = "failed_validation"
+    FAILED_REPORTING = "failed_reporting"
+
+    @property
+    def is_success(self) -> bool:
+        """Check if this is a success status."""
+        return self in (
+            PipelineStatus.COMPLETED_SUCCESS,
+            PipelineStatus.COMPLETED_PARTIAL,
+        )
+
+    @property
+    def is_failure(self) -> bool:
+        """Check if this is a failure status."""
+        return self.value.startswith("failed_")
+
+    @property
+    def is_guard_failure(self) -> bool:
+        """Check if this is a guard (precondition) failure."""
+        return self.value.startswith("failed_guard_")
+
+    @property
+    def is_running(self) -> bool:
+        """Check if pipeline is still running."""
+        return self in (PipelineStatus.PENDING, PipelineStatus.RUNNING)
+
+    @property
+    def exit_code(self) -> int:
+        """Get the CLI exit code for this status."""
+        from src.utils.result import ExitCode
+
+        exit_codes = {
+            PipelineStatus.COMPLETED_SUCCESS: ExitCode.SUCCESS,
+            PipelineStatus.COMPLETED_PARTIAL: ExitCode.SUCCESS,  # Tests failed but pipeline ran
+            PipelineStatus.COMPLETED_EMPTY: ExitCode.SUCCESS,  # No results but no error
+            PipelineStatus.FAILED_GUARD_API_KEY: ExitCode.GUARD_API_KEY,
+            PipelineStatus.FAILED_GUARD_TEMPLATES: ExitCode.GUARD_TEMPLATES_DIR,
+            PipelineStatus.FAILED_GUARD_DOCKER: ExitCode.GUARD_DOCKER,
+            PipelineStatus.FAILED_GUARD_OUTPUT: ExitCode.GUARD_OUTPUT_DIR,
+            PipelineStatus.FAILED_MINING: ExitCode.MINING_FAILED,
+            PipelineStatus.FAILED_GENERATION: ExitCode.GENERATION_FAILED,
+            PipelineStatus.FAILED_VALIDATION: ExitCode.VALIDATION_FAILED,
+            PipelineStatus.FAILED_REPORTING: ExitCode.REPORTING_FAILED,
+        }
+        return exit_codes.get(self, ExitCode.GENERAL_ERROR)
+
+
 @dataclass
 class ArchitectureResult:
     """

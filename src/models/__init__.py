@@ -21,6 +21,7 @@ from src.models.results import (
     ArchitectureResult,
     InfrastructureResult,
     LogBundle,
+    PipelineStatus,
     ResultStatus,
     RunStatistics,
     StageTiming,
@@ -48,6 +49,7 @@ __all__ = [
     "TestResult",
     "LogBundle",
     "ResultStatus",
+    "PipelineStatus",
     "ArchitectureResult",
     # Coverage models
     "ServiceCoverage",

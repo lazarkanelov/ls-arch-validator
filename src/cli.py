@@ -10,7 +10,12 @@ from typing import Optional
 import click
 
 from src import __version__
+from src.config import PipelineConfig, load_config
+from src.models import PipelineStatus
+from src.pipeline import run_guards
+from src.pipeline.guards import guard_error_to_status
 from src.utils.logging import configure_logging, get_logger
+from src.utils.result import ExitCode
 
 # Default paths
 DEFAULT_CONFIG = "./config"
@@ -29,6 +34,7 @@ class Context:
         log_level: str,
         log_format: str,
         dry_run: bool,
+        pipeline_config: Optional[PipelineConfig] = None,
     ) -> None:
         self.config_dir = config_dir
         self.cache_dir = cache_dir
@@ -37,6 +43,8 @@ class Context:
         self.log_format = log_format
         self.dry_run = dry_run
         self.logger = get_logger("cli")
+        self.pipeline_config = pipeline_config
+        self.pipeline_status = PipelineStatus.PENDING
 
 
 pass_context = click.make_pass_decorator(Context)
@@ -105,6 +113,32 @@ def cli(
     # Configure logging
     configure_logging(level=log_level, format_type=log_format)
 
+    # Load pipeline configuration
+    config_result = load_config(config)
+    if config_result.is_err():
+        logger = get_logger("cli")
+        logger.warning(
+            "config_load_warning",
+            error=str(config_result.unwrap_err()),
+            using_defaults=True,
+        )
+        pipeline_config = PipelineConfig()
+    else:
+        pipeline_config = config_result.unwrap()
+
+    # Find templates directory
+    templates_dir = Path(__file__).parent.parent / "templates"
+    if not templates_dir.exists():
+        templates_dir = Path("templates")
+
+    # Set paths on config
+    pipeline_config = pipeline_config.with_paths(
+        config_dir=config,
+        cache_dir=cache,
+        output_dir=output,
+        templates_dir=templates_dir,
+    )
+
     # Create context
     ctx.obj = Context(
         config_dir=config,
@@ -113,6 +147,7 @@ def cli(
         log_level=log_level,
         log_format=log_format,
         dry_run=dry_run,
+        pipeline_config=pipeline_config,
     )
 
     # Ensure directories exist
@@ -632,6 +667,34 @@ def _run_with_fsm(
         skip_cache=skip_cache,
         incremental=incremental,
     )
+
+    ctx.pipeline_status = PipelineStatus.RUNNING
+
+    # Run guards - fail fast on critical preconditions
+    if ctx.pipeline_config:
+        guard_result = run_guards(
+            config=ctx.pipeline_config,
+            require_generation=not skip_generation,
+            require_docker=True,
+            require_templates=True,
+        )
+
+        if guard_result.is_err():
+            error = guard_result.unwrap_err()
+            ctx.pipeline_status = guard_error_to_status(error)
+            ctx.logger.error(
+                "guard_failed",
+                code=error.code,
+                message=error.message,
+                details=error.details,
+            )
+            output_json({
+                "status": "error",
+                "pipeline_status": ctx.pipeline_status.value,
+                "message": str(error),
+                "exit_code": error.code,
+            })
+            sys.exit(error.code)
 
     try:
         # Configure processor

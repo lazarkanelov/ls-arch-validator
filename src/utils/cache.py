@@ -1,4 +1,4 @@
-"""File-based caching utility with content hashing."""
+"""File-based caching utility with content hashing and versioning."""
 
 from __future__ import annotations
 
@@ -8,9 +8,14 @@ import os
 from pathlib import Path
 from typing import Any, Optional
 
+from src.config.settings import CACHE_VERSION
+from src.utils.atomic import atomic_write_json, atomic_write_text
 from src.utils.logging import get_logger
 
 logger = get_logger("cache")
+
+# Current cache format version - increment when format changes
+CURRENT_CACHE_VERSION = CACHE_VERSION
 
 
 def get_cache_key(content: str, version: str = "1.0") -> str:
@@ -94,7 +99,9 @@ class FileCache:
 
     def set(self, key: str, content: str, subdir: str = "") -> None:
         """
-        Store raw content in cache.
+        Store raw content in cache atomically.
+
+        Uses atomic write to prevent partial/corrupt cache entries.
 
         Args:
             key: Cache key
@@ -105,44 +112,82 @@ class FileCache:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            path.write_text(content, encoding="utf-8")
+            atomic_write_text(path, content)
             logger.debug("cache_write", key=key, size=len(content))
         except Exception as e:
             logger.error("cache_write_error", key=key, error=str(e))
             raise
 
-    def get_json(self, key: str, subdir: str = "") -> Optional[dict[str, Any]]:
+    def get_json(
+        self,
+        key: str,
+        subdir: str = "",
+        check_version: bool = True,
+    ) -> Optional[dict[str, Any]]:
         """
-        Get JSON data from cache.
+        Get JSON data from cache with optional version checking.
 
         Args:
             key: Cache key
             subdir: Optional subdirectory
+            check_version: Whether to validate cache version (default True)
 
         Returns:
-            Parsed JSON data or None if not found
+            Parsed JSON data or None if not found or version mismatch
         """
         content = self.get(key, subdir)
         if content is None:
             return None
 
         try:
-            return json.loads(content)
+            data = json.loads(content)
         except json.JSONDecodeError as e:
             logger.warning("cache_json_error", key=key, error=str(e))
             return None
 
+        # Check cache version if requested
+        if check_version:
+            cache_version = data.get("_cache_version")
+            if cache_version and cache_version != CURRENT_CACHE_VERSION:
+                logger.info(
+                    "cache_version_mismatch",
+                    key=key,
+                    cached_version=cache_version,
+                    current_version=CURRENT_CACHE_VERSION,
+                )
+                return None  # Treat as cache miss
+
+        # Remove version metadata from returned data
+        if "_cache_version" in data:
+            data = {k: v for k, v in data.items() if k != "_cache_version"}
+
+        return data
+
     def set_json(self, key: str, data: dict[str, Any], subdir: str = "") -> None:
         """
-        Store JSON data in cache.
+        Store JSON data in cache atomically.
+
+        Adds cache version metadata for future compatibility checks.
 
         Args:
             key: Cache key
             data: Data to serialize and cache
             subdir: Optional subdirectory
         """
-        content = json.dumps(data, indent=2, default=str)
-        self.set(key, content, subdir)
+        # Add cache version metadata
+        versioned_data = {
+            "_cache_version": CURRENT_CACHE_VERSION,
+            **data,
+        }
+        path = self._get_path(key, subdir)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            atomic_write_json(path, versioned_data)
+            logger.debug("cache_write_json", key=key)
+        except Exception as e:
+            logger.error("cache_write_json_error", key=key, error=str(e))
+            raise
 
     def delete(self, key: str, subdir: str = "") -> bool:
         """
@@ -239,6 +284,51 @@ class FileCache:
                         logger.warning("cache_clear_error", path=str(path), error=str(e))
 
         logger.info("cache_cleared", subdir=subdir, count=count)
+        return count
+
+    def invalidate_old_versions(self, subdir: str = "") -> int:
+        """
+        Invalidate cache entries with old version numbers.
+
+        Scans JSON files and removes those with outdated version metadata.
+
+        Args:
+            subdir: Optional subdirectory to scan
+
+        Returns:
+            Number of entries invalidated
+        """
+        target = self.cache_dir / subdir if subdir else self.cache_dir
+        if not target.exists():
+            return 0
+
+        count = 0
+        for path in target.rglob("*.json"):
+            try:
+                content = path.read_text(encoding="utf-8")
+                data = json.loads(content)
+
+                cache_version = data.get("_cache_version")
+                if cache_version and cache_version != CURRENT_CACHE_VERSION:
+                    path.unlink()
+                    count += 1
+                    logger.debug(
+                        "cache_invalidated",
+                        path=str(path),
+                        old_version=cache_version,
+                    )
+            except (json.JSONDecodeError, OSError):
+                # Skip files that can't be read or parsed
+                continue
+
+        if count > 0:
+            logger.info(
+                "cache_version_invalidation",
+                subdir=subdir,
+                invalidated_count=count,
+                current_version=CURRENT_CACHE_VERSION,
+            )
+
         return count
 
 

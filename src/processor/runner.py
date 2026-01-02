@@ -148,15 +148,19 @@ class ArchitectureProcessor:
             },
         )
 
-        # Early check for API key if generation is needed
+        # API key check is now handled by guards at CLI level
+        # If we get here without skip_generation and no API key, it's a programming error
         if not self.config.skip_generation and not os.environ.get("ANTHROPIC_API_KEY"):
-            logger.warning(
-                "api_key_missing_auto_skip",
-                message="ANTHROPIC_API_KEY not set - auto-enabling skip_generation. "
-                        "Set the secret CLAUDE_API_KEY in GitHub repository settings.",
+            logger.error(
+                "api_key_missing_fatal",
+                message="ANTHROPIC_API_KEY not set and generation is required. "
+                        "This should have been caught by guards. Failing pipeline.",
             )
-            # Auto-skip generation to allow pipeline to run with cached apps
-            self.config.skip_generation = True
+            raise ValueError(
+                "ANTHROPIC_API_KEY environment variable is not set. "
+                "Generation is required but cannot proceed without API key. "
+                "Either set the API key or use --skip-generation flag."
+            )
 
         try:
             # Phase 1: Mining
@@ -176,7 +180,22 @@ class ArchitectureProcessor:
             raise
 
         finally:
-            self.machine.stats.completed_at = datetime.utcnow()
+            # Set completion time with validation
+            completed_at = datetime.utcnow()
+
+            # Validate timestamp consistency
+            if self.machine.stats.started_at and completed_at < self.machine.stats.started_at:
+                logger.warning(
+                    "timestamp_anomaly",
+                    started_at=str(self.machine.stats.started_at),
+                    completed_at=str(completed_at),
+                    message="completed_at is before started_at, adjusting to started_at + 1 second",
+                )
+                # Adjust to at least 1 second after start (clock skew protection)
+                from datetime import timedelta
+                completed_at = self.machine.stats.started_at + timedelta(seconds=1)
+
+            self.machine.stats.completed_at = completed_at
             self.machine.save_state()
 
         logger.info(

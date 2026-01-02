@@ -99,9 +99,12 @@ class ContainerManager:
         """
         Start a new LocalStack container.
 
+        Uses Docker's automatic port assignment when port is not specified
+        to avoid race conditions between port checking and container startup.
+
         Args:
             instance_id: Unique identifier for this instance
-            port: Port to expose (auto-assigned if not specified)
+            port: Port to expose (Docker auto-assigns if not specified)
 
         Returns:
             ContainerInfo for the started container
@@ -111,15 +114,15 @@ class ContainerManager:
         # Generate container name
         container_name = f"{self.config.name_prefix}-{instance_id}"
 
-        # Determine port
-        if port is None:
-            port = self._find_available_port()
+        # Use Docker's automatic port assignment if port not specified
+        # This eliminates the race condition between find_available_port() and run()
+        port_binding = port if port is not None else None
 
         logger.info(
             "starting_container",
             name=container_name,
             image=self.config.image,
-            port=port,
+            port=port_binding or "auto",
         )
 
         try:
@@ -130,27 +133,47 @@ class ContainerManager:
                 logger.info("pulling_image", image=self.config.image)
                 client.images.pull(self.config.image)
 
-            # Start container
+            # Start container with Docker-assigned port if not specified
             container = client.containers.run(
                 self.config.image,
                 name=container_name,
                 detach=True,
-                ports={"4566/tcp": port},
+                ports={"4566/tcp": port_binding},  # None = Docker assigns port
                 environment=self.config.environment,
                 mem_limit=self.config.mem_limit,
                 cpu_count=self.config.cpu_count,
                 remove=True,  # Auto-remove when stopped
             )
 
+            # Get the actual assigned port from container metadata
+            container.reload()  # Refresh container data
+            port_info = container.attrs.get("NetworkSettings", {}).get("Ports", {})
+            assigned_port = port_binding
+
+            if not assigned_port:
+                # Extract Docker-assigned port
+                port_mappings = port_info.get("4566/tcp", [])
+                if port_mappings:
+                    assigned_port = int(port_mappings[0].get("HostPort", self.config.port))
+                else:
+                    assigned_port = self.config.port
+
             info = ContainerInfo(
                 container_id=container.id,
                 name=container_name,
-                port=port,
+                port=assigned_port,
                 image=self.config.image,
                 status="starting",
             )
 
             self._containers[instance_id] = info
+
+            logger.debug(
+                "container_port_assigned",
+                name=container_name,
+                requested_port=port_binding or "auto",
+                assigned_port=assigned_port,
+            )
 
             # Wait for container to be healthy
             await self._wait_for_healthy(info)
@@ -159,7 +182,7 @@ class ContainerManager:
             logger.info(
                 "container_started",
                 name=container_name,
-                port=port,
+                port=assigned_port,
                 endpoint=info.endpoint_url,
             )
 

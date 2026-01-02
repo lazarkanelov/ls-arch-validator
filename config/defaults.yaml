@@ -1,5 +1,6 @@
 # Default configuration for ls-arch-validator
 # These values can be overridden via CLI options or environment variables
+# Version: 2.0 (robust architecture redesign)
 
 # Parallel execution settings
 parallelism: 4
@@ -11,11 +12,16 @@ token_budget: 500000
 retention_days: 90
 max_storage_gb: 10
 
+# Cache versioning - increment when cache format changes
+cache_version: "2.0"
+
 # LocalStack settings
 localstack:
   image: "localstack/localstack:latest"
+  base_port: 4566
+  endpoint_template: "http://{host}:{port}"
   services: "lambda,s3,dynamodb,sqs,sns,apigateway,events,stepfunctions"
-  debug: true
+  debug: false
   lambda_executor: "docker"
 
 # Container resource limits
@@ -29,11 +35,30 @@ container_limits:
 # Timeouts (seconds)
 timeouts:
   localstack_start: 120
+  terraform_init: 60
   terraform_apply: 300
+  terraform_destroy: 120
   test_execution: 180
   per_architecture: 600
+  diagram_scrape: 60
+  diagram_parse: 30
+  git_clone: 120
+  template_conversion: 60
+  generation_request: 120
+  vision_request: 60
+
+# Retry and rate limiting configuration
+retries:
+  max_attempts: 3
+  backoff_factor: 2.0
+  max_backoff: 60.0
+  rate_limit_base_delay: 35.0
 
 # Logging
 logging:
   level: "info"
   format: "json"
+
+# Behavior flags
+require_api_key_for_generation: true
+fail_on_empty_results: true

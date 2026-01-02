@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 
 from src import __version__
 from src.models import Architecture, ValidationRun
@@ -16,8 +16,10 @@ from src.reporter.aggregator import ResultsAggregator
 from src.reporter.downloads import AppDownloadGenerator
 from src.reporter.storage import IndexBuilder, ObjectStore
 from src.reporter.trends import TrendAnalyzer
+from src.utils.atomic import atomic_write_json, atomic_write_text
 from src.utils.cache import AppCache
 from src.utils.logging import get_logger
+from src.utils.result import DashboardError, Err, Ok, Result
 
 logger = get_logger("reporter.site")
 
@@ -57,7 +59,7 @@ class SiteGenerator:
         data_dir: Optional[Path] = None,
         architectures: Optional[dict[str, Architecture]] = None,
         app_cache: Optional[AppCache] = None,
-    ) -> Path:
+    ) -> Result[Path, DashboardError]:
         """
         Generate the static dashboard site.
 
@@ -68,7 +70,7 @@ class SiteGenerator:
             app_cache: App cache for retrieving generated code
 
         Returns:
-            Path to the generated index.html
+            Result with path to generated index.html or DashboardError
         """
         # Debug: Log paths and parameters
         logger.info(
@@ -82,15 +84,29 @@ class SiteGenerator:
         )
 
         # Ensure output directory exists
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            return Err(DashboardError(
+                phase="setup",
+                message=f"Cannot create output directory: {self.output_dir}",
+                cause=e,
+            ))
 
         # Copy static assets
         self._copy_assets()
 
         # Prepare data directory
         data_output_dir = self.output_dir / "data"
-        data_output_dir.mkdir(parents=True, exist_ok=True)
-        (data_output_dir / "runs").mkdir(parents=True, exist_ok=True)
+        try:
+            data_output_dir.mkdir(parents=True, exist_ok=True)
+            (data_output_dir / "runs").mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            return Err(DashboardError(
+                phase="setup",
+                message=f"Cannot create data directory: {data_output_dir}",
+                cause=e,
+            ))
 
         logger.info(
             "data_dir_created",
@@ -110,22 +126,49 @@ class SiteGenerator:
             else:
                 # Try to load from output directory's data folder
                 dashboard_data = self._load_data_from_files(data_output_dir)
-
-            # Render dashboard
-            index_path = self._render_dashboard(dashboard_data)
-
-            logger.info(
-                "site_generated",
-                output_path=str(index_path),
-                has_run=run is not None,
-            )
-
-            return index_path
         except Exception as e:
-            logger.error("dashboard_generation_failed", error=str(e))
-            # Create a minimal fallback page
-            index_path = self._create_fallback_page(str(e))
-            return index_path
+            logger.error("dashboard_data_preparation_failed", error=str(e))
+            return Err(DashboardError(
+                phase="data_preparation",
+                message="Failed to prepare dashboard data",
+                cause=e,
+            ))
+
+        # Render dashboard
+        render_result = self._render_dashboard_safe(dashboard_data)
+        if render_result.is_err():
+            return render_result
+
+        index_path = render_result.unwrap()
+
+        logger.info(
+            "site_generated",
+            output_path=str(index_path),
+            has_run=run is not None,
+        )
+
+        return Ok(index_path)
+
+    def generate_legacy(
+        self,
+        run: Optional[ValidationRun] = None,
+        data_dir: Optional[Path] = None,
+        architectures: Optional[dict[str, Architecture]] = None,
+        app_cache: Optional[AppCache] = None,
+    ) -> Path:
+        """
+        Legacy generate method for backward compatibility.
+
+        Calls generate() and unwraps the result, creating a fallback page on error.
+        """
+        result = self.generate(run, data_dir, architectures, app_cache)
+
+        if result.is_ok():
+            return result.unwrap()
+        else:
+            error = result.unwrap_err()
+            logger.error("dashboard_generation_failed", error=str(error))
+            return self._create_fallback_page(str(error))
 
     def _create_fallback_page(self, error_message: str) -> Path:
         """Create a minimal fallback page when generation fails."""
@@ -429,6 +472,94 @@ class SiteGenerator:
         index_path.write_text(html)
 
         return index_path
+
+    def _render_dashboard_safe(self, data: dict[str, Any]) -> Result[Path, DashboardError]:
+        """
+        Render the dashboard HTML with explicit error handling.
+
+        Uses atomic writes to prevent partial/corrupt output.
+
+        Args:
+            data: Dashboard data dictionary
+
+        Returns:
+            Result with path to rendered index.html or DashboardError
+        """
+        # Load template
+        try:
+            template = self.env.get_template("index.html")
+        except TemplateNotFound:
+            return Err(DashboardError(
+                phase="template_loading",
+                message="Template 'index.html' not found",
+            ))
+        except Exception as e:
+            return Err(DashboardError(
+                phase="template_loading",
+                message="Failed to load template",
+                cause=e,
+            ))
+
+        # Calculate report period (week containing the run)
+        now = datetime.utcnow()
+        week_start = now - timedelta(days=now.weekday())  # Monday
+        week_end = week_start + timedelta(days=6)  # Sunday
+        report_period = {
+            "start": week_start.strftime("%B %d, %Y"),
+            "end": week_end.strftime("%B %d, %Y"),
+        }
+
+        # Prepare context
+        context = {
+            "base_url": self.base_url,
+            "version": __version__,
+            "last_updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "latest_run_id": data.get("run_id", ""),
+            "report_period": report_period,
+            **data,
+        }
+
+        # Render template
+        try:
+            html = template.render(**context)
+        except Exception as e:
+            return Err(DashboardError(
+                phase="rendering",
+                message="Failed to render template",
+                cause=e,
+            ))
+
+        # Validate rendered content
+        if not html or len(html) < 100:
+            return Err(DashboardError(
+                phase="validation",
+                message=f"Rendered HTML is too short ({len(html)} bytes), likely failed",
+            ))
+
+        if "<!DOCTYPE html>" not in html and "<html" not in html.lower():
+            return Err(DashboardError(
+                phase="validation",
+                message="Rendered content does not appear to be valid HTML",
+            ))
+
+        # Write output atomically
+        index_path = self.output_dir / "index.html"
+        try:
+            atomic_write_text(index_path, html)
+        except Exception as e:
+            return Err(DashboardError(
+                phase="writing",
+                message=f"Failed to write index.html to {index_path}",
+                cause=e,
+            ))
+
+        logger.info(
+            "dashboard_rendered",
+            path=str(index_path),
+            size_bytes=len(html),
+        )
+
+        return Ok(index_path)
 
     def _copy_assets(self) -> None:
         """Copy static assets to output directory."""
