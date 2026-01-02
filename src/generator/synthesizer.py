@@ -343,8 +343,27 @@ class CodeSynthesizer:
 
                 # Parse response
                 content = response.content[0].text
+
+                # Debug: Log response format
+                logger.info(
+                    "claude_response_received",
+                    content_length=len(content),
+                    content_preview=content[:500].replace('\n', '\\n'),
+                    has_file_headers="### FILE:" in content,
+                    has_metadata="### METADATA" in content,
+                    has_json_block="```json" in content,
+                )
+
                 result = self._parse_json_response(content)
                 result["tokens"] = response.usage.input_tokens + response.usage.output_tokens
+
+                # Debug: Log parsing result
+                logger.info(
+                    "parsing_result",
+                    files_count=len(result.get("files", {})),
+                    file_names=list(result.get("files", {}).keys())[:5],
+                    requirements_count=len(result.get("requirements", [])),
+                )
 
                 # Set probe name from config if not in response
                 if not result.get("probe_name") and probe_type in PROBE_CONFIGS:
