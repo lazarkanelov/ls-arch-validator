@@ -754,7 +754,7 @@ class ArchitectureProcessor:
                     architecture_id=arch_state.arch_id,
                     source_type=source_type,
                     status=ResultStatus.FAILED,
-                    logs=LogBundle(stderr=arch_state.context.error_message or "Processing failed"),
+                    logs=LogBundle(app_log=arch_state.context.error_message or "Processing failed"),
                     suggested_issue_title=f"Processing failed: {arch_state.arch_id}",
                 )
                 self._results.append(error_result)
@@ -767,7 +767,7 @@ class ArchitectureProcessor:
                     architecture_id=arch_state.arch_id,
                     source_type=source_type,
                     status=ResultStatus.FAILED,
-                    logs=LogBundle(stderr=arch_state.context.error_message or "Skipped"),
+                    logs=LogBundle(app_log=arch_state.context.error_message or "Skipped"),
                     suggested_issue_title=f"Skipped: {arch_state.arch_id}",
                 )
                 self._results.append(skip_result)
