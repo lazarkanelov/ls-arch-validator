@@ -710,6 +710,14 @@ def _run_with_fsm(
         app_cache = AppCache(ctx.cache_dir)
 
         try:
+            ctx.logger.info(
+                "dashboard_generation_starting",
+                templates_dir=str(templates_dir),
+                templates_exists=templates_dir.exists(),
+                output_dir=str(ctx.output_dir),
+                arch_count=len(architectures) if architectures else 0,
+            )
+
             generator = SiteGenerator(
                 templates_dir=templates_dir,
                 output_dir=ctx.output_dir,
@@ -722,8 +730,10 @@ def _run_with_fsm(
                 architectures=architectures if architectures else None,
                 app_cache=app_cache,
             )
+            ctx.logger.info("dashboard_generation_completed")
         except Exception as e:
-            ctx.logger.error("dashboard_generation_failed", error=str(e))
+            import traceback
+            ctx.logger.error("dashboard_generation_failed", error=str(e), tb=traceback.format_exc())
             # Create minimal fallback index.html
             index_path = ctx.output_dir / "index.html"
             index_path.write_text(f"""<!DOCTYPE html>
