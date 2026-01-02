@@ -1,4 +1,17 @@
-"""Code synthesizer using Claude API."""
+"""Code synthesizer using Claude API.
+
+Implements best practices from Anthropic documentation:
+- Prompt caching for system prompts (90% cost reduction)
+- Proper rate limit handling with retry-after header
+- Temperature control for deterministic code output
+- Structured error handling with specific exception types
+- Token budget management
+
+References:
+- https://platform.claude.com/docs/en/api/rate-limits
+- https://www.anthropic.com/news/prompt-caching
+- https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices
+"""
 
 from __future__ import annotations
 
@@ -7,6 +20,9 @@ import os
 import re
 from dataclasses import dataclass, field
 from typing import Any, Optional
+
+import anthropic
+from anthropic import APIError, APIConnectionError, RateLimitError, APIStatusError
 
 from src.generator.analyzer import InfrastructureAnalysis, TerraformAnalyzer
 from src.generator.prompts import (
@@ -22,6 +38,12 @@ from src.utils.logging import get_logger
 from src.utils.tokens import TokenTracker
 
 logger = get_logger("generator.synthesizer")
+
+# Best practice: Use lower temperature for code generation (deterministic output)
+CODE_GENERATION_TEMPERATURE = 0.3
+
+# Best practice: Minimum tokens for prompt caching (1024 required)
+MIN_CACHE_TOKENS = 1024
 
 
 @dataclass
@@ -312,7 +334,14 @@ class CodeSynthesizer:
         probe_type: ProbeType,
     ) -> dict[str, Any]:
         """
-        Generate probe code using Claude with robust retry logic.
+        Generate probe code using Claude with best practices.
+
+        Implements:
+        - Prompt caching for system prompt (90% cost reduction)
+        - Temperature control (0.3 for deterministic code)
+        - Proper rate limit handling using retry-after header
+        - Specific exception handling for different error types
+        - Token usage tracking with cache metrics
 
         Args:
             prompt: The probe-specific prompt
@@ -323,23 +352,48 @@ class CodeSynthesizer:
         """
         import asyncio
 
-        max_retries = 3
-        base_delay = 10  # Start with 10 second delay
+        max_retries = 5  # Best practice: more retries for production
+        default_retry_delay = 10  # Default if no retry-after header
 
         for attempt in range(max_retries):
             try:
                 client = await self._get_client()
 
+                # Best practice: Use prompt caching for system prompt
+                # This reduces cost by up to 90% and latency by 85%
+                # The system prompt is cached and reused across requests
                 response = await client.messages.create(
                     model=self.model,
-                    max_tokens=8192,  # Increased for longer code responses
-                    system=SYSTEM_PROMPT,
+                    max_tokens=8192,
+                    temperature=CODE_GENERATION_TEMPERATURE,  # Lower for deterministic code
+                    system=[
+                        {
+                            "type": "text",
+                            "text": SYSTEM_PROMPT,
+                            "cache_control": {"type": "ephemeral"}  # 5-minute cache
+                        }
+                    ],
                     messages=[{"role": "user", "content": prompt}],
                 )
 
-                # Track token usage
+                # Track token usage including cache metrics
                 tracker = TokenTracker.get_instance()
                 tracker.record_from_response(response.usage)
+
+                # Log cache performance for optimization
+                cache_read = getattr(response.usage, 'cache_read_input_tokens', 0) or 0
+                cache_create = getattr(response.usage, 'cache_creation_input_tokens', 0) or 0
+                input_tokens = response.usage.input_tokens
+
+                logger.info(
+                    "api_call_completed",
+                    probe_type=probe_type.value,
+                    input_tokens=input_tokens,
+                    output_tokens=response.usage.output_tokens,
+                    cache_read_tokens=cache_read,
+                    cache_create_tokens=cache_create,
+                    cache_hit_rate=f"{(cache_read / (cache_read + input_tokens + cache_create) * 100):.1f}%" if (cache_read + input_tokens + cache_create) > 0 else "0%",
+                )
 
                 # Parse response
                 content = response.content[0].text
@@ -348,16 +402,18 @@ class CodeSynthesizer:
                 logger.info(
                     "claude_response_received",
                     content_length=len(content),
-                    content_preview=content[:500].replace('\n', '\\n'),
-                    has_file_headers="### FILE:" in content,
-                    has_metadata="### METADATA" in content,
+                    content_preview=content[:300].replace('\n', '\\n'),
+                    has_file_headers="### FILE:" in content or "## FILE:" in content,
+                    has_metadata="METADATA" in content,
                     has_json_block="```json" in content,
                 )
 
                 result = self._parse_json_response(content)
-                result["tokens"] = response.usage.input_tokens + response.usage.output_tokens
+                result["tokens"] = input_tokens + response.usage.output_tokens
+                result["cache_read_tokens"] = cache_read
+                result["cache_create_tokens"] = cache_create
 
-                # Debug: Log parsing result
+                # Log parsing result
                 logger.info(
                     "parsing_result",
                     files_count=len(result.get("files", {})),
@@ -371,25 +427,112 @@ class CodeSynthesizer:
 
                 return result
 
-            except Exception as e:
-                error_str = str(e)
-                is_rate_limit = "429" in error_str or "rate" in error_str.lower()
+            except RateLimitError as e:
+                # Best practice: Use retry-after header from response
+                retry_after = self._get_retry_after(e)
+                delay = retry_after if retry_after else default_retry_delay * (2 ** attempt)
 
-                if attempt < max_retries - 1 and is_rate_limit:
-                    # Exponential backoff for rate limits
-                    delay = base_delay * (2 ** attempt)
+                if attempt < max_retries - 1:
                     logger.warning(
-                        "rate_limit_retry",
+                        "rate_limit_hit",
                         probe_type=probe_type.value,
+                        attempt=attempt + 1,
+                        retry_after=retry_after,
+                        delay=delay,
+                        message=str(e),
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error(
+                        "rate_limit_exhausted",
+                        probe_type=probe_type.value,
+                        attempts=max_retries,
+                        error=str(e),
+                    )
+                    return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
+
+            except APIConnectionError as e:
+                # Network/connection errors - retry with backoff
+                delay = default_retry_delay * (2 ** attempt)
+                if attempt < max_retries - 1:
+                    logger.warning(
+                        "connection_error_retry",
+                        probe_type=probe_type.value,
+                        attempt=attempt + 1,
+                        delay=delay,
+                        error=str(e),
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error("connection_error_exhausted", probe_type=probe_type.value, error=str(e))
+                    return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
+
+            except APIStatusError as e:
+                # API errors (4xx, 5xx) - check if retryable
+                if e.status_code >= 500 and attempt < max_retries - 1:
+                    # Server errors are retryable
+                    delay = default_retry_delay * (2 ** attempt)
+                    logger.warning(
+                        "server_error_retry",
+                        probe_type=probe_type.value,
+                        status_code=e.status_code,
                         attempt=attempt + 1,
                         delay=delay,
                     )
                     await asyncio.sleep(delay)
                 else:
-                    logger.error("probe_generation_failed", probe_type=probe_type.value, error=error_str)
+                    # Client errors (4xx) or exhausted retries
+                    logger.error(
+                        "api_error",
+                        probe_type=probe_type.value,
+                        status_code=e.status_code,
+                        error=str(e),
+                    )
                     return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
 
+            except Exception as e:
+                # Unexpected errors - log and fail
+                logger.error(
+                    "unexpected_error",
+                    probe_type=probe_type.value,
+                    error_type=type(e).__name__,
+                    error=str(e),
+                )
+                return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
+
         return {"files": {}, "requirements": [], "probed_features": [], "tokens": 0}
+
+    def _get_retry_after(self, error: RateLimitError) -> Optional[float]:
+        """
+        Extract retry-after value from rate limit error response.
+
+        Best practice: Use the retry-after header provided by Anthropic
+        instead of arbitrary delays.
+
+        Args:
+            error: The rate limit error
+
+        Returns:
+            Seconds to wait, or None if not available
+        """
+        try:
+            # Try to get from response headers
+            if hasattr(error, 'response') and error.response:
+                headers = getattr(error.response, 'headers', {})
+                retry_after = headers.get('retry-after')
+                if retry_after:
+                    return float(retry_after)
+
+            # Try to parse from error message
+            error_str = str(error)
+            import re
+            match = re.search(r'retry.after[:\s]+(\d+(?:\.\d+)?)', error_str, re.IGNORECASE)
+            if match:
+                return float(match.group(1))
+        except Exception:
+            pass
+
+        return None
 
     async def _generate_source_code(
         self,
@@ -397,7 +540,7 @@ class CodeSynthesizer:
         terraform_content: str,
     ) -> dict[str, Any]:
         """
-        Generate source code using Claude.
+        Generate source code using Claude with best practices.
 
         Args:
             analysis: Infrastructure analysis
@@ -411,10 +554,18 @@ class CodeSynthesizer:
         try:
             client = await self._get_client()
 
+            # Best practice: prompt caching + temperature control
             response = await client.messages.create(
                 model=self.model,
                 max_tokens=4096,
-                system=SYSTEM_PROMPT,
+                temperature=CODE_GENERATION_TEMPERATURE,
+                system=[
+                    {
+                        "type": "text",
+                        "text": SYSTEM_PROMPT,
+                        "cache_control": {"type": "ephemeral"}
+                    }
+                ],
                 messages=[{"role": "user", "content": prompt}],
             )
 
@@ -429,6 +580,12 @@ class CodeSynthesizer:
 
             return result
 
+        except RateLimitError as e:
+            logger.error("source_generation_rate_limited", error=str(e))
+            return {"files": {}, "requirements": [], "tokens": 0}
+        except APIError as e:
+            logger.error("source_generation_api_error", error=str(e))
+            return {"files": {}, "requirements": [], "tokens": 0}
         except Exception as e:
             logger.error("source_generation_failed", error=str(e))
             return {"files": {}, "requirements": [], "tokens": 0}
@@ -439,7 +596,7 @@ class CodeSynthesizer:
         app_code: str,
     ) -> dict[str, Any]:
         """
-        Generate test code using Claude with robust retry logic.
+        Generate test code using Claude with best practices.
 
         Args:
             analysis: Infrastructure analysis
@@ -451,17 +608,25 @@ class CodeSynthesizer:
         import asyncio
 
         prompt = format_test_prompt(analysis, app_code)
-        max_retries = 3
-        base_delay = 10
+        max_retries = 5
+        default_retry_delay = 10
 
         for attempt in range(max_retries):
             try:
                 client = await self._get_client()
 
+                # Best practice: prompt caching + temperature control
                 response = await client.messages.create(
                     model=self.model,
-                    max_tokens=8192,  # Increased for longer code responses
-                    system=SYSTEM_PROMPT,
+                    max_tokens=8192,
+                    temperature=CODE_GENERATION_TEMPERATURE,
+                    system=[
+                        {
+                            "type": "text",
+                            "text": SYSTEM_PROMPT,
+                            "cache_control": {"type": "ephemeral"}
+                        }
+                    ],
                     messages=[{"role": "user", "content": prompt}],
                 )
 
@@ -476,17 +641,44 @@ class CodeSynthesizer:
 
                 return result
 
-            except Exception as e:
-                error_str = str(e)
-                is_rate_limit = "429" in error_str or "rate" in error_str.lower()
+            except RateLimitError as e:
+                # Best practice: Use retry-after header
+                retry_after = self._get_retry_after(e)
+                delay = retry_after if retry_after else default_retry_delay * (2 ** attempt)
 
-                if attempt < max_retries - 1 and is_rate_limit:
-                    delay = base_delay * (2 ** attempt)
-                    logger.warning("rate_limit_retry_tests", attempt=attempt + 1, delay=delay)
+                if attempt < max_retries - 1:
+                    logger.warning(
+                        "test_generation_rate_limited",
+                        attempt=attempt + 1,
+                        retry_after=retry_after,
+                        delay=delay,
+                    )
                     await asyncio.sleep(delay)
                 else:
-                    logger.error("test_generation_failed", error=error_str)
+                    logger.error("test_generation_rate_limit_exhausted", error=str(e))
                     return {"files": {}, "requirements": [], "tokens": 0}
+
+            except APIConnectionError as e:
+                delay = default_retry_delay * (2 ** attempt)
+                if attempt < max_retries - 1:
+                    logger.warning("test_generation_connection_error", attempt=attempt + 1, delay=delay)
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error("test_generation_connection_exhausted", error=str(e))
+                    return {"files": {}, "requirements": [], "tokens": 0}
+
+            except APIStatusError as e:
+                if e.status_code >= 500 and attempt < max_retries - 1:
+                    delay = default_retry_delay * (2 ** attempt)
+                    logger.warning("test_generation_server_error", status_code=e.status_code, attempt=attempt + 1)
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error("test_generation_api_error", status_code=e.status_code, error=str(e))
+                    return {"files": {}, "requirements": [], "tokens": 0}
+
+            except Exception as e:
+                logger.error("test_generation_unexpected_error", error_type=type(e).__name__, error=str(e))
+                return {"files": {}, "requirements": [], "tokens": 0}
 
         return {"files": {}, "requirements": [], "tokens": 0}
 
