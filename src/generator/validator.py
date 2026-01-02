@@ -59,19 +59,22 @@ class CodeValidator:
             if not file_path.endswith(".py"):
                 continue
 
-            # Validate syntax
+            # Validate syntax using py_compile first
             syntax_result = self._validate_syntax(file_path, content)
             if syntax_result:
                 result.syntax_errors.append(syntax_result)
                 result.valid = False
+                # Skip AST validation if py_compile already found an error
+                continue
 
-            # Validate AST
+            # Validate AST only if py_compile passed
             ast_result = self._validate_ast(file_path, content)
             if ast_result:
                 result.syntax_errors.append(ast_result)
                 result.valid = False
+                continue
 
-            # Check imports
+            # Check imports only if syntax is valid
             import_warnings = self._check_imports(file_path, content)
             result.warnings.extend(import_warnings)
 
