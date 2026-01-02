@@ -608,6 +608,7 @@ def _run_with_fsm(
     ctx: Context,
     skip_mining: bool,
     skip_generation: bool,
+    skip_cache: bool,
     create_issues: bool,
     github_token: Optional[str],
     github_repo: Optional[str],
@@ -625,7 +626,7 @@ def _run_with_fsm(
     from src.utils.cache import AppCache, ArchitectureCache
     from src.models import Architecture, ArchitectureMetadata, ArchitectureSourceType
 
-    ctx.logger.info("fsm_pipeline_started")
+    ctx.logger.info("fsm_pipeline_started", skip_cache=skip_cache)
 
     try:
         # Configure processor
@@ -635,7 +636,7 @@ def _run_with_fsm(
             include_diagrams=True,
             skip_mining=skip_mining,
             skip_generation=skip_generation,
-            skip_cache=False,
+            skip_cache=skip_cache,
             localstack_version=localstack_version,
         )
 
@@ -791,6 +792,12 @@ def _run_with_fsm(
     default=False,
     help="Use FSM-based processor (sequential, handles rate limits gracefully)",
 )
+@click.option(
+    "--force-fresh",
+    is_flag=True,
+    default=False,
+    help="Force fresh mining and generation (ignore cache)",
+)
 @pass_context
 def run(
     ctx: Context,
@@ -804,6 +811,7 @@ def run(
     localstack_version: str,
     max_per_source: int,
     use_fsm: bool,
+    force_fresh: bool,
 ) -> None:
     """Run full pipeline (mine -> generate -> validate -> report)."""
     import asyncio
@@ -839,6 +847,7 @@ def run(
             ctx=ctx,
             skip_mining=skip_mining,
             skip_generation=skip_generation,
+            skip_cache=force_fresh,
             create_issues=create_issues,
             github_token=github_token,
             github_repo=github_repo,
