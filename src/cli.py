@@ -604,6 +604,134 @@ def report(
         })
 
 
+def _run_with_fsm(
+    ctx: Context,
+    skip_mining: bool,
+    skip_generation: bool,
+    create_issues: bool,
+    github_token: Optional[str],
+    github_repo: Optional[str],
+    dashboard_url: str,
+    localstack_version: str,
+    max_per_source: int,
+) -> None:
+    """Run pipeline using FSM-based processor."""
+    import asyncio
+    from datetime import datetime
+    from pathlib import Path
+
+    from src.processor import ArchitectureProcessor, ProcessorConfig
+    from src.reporter import SiteGenerator
+    from src.utils.cache import AppCache, ArchitectureCache
+    from src.models import Architecture, ArchitectureMetadata, ArchitectureSourceType
+
+    ctx.logger.info("fsm_pipeline_started")
+
+    try:
+        # Configure processor
+        config = ProcessorConfig(
+            cache_dir=ctx.cache_dir,
+            max_per_source=max_per_source,
+            include_diagrams=True,
+            skip_mining=skip_mining,
+            skip_generation=skip_generation,
+            skip_cache=False,
+            localstack_version=localstack_version,
+        )
+
+        # Run processor
+        processor = ArchitectureProcessor(config)
+        validation_run = asyncio.run(processor.run())
+
+        ctx.logger.info(
+            "fsm_pipeline_completed",
+            stats=processor.machine.stats.to_dict(),
+            summary=processor.machine.progress_summary(),
+        )
+
+        # Generate report
+        templates_dir = Path(__file__).parent.parent / "templates"
+        if not templates_dir.exists():
+            templates_dir = Path("templates")
+
+        # Load architectures for dashboard
+        arch_cache = ArchitectureCache(ctx.cache_dir)
+        architectures: dict[str, Architecture] = {}
+
+        for arch_id in arch_cache.list_keys():
+            cached = arch_cache.load_architecture(arch_id)
+            if cached:
+                metadata = None
+                meta_dict = cached.get("metadata", {})
+                if meta_dict:
+                    metadata = ArchitectureMetadata.from_dict(meta_dict)
+
+                content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
+
+                arch = Architecture(
+                    id=arch_id,
+                    source_type=ArchitectureSourceType(cached.get("source_type", "template")),
+                    source_name=cached.get("source_name", "cached"),
+                    source_url=cached.get("source_url", ""),
+                    main_tf=cached.get("main_tf", ""),
+                    variables_tf=cached.get("variables_tf"),
+                    outputs_tf=cached.get("outputs_tf"),
+                    metadata=metadata,
+                    content_hash=content_hash,
+                )
+                architectures[arch_id] = arch
+
+        app_cache = AppCache(ctx.cache_dir)
+
+        generator = SiteGenerator(
+            templates_dir=templates_dir,
+            output_dir=ctx.output_dir,
+            base_url="",
+        )
+
+        generator.generate(
+            run=validation_run,
+            data_dir=ctx.output_dir / "data",
+            architectures=architectures if architectures else None,
+            app_cache=app_cache,
+        )
+
+        # Output results
+        stats = processor.machine.stats
+        output_json({
+            "status": "success" if stats.errors == 0 else "partial",
+            "run_id": validation_run.id,
+            "statistics": {
+                "total": stats.total,
+                "passed": stats.passed,
+                "partial": stats.partial,
+                "failed": stats.failed,
+                "errors": stats.errors,
+                "skipped": stats.skipped,
+                "rate_limits": stats.rate_limits,
+                "pass_rate": stats.pass_rate,
+            },
+            "timing": {
+                "started_at": stats.started_at.isoformat() if stats.started_at else None,
+                "completed_at": stats.completed_at.isoformat() if stats.completed_at else None,
+                "total_seconds": (
+                    (stats.completed_at - stats.started_at).total_seconds()
+                    if stats.started_at and stats.completed_at
+                    else 0
+                ),
+            },
+            "fsm_summary": processor.machine.progress_summary(),
+        })
+
+    except Exception as e:
+        ctx.logger.error("fsm_pipeline_failed", error=str(e))
+        output_json({
+            "status": "error",
+            "message": str(e),
+        })
+        raise
+
+
 @cli.command()
 @click.option(
     "--skip-mining",
@@ -657,6 +785,12 @@ def report(
     default=3,
     help="Maximum architectures per source (default: 3, keeps API calls low)",
 )
+@click.option(
+    "--use-fsm",
+    is_flag=True,
+    default=False,
+    help="Use FSM-based processor (sequential, handles rate limits gracefully)",
+)
 @pass_context
 def run(
     ctx: Context,
@@ -669,6 +803,7 @@ def run(
     parallelism: int,
     localstack_version: str,
     max_per_source: int,
+    use_fsm: bool,
 ) -> None:
     """Run full pipeline (mine -> generate -> validate -> report)."""
     import asyncio
@@ -681,6 +816,7 @@ def run(
         skip_mining=skip_mining,
         skip_generation=skip_generation,
         parallelism=parallelism,
+        use_fsm=use_fsm,
     )
 
     if ctx.dry_run:
@@ -693,7 +829,23 @@ def run(
                 "validate": True,
                 "report": True,
             },
+            "use_fsm": use_fsm,
         })
+        return
+
+    # Use FSM-based processor if requested
+    if use_fsm:
+        _run_with_fsm(
+            ctx=ctx,
+            skip_mining=skip_mining,
+            skip_generation=skip_generation,
+            create_issues=create_issues,
+            github_token=github_token,
+            github_repo=github_repo,
+            dashboard_url=dashboard_url,
+            localstack_version=localstack_version,
+            max_per_source=max_per_source,
+        )
         return
 
     pipeline_start = datetime.utcnow()
