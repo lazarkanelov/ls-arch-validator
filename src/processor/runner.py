@@ -186,11 +186,23 @@ class ArchitectureProcessor:
             incremental=self.config.incremental,
         )
 
-        # Register architectures with FSM
+        # Register architectures with FSM and save to cache
         for arch in result.architectures:
             self._architectures[arch.id] = arch
             arch_state = self.machine.register_architecture(arch.id)
             arch_state.architecture = arch
+
+            # Save architecture to cache for dashboard
+            self.arch_cache.save_architecture(
+                arch_id=arch.id,
+                main_tf=arch.main_tf,
+                variables_tf=arch.variables_tf,
+                outputs_tf=arch.outputs_tf,
+                metadata=arch.metadata.to_dict() if arch.metadata else None,
+                source_type=arch.source_type.value,
+                source_name=arch.source_name,
+                source_url=arch.source_url,
+            )
 
             # Transition to MINED (skip MINING state since mining is batch)
             self.machine.transition(arch.id, ArchState.MINING)
@@ -205,7 +217,15 @@ class ArchitectureProcessor:
             new_architectures=result.new_architectures,
             skipped_known=result.skipped_known,
             errors=len(result.errors),
+            arch_ids=[a.id for a in result.architectures],
         )
+
+        # If no architectures found, log error
+        if len(result.architectures) == 0:
+            logger.error(
+                "no_architectures_found",
+                errors=result.errors[:5],  # First 5 errors
+            )
 
     async def _load_cached_architectures(self) -> None:
         """Load architectures from cache."""
