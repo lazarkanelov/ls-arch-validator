@@ -544,17 +544,15 @@ class SiteGenerator:
         from src.reporter.trends import RunSummary
 
         stats = run.statistics
-        duration = (
-            stats.mining_seconds
-            + stats.generation_seconds
-            + stats.running_seconds
-            + stats.reporting_seconds
-        ) if stats else 0
+        # Calculate duration from run times if available
+        duration = 0
+        if run.started_at and run.completed_at:
+            duration = (run.completed_at - run.started_at).total_seconds()
 
         summary = RunSummary(
             id=run.id,
             date=run.started_at.strftime("%Y-%m-%d") if run.started_at else "",
-            total=stats.total if stats else 0,
+            total=getattr(stats, 'total_architectures', 0) if stats else 0,
             passed=stats.passed if stats else 0,
             partial=stats.partial if stats else 0,
             failed=stats.failed if stats else 0,

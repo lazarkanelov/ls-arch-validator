@@ -744,13 +744,18 @@ class ArchitectureProcessor:
                 )
                 self._results.append(skip_result)
 
+        # Calculate pass rate
+        total = self.machine.stats.total
+        passed = self.machine.stats.passed
+        pass_rate = (passed / total * 100) if total > 0 else 0.0
+
         stats = RunStatistics(
-            total=self.machine.stats.total,
-            passed=self.machine.stats.passed,
+            total_architectures=total,
+            passed=passed,
             partial=self.machine.stats.partial,
-            failed=self.machine.stats.failed,
-            errors=self.machine.stats.errors,
+            failed=self.machine.stats.failed + self.machine.stats.errors,
             skipped=self.machine.stats.skipped,
+            pass_rate=pass_rate,
         )
 
         run = ValidationRun(

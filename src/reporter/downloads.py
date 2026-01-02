@@ -184,9 +184,9 @@ class AppDownloadGenerator:
             # Generate zip
             zip_path = self.generate_zip(
                 arch.content_hash,
-                terraform_content=arch.terraform_content,
-                variables_content=arch.variables_content,
-                outputs_content=arch.outputs_content,
+                terraform_content=arch.main_tf,
+                variables_content=arch.variables_tf,
+                outputs_content=arch.outputs_tf,
             )
 
             if zip_path:
@@ -195,9 +195,9 @@ class AppDownloadGenerator:
                 # Also generate JSON for lazy loading
                 self.generate_code_json(
                     arch.content_hash,
-                    terraform_content=arch.terraform_content,
-                    variables_content=arch.variables_content,
-                    outputs_content=arch.outputs_content,
+                    terraform_content=arch.main_tf,
+                    variables_content=arch.variables_tf,
+                    outputs_content=arch.outputs_tf,
                 )
 
         logger.info("downloads_generated", count=len(download_urls))
