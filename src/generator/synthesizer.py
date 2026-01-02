@@ -51,15 +51,15 @@ MIN_CACHE_TOKENS = 1024
 # IMPORTANT: With 8,000 OTPM, we can only afford limited requests per minute.
 #
 # Strategy:
-# - Use max_tokens=8192 (some responses need more than 4096)
-# - Wait 65 seconds between requests to stay under rate limit
+# - Use max_tokens=16384 (complex probes need more tokens)
+# - Wait 130 seconds between requests to stay under rate limit
 # - Disable SDK retries to avoid wasting rate limit on auto-retries
-MAX_OUTPUT_TOKENS = 8192
+MAX_OUTPUT_TOKENS = 16384
 
-# 65 second delay ensures we stay under 8,000 OTPM with 8192 max tokens
-# Formula: 60s / (8000 OTPM / 8192 max_tokens) ≈ 61s minimum
+# 130 second delay ensures we stay under 8,000 OTPM with 16384 max tokens
+# Formula: 60s / (8000 OTPM / 16384 max_tokens) ≈ 122s minimum
 # Adding buffer for safety
-MIN_REQUEST_DELAY_SECONDS = 65.0
+MIN_REQUEST_DELAY_SECONDS = 130.0
 
 
 @dataclass
