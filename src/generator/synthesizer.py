@@ -492,73 +492,86 @@ class CodeSynthesizer:
 
     def _parse_json_response(self, content: str) -> dict[str, Any]:
         """
-        Parse response from Claude with support for markdown file format.
+        Parse response from Claude with robust multi-strategy extraction.
 
-        The expected format is:
-        ### FILE: path/to/file.py
-        ```python
-        code here
-        ```
-
-        ### METADATA
-        ```json
-        {"requirements": [...], "probed_features": [...]}
-        ```
+        Tries multiple parsing strategies in order:
+        1. New markdown format with ### FILE: headers
+        2. JSON with "files" dict (direct or in code block)
+        3. Embedded code extraction from JSON strings
+        4. Plain Python code blocks with filename comments
+        5. Any Python code blocks (auto-generate names)
 
         Args:
-            content: Response text
+            content: Response text from Claude
 
         Returns:
             Parsed response with files, requirements, probed_features
         """
-        # First, try the new markdown format with ### FILE: headers
+        files: dict[str, str] = {}
+        metadata: dict[str, Any] = {}
+
+        # Strategy 1: New markdown format with ### FILE: headers
         files = self._extract_markdown_files(content)
-        metadata = self._extract_metadata(content)
-
         if files:
-            logger.debug("parsed_markdown_format", file_count=len(files))
-            return {
-                "files": files,
-                "requirements": metadata.get("requirements", ["boto3", "pytest"]),
-                "probed_features": metadata.get("probed_features", []),
-                "probe_name": metadata.get("probe_name", ""),
-                "tested_features": metadata.get("tested_features", []),
-            }
+            metadata = self._extract_metadata(content)
+            logger.info("parse_strategy_1_markdown", file_count=len(files))
+            return self._build_result(files, metadata)
 
-        # Fallback: try to extract JSON from markdown code block
-        json_match = re.search(r"```json\s*(.*?)\s*```", content, re.DOTALL)
-        if json_match:
-            json_str = json_match.group(1)
-            try:
-                result = json.loads(json_str)
-                if "files" in result:
-                    logger.debug("parsed_json_format", file_count=len(result.get("files", {})))
-                    return result
-            except json.JSONDecodeError as e:
-                logger.warning("json_parse_failed", error=str(e), content_length=len(content))
-
-        # Fallback: try to extract plain code blocks
-        files = self._extract_code_blocks(content)
+        # Strategy 2: JSON with "files" dict
+        files, metadata = self._extract_json_files(content)
         if files:
-            logger.info("extracted_code_blocks_fallback", file_count=len(files))
-            return {
-                "files": files,
-                "requirements": ["boto3", "pytest", "localstack-client"],
-                "probed_features": [],
-            }
+            logger.info("parse_strategy_2_json", file_count=len(files))
+            return self._build_result(files, metadata)
 
-        logger.warning("no_code_extracted", content_length=len(content))
+        # Strategy 3: Extract code from embedded JSON strings
+        files = self._extract_embedded_code_from_json(content)
+        if files:
+            metadata = self._extract_metadata(content)
+            logger.info("parse_strategy_3_embedded", file_count=len(files))
+            return self._build_result(files, metadata)
+
+        # Strategy 4: Code blocks with filename comments
+        files = self._extract_code_blocks_with_filenames(content)
+        if files:
+            logger.info("parse_strategy_4_comments", file_count=len(files))
+            return self._build_result(files, {})
+
+        # Strategy 5: Any Python code blocks (last resort)
+        files = self._extract_any_code_blocks(content)
+        if files:
+            logger.info("parse_strategy_5_any_blocks", file_count=len(files))
+            return self._build_result(files, {})
+
+        logger.warning(
+            "all_parse_strategies_failed",
+            content_length=len(content),
+            content_sample=content[:200].replace('\n', '\\n'),
+        )
         return {"files": {}, "requirements": [], "probed_features": []}
+
+    def _build_result(
+        self,
+        files: dict[str, str],
+        metadata: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Build standardized result dict."""
+        return {
+            "files": files,
+            "requirements": metadata.get("requirements", ["boto3", "pytest"]),
+            "probed_features": metadata.get("probed_features", []),
+            "probe_name": metadata.get("probe_name", ""),
+            "tested_features": metadata.get("tested_features", []),
+        }
 
     def _extract_markdown_files(self, content: str) -> dict[str, str]:
         """
-        Extract files from markdown format with ### FILE: headers.
+        Extract files from markdown format with FILE: headers.
 
-        Expected format:
-        ### FILE: path/to/file.py
-        ```python
-        code here
-        ```
+        Supports multiple header formats:
+        - ### FILE: path/to/file.py
+        - ## FILE: path/to/file.py
+        - **FILE:** path/to/file.py
+        - `path/to/file.py`:
 
         Args:
             content: Response text with markdown file blocks
@@ -568,49 +581,195 @@ class CodeSynthesizer:
         """
         files = {}
 
-        # Pattern to match ### FILE: filename followed by a code block
-        # Supports both ### FILE: and ## FILE: formats
-        pattern = r"#{2,3}\s*FILE:\s*(\S+)\s*\n```(?:python|py)?\s*\n(.*?)```"
-        matches = re.findall(pattern, content, re.DOTALL | re.IGNORECASE)
+        # Pattern 1: ### FILE: or ## FILE: format
+        pattern1 = r"#{1,4}\s*FILE:\s*[`'\"]?([^\s`'\"]+)[`'\"]?\s*\n```(?:python|py)?\s*\n(.*?)```"
+        for match in re.finditer(pattern1, content, re.DOTALL | re.IGNORECASE):
+            filename = match.group(1).strip()
+            code = match.group(2).strip()
+            if filename and code:
+                files[filename] = code
 
-        for filename, code in matches:
-            # Clean up the filename (remove quotes if present)
-            filename = filename.strip().strip('"').strip("'")
-            files[filename] = code.strip()
+        if files:
+            return files
+
+        # Pattern 2: **filename** or `filename` followed by code block
+        pattern2 = r"(?:\*\*|`)([^\s*`]+\.py)(?:\*\*|`)[:\s]*\n```(?:python|py)?\s*\n(.*?)```"
+        for match in re.finditer(pattern2, content, re.DOTALL):
+            filename = match.group(1).strip()
+            code = match.group(2).strip()
+            if filename and code:
+                files[filename] = code
+
+        if files:
+            return files
+
+        # Pattern 3: Filename on its own line before code block
+        pattern3 = r"^([a-zA-Z_][a-zA-Z0-9_/]*\.py)\s*$\n```(?:python|py)?\s*\n(.*?)```"
+        for match in re.finditer(pattern3, content, re.DOTALL | re.MULTILINE):
+            filename = match.group(1).strip()
+            code = match.group(2).strip()
+            if filename and code:
+                files[filename] = code
 
         return files
 
     def _extract_metadata(self, content: str) -> dict[str, Any]:
         """
-        Extract metadata JSON from ### METADATA section.
+        Extract metadata from response (requirements, probed_features, etc.).
 
-        Expected format:
-        ### METADATA
-        ```json
-        {"requirements": [...], "probed_features": [...]}
-        ```
+        Looks for:
+        - ### METADATA section with JSON
+        - "requirements" array anywhere in JSON
+        - pip install comments in code
 
         Args:
             content: Response text
 
         Returns:
-            Metadata dict or empty dict
+            Metadata dict with requirements and probed_features
         """
-        # Pattern to match ### METADATA followed by a JSON code block
-        pattern = r"#{2,3}\s*METADATA\s*\n```json\s*\n(.*?)```"
-        match = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
+        metadata: dict[str, Any] = {}
 
+        # Try METADATA section first
+        pattern = r"#{1,4}\s*METADATA\s*\n```json\s*\n(.*?)```"
+        match = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
         if match:
             try:
-                return json.loads(match.group(1))
-            except json.JSONDecodeError as e:
-                logger.warning("metadata_parse_failed", error=str(e))
+                metadata = json.loads(match.group(1))
+                return metadata
+            except json.JSONDecodeError:
+                pass
 
-        return {}
+        # Try to find requirements array in any JSON block
+        json_pattern = r"```json\s*\n(.*?)```"
+        for match in re.finditer(json_pattern, content, re.DOTALL):
+            try:
+                data = json.loads(match.group(1))
+                if isinstance(data, dict):
+                    if "requirements" in data:
+                        metadata["requirements"] = data["requirements"]
+                    if "probed_features" in data:
+                        metadata["probed_features"] = data["probed_features"]
+                    if "probe_name" in data:
+                        metadata["probe_name"] = data["probe_name"]
+            except json.JSONDecodeError:
+                continue
 
-    def _extract_code_blocks(self, content: str) -> dict[str, str]:
+        # Extract requirements from pip install comments
+        if "requirements" not in metadata:
+            pip_pattern = r"#\s*pip install\s+(.+)"
+            pip_matches = re.findall(pip_pattern, content)
+            if pip_matches:
+                requirements = []
+                for match in pip_matches:
+                    requirements.extend(match.split())
+                metadata["requirements"] = requirements
+
+        return metadata
+
+    def _extract_json_files(self, content: str) -> tuple[dict[str, str], dict[str, Any]]:
         """
-        Extract Python code blocks as fallback when other parsing fails.
+        Extract files from JSON format with "files" dict.
+
+        Args:
+            content: Response text
+
+        Returns:
+            Tuple of (files dict, metadata dict)
+        """
+        # Try JSON in code block first
+        json_pattern = r"```json\s*\n(.*?)```"
+        for match in re.finditer(json_pattern, content, re.DOTALL):
+            try:
+                data = json.loads(match.group(1))
+                if isinstance(data, dict) and "files" in data:
+                    files = data["files"]
+                    if isinstance(files, dict) and files:
+                        metadata = {
+                            k: v for k, v in data.items()
+                            if k in ("requirements", "probed_features", "probe_name")
+                        }
+                        return files, metadata
+            except json.JSONDecodeError:
+                continue
+
+        # Try raw JSON (without code block)
+        try:
+            # Find JSON object in content
+            json_match = re.search(r'\{[^{}]*"files"\s*:\s*\{.*?\}\s*\}', content, re.DOTALL)
+            if json_match:
+                data = json.loads(json_match.group(0))
+                if "files" in data:
+                    files = data["files"]
+                    metadata = {
+                        k: v for k, v in data.items()
+                        if k in ("requirements", "probed_features", "probe_name")
+                    }
+                    return files, metadata
+        except json.JSONDecodeError:
+            pass
+
+        return {}, {}
+
+    def _extract_embedded_code_from_json(self, content: str) -> dict[str, str]:
+        """
+        Extract code embedded as strings within JSON.
+
+        Handles cases where Claude outputs JSON like:
+        {"files": {"src/main.py": "def foo():\\n    pass"}}
+
+        The code is escaped as JSON string and needs to be unescaped.
+
+        Args:
+            content: Response text
+
+        Returns:
+            Dict of filename to code content
+        """
+        files = {}
+
+        # Find all JSON blocks
+        json_pattern = r"```json\s*\n(.*?)```"
+        for match in re.finditer(json_pattern, content, re.DOTALL):
+            json_str = match.group(1)
+
+            # Try to parse as JSON first
+            try:
+                data = json.loads(json_str)
+                if isinstance(data, dict) and "files" in data:
+                    for filename, code in data["files"].items():
+                        if isinstance(code, str) and code.strip():
+                            # Code is already unescaped by json.loads
+                            files[filename] = code
+                    if files:
+                        return files
+            except json.JSONDecodeError:
+                pass
+
+            # If JSON parsing failed, try regex extraction from the raw string
+            # Pattern to find "filename.py": "code..."
+            file_pattern = r'"([^"]+\.py)"\s*:\s*"((?:[^"\\]|\\.)*)\"'
+            for file_match in re.finditer(file_pattern, json_str):
+                filename = file_match.group(1)
+                code = file_match.group(2)
+                # Unescape the code
+                try:
+                    code = code.encode().decode('unicode_escape')
+                except Exception:
+                    code = code.replace('\\n', '\n').replace('\\t', '\t').replace('\\"', '"')
+                if code.strip():
+                    files[filename] = code.strip()
+
+        return files
+
+    def _extract_code_blocks_with_filenames(self, content: str) -> dict[str, str]:
+        """
+        Extract Python code blocks that have filename indicators.
+
+        Looks for:
+        - # filename.py at the start of the code
+        - # File: filename.py comment
+        - '''filename.py''' docstring
 
         Args:
             content: Response text with code blocks
@@ -620,18 +779,88 @@ class CodeSynthesizer:
         """
         files = {}
 
-        # Find all Python code blocks with optional filename comments
-        pattern = r"```python\s*(?:#\s*(\S+\.py))?\s*\n(.*?)```"
-        matches = re.findall(pattern, content, re.DOTALL)
+        # Find all Python code blocks
+        pattern = r"```(?:python|py)\s*\n(.*?)```"
+        for i, match in enumerate(re.finditer(pattern, content, re.DOTALL)):
+            code = match.group(1).strip()
+            if not code:
+                continue
 
-        for i, (filename, code) in enumerate(matches):
+            filename = None
+
+            # Try to extract filename from first line comment
+            first_line = code.split('\n')[0].strip()
+
+            # Pattern: # filename.py or # src/filename.py
+            if first_line.startswith('#'):
+                name_match = re.match(r'#\s*(?:File:\s*)?([a-zA-Z_][a-zA-Z0-9_/]*\.py)', first_line, re.IGNORECASE)
+                if name_match:
+                    filename = name_match.group(1)
+                    # Remove the filename comment from code
+                    code = '\n'.join(code.split('\n')[1:]).strip()
+
+            # Pattern: """filename.py""" or '''filename.py'''
             if not filename:
+                doc_match = re.match(r'["\']{{3}}([a-zA-Z_][a-zA-Z0-9_/]*\.py)["\']{{3}}', first_line)
+                if doc_match:
+                    filename = doc_match.group(1)
+
+            # If we found a filename, add it
+            if filename and code:
+                files[filename] = code
+            elif code and len(code) > 50:  # Only add substantial code blocks
                 # Generate filename based on content
-                if "test_" in code or "def test" in code:
-                    filename = f"tests/test_probe_{i}.py"
-                else:
+                if "test_" in code or "def test" in code or "@pytest" in code:
+                    filename = f"tests/test_generated_{i}.py"
+                elif "class " in code and "Probe" in code:
                     filename = f"src/probes/probe_{i}.py"
-            files[filename] = code.strip()
+                elif "def " in code:
+                    filename = f"src/generated_{i}.py"
+                else:
+                    filename = f"src/code_{i}.py"
+                files[filename] = code
+
+        return files
+
+    def _extract_any_code_blocks(self, content: str) -> dict[str, str]:
+        """
+        Extract any Python code blocks as last resort.
+
+        Args:
+            content: Response text with code blocks
+
+        Returns:
+            Dict of filename to code content
+        """
+        files = {}
+
+        # Find ALL code blocks (python, py, or unspecified)
+        pattern = r"```(?:python|py)?\s*\n(.*?)```"
+        blocks = re.findall(pattern, content, re.DOTALL)
+
+        src_count = 0
+        test_count = 0
+
+        for code in blocks:
+            code = code.strip()
+            if not code or len(code) < 30:
+                continue
+
+            # Skip JSON blocks
+            if code.startswith('{') or code.startswith('['):
+                continue
+
+            # Determine if it's a test or source file
+            is_test = any(x in code for x in ["test_", "def test", "@pytest", "import pytest", "TestCase"])
+
+            if is_test:
+                filename = f"tests/test_probe_{test_count}.py"
+                test_count += 1
+            else:
+                filename = f"src/probes/probe_{src_count}.py"
+                src_count += 1
+
+            files[filename] = code
 
         return files
 
