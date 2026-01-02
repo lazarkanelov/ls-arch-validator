@@ -150,11 +150,13 @@ class ArchitectureProcessor:
 
         # Early check for API key if generation is needed
         if not self.config.skip_generation and not os.environ.get("ANTHROPIC_API_KEY"):
-            logger.error(
-                "api_key_missing_early_check",
-                message="ANTHROPIC_API_KEY not set - generation will fail. "
+            logger.warning(
+                "api_key_missing_auto_skip",
+                message="ANTHROPIC_API_KEY not set - auto-enabling skip_generation. "
                         "Set the secret CLAUDE_API_KEY in GitHub repository settings.",
             )
+            # Auto-skip generation to allow pipeline to run with cached apps
+            self.config.skip_generation = True
 
         try:
             # Phase 1: Mining
