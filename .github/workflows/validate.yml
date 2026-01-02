@@ -29,7 +29,7 @@ on:
       parallelism:
         description: 'Number of concurrent validations'
         type: number
-        default: 4
+        default: 1
       localstack_version:
         description: 'LocalStack image tag'
         type: string
@@ -43,9 +43,9 @@ on:
         type: boolean
         default: true
       max_per_source:
-        description: 'Maximum architectures per source (reduces API calls)'
+        description: 'Maximum architectures per source'
         type: number
-        default: 3
+        default: 10
 
 env:
   PYTHON_VERSION: '3.11'
@@ -61,7 +61,7 @@ jobs:
   validate:
     name: Run Validation Pipeline
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 240
 
     steps:
       - name: Checkout repository
@@ -105,9 +105,9 @@ jobs:
         id: validate
         run: |
           # Build command arguments
-          ARGS="--parallelism ${{ inputs.parallelism || 4 }}"
+          ARGS="--parallelism ${{ inputs.parallelism || 1 }}"
           ARGS="$ARGS --localstack-version ${{ inputs.localstack_version || 'latest' }}"
-          ARGS="$ARGS --max-per-source ${{ inputs.max_per_source || 3 }}"
+          ARGS="$ARGS --max-per-source ${{ inputs.max_per_source || 10 }}"
 
           if [ "${{ inputs.skip_mining }}" = "true" ]; then
             ARGS="$ARGS --skip-mining"
