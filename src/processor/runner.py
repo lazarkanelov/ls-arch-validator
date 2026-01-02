@@ -9,9 +9,11 @@ from typing import Any, Optional
 
 from src.generator import CodeSynthesizer, CodeValidator, validate_all_files
 from src.miner import mine_all, MiningResult
-from src.models import Architecture, SampleApp, ValidationResult, ValidationRun
+from src.models import Architecture, ArchitectureResult, ResultStatus, SampleApp, ValidationRun
 from src.processor.machine import ProcessingMachine
 from src.processor.states import ArchState, StateContext
+from src.runner.container import ContainerManager
+from src.runner.executor import ExecutionContext, PytestExecutor, TerraformExecutor
 from src.utils.cache import AppCache, ArchitectureCache
 from src.utils.logging import get_logger
 from src.utils.tokens import TokenTracker
@@ -81,12 +83,18 @@ class ArchitectureProcessor:
         # Initialize components (lazy)
         self._synthesizer: Optional[CodeSynthesizer] = None
         self._validator: Optional[CodeValidator] = None
+        self._container_manager: Optional[ContainerManager] = None
+        self._tf_executor: Optional[TerraformExecutor] = None
+        self._pytest_executor: Optional[PytestExecutor] = None
 
         # Loaded architectures
         self._architectures: dict[str, Architecture] = {}
 
         # Results
-        self._results: list[ValidationResult] = []
+        self._results: list[ArchitectureResult] = []
+
+        # LocalStack container info
+        self._localstack_endpoint: Optional[str] = None
 
     @property
     def synthesizer(self) -> CodeSynthesizer:
@@ -457,9 +465,9 @@ class ArchitectureProcessor:
             self.machine.transition(arch_id, ArchState.VALIDATED)
 
             # Transition to final state based on result
-            if result.status == "passed":
+            if result.status == ResultStatus.PASSED:
                 self.machine.transition(arch_id, ArchState.PASSED)
-            elif result.status == "partial":
+            elif result.status == ResultStatus.PARTIAL:
                 self.machine.transition(arch_id, ArchState.PARTIAL)
             else:
                 self.machine.transition(arch_id, ArchState.FAILED)
@@ -467,7 +475,27 @@ class ArchitectureProcessor:
         except Exception as e:
             self.machine.handle_error(arch_id, e, recoverable=False)
 
-    async def _run_validation(self, arch_state: ArchitectureState) -> ValidationResult:
+    async def _ensure_localstack(self) -> str:
+        """Ensure LocalStack container is running and return endpoint URL."""
+        if self._localstack_endpoint:
+            return self._localstack_endpoint
+
+        if self._container_manager is None:
+            self._container_manager = ContainerManager()
+
+        # Start LocalStack container
+        logger.info("starting_localstack", version=self.config.localstack_version)
+
+        container = await self._container_manager.start_localstack(
+            image_tag=self.config.localstack_version,
+        )
+
+        self._localstack_endpoint = container.endpoint_url
+        logger.info("localstack_started", endpoint=self._localstack_endpoint)
+
+        return self._localstack_endpoint
+
+    async def _run_validation(self, arch_state: ArchitectureState) -> ArchitectureResult:
         """
         Run validation against LocalStack.
 
@@ -475,30 +503,132 @@ class ArchitectureProcessor:
             arch_state: Architecture state with synthesis result
 
         Returns:
-            ValidationResult
+            ArchitectureResult with test results
         """
+        import shutil
+        import tempfile
+
         arch_id = arch_state.arch_id
         synthesis = arch_state.synthesis_result
-
-        # Create sample app
         arch = arch_state.architecture or self._architectures.get(arch_id)
-        app = self.synthesizer.create_sample_app(arch, synthesis)
 
-        # For now, create a placeholder result
-        # The actual LocalStack validation would happen here
-        # This is a simplified version - full implementation would use
-        # the existing validator infrastructure
+        # Ensure LocalStack is running
+        endpoint_url = await self._ensure_localstack()
 
-        # TODO: Integrate with actual LocalStack runner
-        result = ValidationResult(
-            architecture_id=arch_id,
-            status="passed",  # Placeholder
-            passed_tests=[],
-            failed_tests=[],
-            error_summary=None,
-        )
+        # Create work directory
+        work_dir = Path(tempfile.mkdtemp(prefix=f"validate-{arch_id}-"))
 
-        return result
+        try:
+            # Write Terraform files
+            tf_dir = work_dir / "terraform"
+            tf_dir.mkdir(parents=True, exist_ok=True)
+
+            if arch and arch.main_tf:
+                (tf_dir / "main.tf").write_text(arch.main_tf)
+            if arch and arch.variables_tf:
+                (tf_dir / "variables.tf").write_text(arch.variables_tf)
+            if arch and arch.outputs_tf:
+                (tf_dir / "outputs.tf").write_text(arch.outputs_tf)
+
+            # Write test files
+            test_dir = work_dir / "tests"
+            test_dir.mkdir(parents=True, exist_ok=True)
+
+            if synthesis and hasattr(synthesis, 'test_code'):
+                for filename, content in synthesis.test_code.items():
+                    (test_dir / filename).write_text(content)
+            elif synthesis and hasattr(synthesis, 'source_code'):
+                # Also write source files
+                for filename, content in synthesis.source_code.items():
+                    (test_dir / filename).write_text(content)
+
+            # Create execution context
+            ctx = ExecutionContext(
+                work_dir=tf_dir,
+                endpoint_url=endpoint_url,
+                architecture_id=arch_id,
+                timeout=600,
+            )
+
+            # Initialize executors
+            if self._tf_executor is None:
+                self._tf_executor = TerraformExecutor(use_tflocal=True)
+            if self._pytest_executor is None:
+                self._pytest_executor = PytestExecutor()
+
+            # Run Terraform
+            logger.info("running_terraform", arch_id=arch_id)
+
+            init_result = await self._tf_executor.init(ctx)
+            if not init_result.success:
+                return ArchitectureResult(
+                    architecture_id=arch_id,
+                    status=ResultStatus.FAILED,
+                    error_summary=f"Terraform init failed: {init_result.error_message}",
+                    infrastructure_error=init_result.error_message,
+                    passed_tests=[],
+                    failed_tests=[],
+                )
+
+            apply_result = await self._tf_executor.apply(ctx)
+            if not apply_result.success:
+                return ArchitectureResult(
+                    architecture_id=arch_id,
+                    status=ResultStatus.FAILED,
+                    error_summary=f"Terraform apply failed: {apply_result.error_message}",
+                    infrastructure_error=apply_result.error_message,
+                    passed_tests=[],
+                    failed_tests=[],
+                )
+
+            # Run tests
+            logger.info("running_tests", arch_id=arch_id)
+
+            test_ctx = ExecutionContext(
+                work_dir=test_dir,
+                endpoint_url=endpoint_url,
+                architecture_id=arch_id,
+                timeout=300,
+            )
+
+            pytest_result = await self._pytest_executor.run(test_ctx)
+
+            # Determine status
+            passed_tests = []
+            failed_tests = []
+
+            for failure in pytest_result.failures:
+                failed_tests.append(failure.get("name", "unknown"))
+
+            # Assume passed = total - failed for simplicity
+            if pytest_result.passed > 0:
+                passed_tests = [f"test_{i}" for i in range(pytest_result.passed)]
+
+            if pytest_result.failed == 0 and pytest_result.errors == 0:
+                status = ResultStatus.PASSED
+            elif pytest_result.passed > 0:
+                status = ResultStatus.PARTIAL
+            else:
+                status = ResultStatus.FAILED
+
+            error_summary = None
+            if failed_tests:
+                error_summary = f"{len(failed_tests)} test(s) failed"
+
+            return ArchitectureResult(
+                architecture_id=arch_id,
+                status=status,
+                passed_tests=passed_tests,
+                failed_tests=failed_tests,
+                error_summary=error_summary,
+            )
+
+        finally:
+            # Cleanup work directory
+            try:
+                shutil.rmtree(work_dir)
+            except Exception as e:
+                logger.warning("cleanup_failed", work_dir=str(work_dir), error=str(e))
 
     def _compile_results(self) -> ValidationRun:
         """Compile all results into a ValidationRun."""
