@@ -11,16 +11,36 @@ from src.utils.logging import get_logger
 
 logger = get_logger("miner.sources.quickstart")
 
-# AWS Quick Start repositories to mine
+# AWS Quick Start repositories to mine - expanded for more coverage
 QUICKSTART_REPOS = [
+    # Networking & Compute
     "https://github.com/aws-quickstart/quickstart-linux-bastion",
     "https://github.com/aws-quickstart/quickstart-amazon-vpc",
+    "https://github.com/aws-quickstart/quickstart-amazon-ec2",
+    # Containers & Kubernetes
     "https://github.com/aws-quickstart/quickstart-amazon-eks",
+    "https://github.com/aws-quickstart/quickstart-amazon-ecs",
+    # Databases
     "https://github.com/aws-quickstart/quickstart-amazon-aurora-mysql",
     "https://github.com/aws-quickstart/quickstart-amazon-aurora-postgresql",
     "https://github.com/aws-quickstart/quickstart-amazon-rds",
     "https://github.com/aws-quickstart/quickstart-amazon-redshift",
     "https://github.com/aws-quickstart/quickstart-amazon-elasticache-redis",
+    "https://github.com/aws-quickstart/quickstart-amazon-documentdb",
+    # Serverless & API
+    "https://github.com/aws-quickstart/quickstart-serverless-backend",
+    "https://github.com/aws-quickstart/quickstart-amazon-kinesis",
+    # Storage
+    "https://github.com/aws-quickstart/quickstart-amazon-s3",
+    "https://github.com/aws-quickstart/quickstart-amazon-efs",
+    # Security
+    "https://github.com/aws-quickstart/quickstart-compliance-common",
+    "https://github.com/aws-quickstart/quickstart-aws-vpc-flow-logs",
+    # Messaging
+    "https://github.com/aws-quickstart/quickstart-amazon-mq",
+    "https://github.com/aws-quickstart/quickstart-amazon-msk",
+    # Machine Learning
+    "https://github.com/aws-quickstart/quickstart-amazon-sagemaker",
 ]
 
 

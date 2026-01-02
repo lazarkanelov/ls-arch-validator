@@ -14,24 +14,48 @@ logger = get_logger("miner.sources.terraform")
 # Terraform Registry API base URL
 TERRAFORM_REGISTRY_API = "https://registry.terraform.io/v1"
 
-# Popular AWS modules to mine
+# Popular AWS modules to mine - expanded for more coverage
 AWS_MODULES = [
+    # Core networking and compute
     ("terraform-aws-modules", "vpc"),
     ("terraform-aws-modules", "ec2-instance"),
+    ("terraform-aws-modules", "autoscaling"),
+    ("terraform-aws-modules", "alb"),
+    ("terraform-aws-modules", "elb"),
+    # Storage
     ("terraform-aws-modules", "s3-bucket"),
+    ("terraform-aws-modules", "efs"),
+    # Serverless
     ("terraform-aws-modules", "lambda"),
-    ("terraform-aws-modules", "rds"),
-    ("terraform-aws-modules", "dynamodb-table"),
-    ("terraform-aws-modules", "sqs"),
-    ("terraform-aws-modules", "sns"),
     ("terraform-aws-modules", "apigateway-v2"),
-    ("terraform-aws-modules", "ecs"),
-    ("terraform-aws-modules", "eks"),
     ("terraform-aws-modules", "step-functions"),
     ("terraform-aws-modules", "eventbridge"),
+    # Database
+    ("terraform-aws-modules", "rds"),
+    ("terraform-aws-modules", "rds-aurora"),
+    ("terraform-aws-modules", "dynamodb-table"),
+    ("terraform-aws-modules", "elasticache"),
+    # Messaging
+    ("terraform-aws-modules", "sqs"),
+    ("terraform-aws-modules", "sns"),
+    # Containers
+    ("terraform-aws-modules", "ecs"),
+    ("terraform-aws-modules", "eks"),
+    ("terraform-aws-modules", "ecr"),
+    # Security & Identity
     ("terraform-aws-modules", "iam"),
     ("terraform-aws-modules", "acm"),
+    ("terraform-aws-modules", "kms"),
+    ("terraform-aws-modules", "secrets-manager"),
+    # Monitoring
     ("terraform-aws-modules", "cloudwatch"),
+    # Data & Analytics
+    ("terraform-aws-modules", "kinesis"),
+    ("terraform-aws-modules", "msk"),
+    # Additional community modules
+    ("cloudposse", "terraform-aws-dynamodb"),
+    ("cloudposse", "terraform-aws-s3-bucket"),
+    ("cloudposse", "terraform-aws-sqs-queue"),
 ]
 
 
