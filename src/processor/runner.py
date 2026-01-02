@@ -80,6 +80,11 @@ class ArchitectureProcessor:
             auto_save=True,
         )
 
+        # Clear FSM state if force-fresh (skip_cache) to allow re-processing
+        if config.skip_cache:
+            logger.info("clearing_fsm_state", reason="force-fresh mode enabled")
+            self.machine.clear()
+
         # Initialize caches
         self.arch_cache = ArchitectureCache(config.cache_dir)
         self.app_cache = AppCache(config.cache_dir)
