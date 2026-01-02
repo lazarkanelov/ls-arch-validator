@@ -679,6 +679,17 @@ def get_builtin_architectures() -> list[Architecture]:
     architectures = []
 
     for arch_data in BUILTIN_ARCHITECTURES:
+        # Count resources in the terraform code
+        resource_count = arch_data["main_tf"].count('resource "')
+
+        # Determine complexity based on resource count
+        if resource_count <= 3:
+            complexity = "low"
+        elif resource_count <= 6:
+            complexity = "medium"
+        else:
+            complexity = "high"
+
         arch = Architecture(
             id=arch_data["id"],
             source_type=ArchitectureSourceType.TEMPLATE,
@@ -686,9 +697,10 @@ def get_builtin_architectures() -> list[Architecture]:
             source_url=None,
             main_tf=arch_data["main_tf"].strip(),
             metadata=ArchitectureMetadata(
-                name=arch_data["name"],
-                description=arch_data["description"],
-                aws_services=arch_data["services"],
+                services=arch_data["services"],
+                resource_count=resource_count,
+                complexity=complexity,
+                original_format="terraform",
             ),
         )
         architectures.append(arch)
