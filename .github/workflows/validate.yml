@@ -105,6 +105,16 @@ jobs:
           sudo systemctl start docker
           docker info
 
+      - name: Check environment
+        run: |
+          echo "Checking required environment variables..."
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            echo "✅ ANTHROPIC_API_KEY is set (length: ${#ANTHROPIC_API_KEY})"
+          else
+            echo "⚠️ ANTHROPIC_API_KEY is NOT set - generation will be skipped"
+            echo "To enable generation, add CLAUDE_API_KEY secret to repository settings"
+          fi
+
       - name: Run validation pipeline
         id: validate
         run: |
