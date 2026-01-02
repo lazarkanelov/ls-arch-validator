@@ -312,6 +312,9 @@ class ProcessingMachine:
 
     def all_complete(self) -> bool:
         """Check if all architectures are in terminal states."""
+        # Empty states means nothing registered yet - not complete
+        if not self._states:
+            return False
         return all(
             arch.state.is_terminal()
             for arch in self._states.values()

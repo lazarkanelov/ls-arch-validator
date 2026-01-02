@@ -661,11 +661,25 @@ def _run_with_fsm(
         if not templates_dir.exists():
             templates_dir = Path("templates")
 
-        # Load architectures for dashboard
+        # Load architectures for dashboard - from processor first, then cache
         arch_cache = ArchitectureCache(ctx.cache_dir)
         architectures: dict[str, Architecture] = {}
 
+        # First, get architectures from the processor (includes newly discovered)
+        for arch_id, arch in processor._architectures.items():
+            architectures[arch_id] = arch
+
+        ctx.logger.info(
+            "architectures_from_processor",
+            count=len(architectures),
+            ids=list(architectures.keys())[:10],
+        )
+
+        # Then supplement with cached architectures
         for arch_id in arch_cache.list_keys():
+            if arch_id in architectures:
+                continue  # Already have from processor
+
             cached = arch_cache.load_architecture(arch_id)
             if cached:
                 metadata = None
@@ -688,6 +702,11 @@ def _run_with_fsm(
                 )
                 architectures[arch_id] = arch
 
+        ctx.logger.info(
+            "total_architectures_for_dashboard",
+            count=len(architectures),
+        )
+
         app_cache = AppCache(ctx.cache_dir)
 
         generator = SiteGenerator(
@@ -707,14 +726,23 @@ def _run_with_fsm(
         import json as json_module
         registry_data_file = ctx.output_dir / "data" / "registry.json"
         registry_data_file.parent.mkdir(parents=True, exist_ok=True)
-        registry_data_file.write_text(json_module.dumps({
+        registry_data = {
             "stats": processor.get_registry_stats(),
             "weekly_summary": processor.get_weekly_summary(),
             "growth_data": processor.get_growth_data(days=30),
             "updated_at": datetime.utcnow().isoformat(),
-        }, indent=2, default=str))
-
+        }
+        registry_data_file.write_text(json_module.dumps(registry_data, indent=2, default=str))
         ctx.logger.info("registry_data_saved", path=str(registry_data_file))
+
+        # Also save discovered architectures count for debugging
+        ctx.logger.info(
+            "architectures_discovered",
+            count=len(architectures) if architectures else 0,
+            from_cache=len(arch_cache.list_keys()),
+            from_processor=len(processor._architectures),
+            results=len(validation_run.results) if validation_run.results else 0,
+        )
 
         # Output results
         stats = processor.machine.stats
@@ -749,10 +777,14 @@ def _run_with_fsm(
                 "new_this_week": registry_stats.get("new_this_week", 0),
                 "services_coverage": registry_stats.get("services_coverage", {}),
             },
+            "architectures_discovered": len(processor._architectures),
+            "architecture_ids": list(processor._architectures.keys()),
+            "results_count": len(validation_run.results) if validation_run.results else 0,
         })
 
     except Exception as e:
-        ctx.logger.error("fsm_pipeline_failed", error=str(e))
+        import traceback
+        ctx.logger.error("fsm_pipeline_failed", error=str(e), traceback=traceback.format_exc())
         output_json({
             "status": "error",
             "message": str(e),

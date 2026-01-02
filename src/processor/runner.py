@@ -129,6 +129,8 @@ class ArchitectureProcessor:
         Returns:
             ValidationRun with all results
         """
+        import os
+
         self.machine.stats.started_at = datetime.utcnow()
 
         logger.info(
@@ -140,6 +142,14 @@ class ArchitectureProcessor:
                 "skip_generation": self.config.skip_generation,
             },
         )
+
+        # Early check for API key if generation is needed
+        if not self.config.skip_generation and not os.environ.get("ANTHROPIC_API_KEY"):
+            logger.error(
+                "api_key_missing_early_check",
+                message="ANTHROPIC_API_KEY not set - generation will fail. "
+                        "Set the secret CLAUDE_API_KEY in GitHub repository settings.",
+            )
 
         try:
             # Phase 1: Mining
