@@ -11,9 +11,9 @@ on:
       - 'docs/**'
       - '.github/workflows/validate.yml'
 
-  # Weekly run on Mondays at 3 AM UTC
+  # Daily run at 3 AM UTC to discover and test NEW architectures
   schedule:
-    - cron: '0 3 * * 1'
+    - cron: '0 3 * * *'
 
   # Manual trigger with options
   workflow_dispatch:
@@ -46,6 +46,10 @@ on:
         description: 'Maximum architectures per source'
         type: number
         default: 10
+      incremental:
+        description: 'Incremental mode: only test NEW architectures (default for scheduled runs)'
+        type: boolean
+        default: true
 
 env:
   PYTHON_VERSION: '3.11'
@@ -92,9 +96,9 @@ jobs:
         with:
           path: |
             ./cache
-          key: arch-validator-cache-v2-${{ github.run_id }}
+          key: arch-validator-cache-v3-${{ github.run_id }}
           restore-keys: |
-            arch-validator-cache-v2-
+            arch-validator-cache-v3-
 
       - name: Start Docker service
         run: |
@@ -107,7 +111,6 @@ jobs:
           # Build command arguments
           # Use FSM processor for sequential, rate-limit-aware processing
           ARGS="--use-fsm"
-          ARGS="$ARGS --force-fresh"
           ARGS="$ARGS --parallelism ${{ inputs.parallelism || 1 }}"
           ARGS="$ARGS --localstack-version ${{ inputs.localstack_version || 'latest' }}"
           ARGS="$ARGS --max-per-source ${{ inputs.max_per_source || 10 }}"
@@ -126,6 +129,17 @@ jobs:
             ARGS="$ARGS --dashboard-url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           fi
 
+          # Use incremental mode for scheduled runs (daily discovery of NEW architectures)
+          # For manual runs, use the input value
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="$ARGS --incremental"
+          elif [ "${{ inputs.incremental }}" = "true" ]; then
+            ARGS="$ARGS --incremental"
+          else
+            # Force fresh for non-incremental manual runs
+            ARGS="$ARGS --force-fresh"
+          fi
+
           # Run the pipeline
           ls-arch-validator run $ARGS | tee run_output.json
 
@@ -138,7 +152,7 @@ jobs:
         with:
           path: |
             ./cache
-          key: arch-validator-cache-v2-${{ github.run_id }}
+          key: arch-validator-cache-v3-${{ github.run_id }}
 
       - name: Upload results artifact
         uses: actions/upload-artifact@v4
@@ -182,13 +196,28 @@ jobs:
               PARTIAL=$(cat run_output.json | jq -r '.statistics.partial // 0')
               PASS_RATE=$(cat run_output.json | jq -r '.statistics.pass_rate // 0')
 
-              echo "### Statistics" >> $GITHUB_STEP_SUMMARY
+              echo "### This Run Statistics" >> $GITHUB_STEP_SUMMARY
               echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
               echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
               echo "| Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
               echo "| Partial | $PARTIAL |" >> $GITHUB_STEP_SUMMARY
               echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
               echo "| Pass Rate | ${PASS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            # Extract cumulative registry stats if available
+            if cat run_output.json | jq -e '.registry' > /dev/null 2>&1; then
+              TOTAL_ARCH=$(cat run_output.json | jq -r '.registry.total_architectures // 0')
+              TESTED_ARCH=$(cat run_output.json | jq -r '.registry.tested_architectures // 0')
+              NEW_THIS_WEEK=$(cat run_output.json | jq -r '.registry.new_this_week // 0')
+
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Cumulative Registry" >> $GITHUB_STEP_SUMMARY
+              echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+              echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+              echo "| Total Architectures | $TOTAL_ARCH |" >> $GITHUB_STEP_SUMMARY
+              echo "| Tested | $TESTED_ARCH |" >> $GITHUB_STEP_SUMMARY
+              echo "| New This Week | $NEW_THIS_WEEK |" >> $GITHUB_STEP_SUMMARY
             fi
 
             # Extract timing if available

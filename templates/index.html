@@ -126,6 +126,71 @@
     </div>
 </section>
 
+<!-- Cumulative Registry Stats (if available) -->
+{% if registry_stats %}
+<section id="registry" class="mb-8">
+    <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-700/50">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                Cumulative Architecture Registry
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">All-time statistics from daily discovery runs</p>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-5 divide-x divide-y lg:divide-y-0 divide-slate-700/50">
+            <div class="p-4 text-center">
+                <div class="text-2xl font-bold text-white">{{ registry_stats.total_architectures | default(0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Total Discovered</div>
+            </div>
+            <div class="p-4 text-center">
+                <div class="text-2xl font-bold text-primary-400">{{ registry_stats.tested_architectures | default(0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Tested</div>
+            </div>
+            <div class="p-4 text-center bg-success-500/5">
+                <div class="text-2xl font-bold text-success-400">{{ registry_stats.passing | default(0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Passing</div>
+            </div>
+            <div class="p-4 text-center bg-warning-500/5">
+                <div class="text-2xl font-bold text-warning-400">{{ registry_stats.partial | default(0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Partial</div>
+            </div>
+            <div class="p-4 text-center bg-danger-500/5">
+                <div class="text-2xl font-bold text-danger-400">{{ registry_stats.failing | default(0) }}</div>
+                <div class="text-xs text-slate-400 mt-1">Failing</div>
+            </div>
+        </div>
+        <!-- Growth indicator -->
+        {% if registry_stats.new_this_week %}
+        <div class="px-6 py-3 border-t border-slate-700/50 bg-slate-800/50 flex items-center gap-2">
+            <svg class="w-4 h-4 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+            <span class="text-sm text-slate-300"><strong class="text-success-400">+{{ registry_stats.new_this_week }}</strong> new architectures discovered this week</span>
+        </div>
+        {% endif %}
+        <!-- Services coverage summary -->
+        {% if registry_stats.services_coverage %}
+        <div class="px-6 py-4 border-t border-slate-700/50">
+            <h3 class="text-sm font-semibold text-white mb-3">AWS Services Coverage</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for service, stats in registry_stats.services_coverage.items() %}
+                {% set pass_rate = (stats.passing / stats.total * 100) if stats.total else 0 %}
+                <div class="px-3 py-1.5 rounded-lg text-xs font-medium
+                    {% if pass_rate >= 80 %}bg-success-500/20 text-success-400
+                    {% elif pass_rate >= 50 %}bg-warning-500/20 text-warning-400
+                    {% else %}bg-danger-500/20 text-danger-400{% endif %}">
+                    {{ service }} ({{ "%.0f"|format(pass_rate) }}%)
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
 <!-- Overview Section -->
 <section id="overview" class="mb-8">
     <!-- Hero Stats Row -->

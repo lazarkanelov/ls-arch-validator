@@ -340,6 +340,18 @@ class SiteGenerator:
             except (json.JSONDecodeError, KeyError) as e:
                 logger.warning("history_load_error", error=str(e))
 
+        # Load registry.json for cumulative tracking
+        registry_file = data_dir / "registry.json"
+        if registry_file.exists():
+            try:
+                registry = json.loads(registry_file.read_text())
+                dashboard_data["registry_stats"] = registry.get("stats", {})
+                dashboard_data["weekly_summary"] = registry.get("weekly_summary", {})
+                dashboard_data["growth_data"] = registry.get("growth_data", [])
+                logger.info("registry_data_loaded")
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.warning("registry_load_error", error=str(e))
+
         return dashboard_data
 
     def _render_dashboard(self, data: dict[str, Any]) -> Path:

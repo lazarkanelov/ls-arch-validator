@@ -11,7 +11,8 @@ from src.generator import CodeSynthesizer, CodeValidator, validate_all_files
 from src.miner import mine_all, MiningResult
 from src.models import Architecture, ArchitectureResult, ResultStatus, SampleApp, ValidationRun
 from src.processor.machine import ProcessingMachine
-from src.processor.states import ArchState, StateContext
+from src.processor.states import ArchitectureState, ArchState, StateContext
+from src.registry import ArchitectureRegistry
 from src.runner.container import ContainerManager
 from src.runner.executor import ExecutionContext, PytestExecutor, TerraformExecutor
 from src.utils.cache import AppCache, ArchitectureCache
@@ -34,6 +35,7 @@ class ProcessorConfig:
         skip_cache: bool = False,
         token_budget: Optional[int] = None,
         localstack_version: str = "latest",
+        incremental: bool = False,
     ) -> None:
         self.cache_dir = Path(cache_dir)
         self.max_per_source = max_per_source
@@ -43,11 +45,13 @@ class ProcessorConfig:
         self.skip_cache = skip_cache
         self.token_budget = token_budget
         self.localstack_version = localstack_version
+        self.incremental = incremental
 
         # Derived paths
         self.state_file = self.cache_dir / "processor_state.json"
         self.architectures_dir = self.cache_dir / "architectures"
         self.apps_dir = self.cache_dir / "apps"
+        self.registry_dir = self.cache_dir / "registry"
 
 
 class ArchitectureProcessor:
@@ -80,6 +84,9 @@ class ArchitectureProcessor:
         self.arch_cache = ArchitectureCache(config.cache_dir)
         self.app_cache = AppCache(config.cache_dir)
 
+        # Initialize architecture registry for cumulative tracking
+        self.registry = ArchitectureRegistry(config.registry_dir)
+
         # Initialize components (lazy)
         self._synthesizer: Optional[CodeSynthesizer] = None
         self._validator: Optional[CodeValidator] = None
@@ -95,6 +102,9 @@ class ArchitectureProcessor:
 
         # LocalStack container info
         self._localstack_endpoint: Optional[str] = None
+
+        # Run ID for this validation run
+        self._run_id = f"run-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}"
 
     @property
     def synthesizer(self) -> CodeSynthesizer:
@@ -162,13 +172,18 @@ class ArchitectureProcessor:
 
     async def _run_mining_phase(self) -> None:
         """Run the mining phase to discover architectures."""
-        logger.info("mining_phase_started")
+        logger.info(
+            "mining_phase_started",
+            incremental=self.config.incremental,
+        )
 
         result = await mine_all(
             cache_dir=self.config.cache_dir,
             include_diagrams=self.config.include_diagrams,
             max_per_source=self.config.max_per_source,
             skip_cache=self.config.skip_cache,
+            registry=self.registry,
+            incremental=self.config.incremental,
         )
 
         # Register architectures with FSM
@@ -181,9 +196,14 @@ class ArchitectureProcessor:
             self.machine.transition(arch.id, ArchState.MINING)
             self.machine.transition(arch.id, ArchState.MINED)
 
+        # Save registry with new discoveries
+        self.registry.save()
+
         logger.info(
             "mining_phase_completed",
             architectures=len(result.architectures),
+            new_architectures=result.new_architectures,
+            skipped_known=result.skipped_known,
             errors=len(result.errors),
         )
 
@@ -461,6 +481,22 @@ class ArchitectureProcessor:
             arch_state.validation_result = result
             self._results.append(result)
 
+            # Record test result in registry
+            status_map = {
+                ResultStatus.PASSED: "passed",
+                ResultStatus.PARTIAL: "partial",
+                ResultStatus.FAILED: "failed",
+            }
+            self.registry.record_test_result(
+                arch_id=arch_id,
+                run_id=self._run_id,
+                status=status_map.get(result.status, "error"),
+                passed_tests=len(result.passed_tests),
+                failed_tests=len(result.failed_tests),
+                error_summary=result.error_summary,
+            )
+            self.registry.save()
+
             # Transition to VALIDATED
             self.machine.transition(arch_id, ArchState.VALIDATED)
 
@@ -644,7 +680,7 @@ class ArchitectureProcessor:
         )
 
         run = ValidationRun(
-            id=f"run-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}",
+            id=self._run_id,
             started_at=self.machine.stats.started_at,
             completed_at=self.machine.stats.completed_at,
             status="completed",
@@ -654,6 +690,18 @@ class ArchitectureProcessor:
         )
 
         return run
+
+    def get_weekly_summary(self) -> dict:
+        """Get the weekly summary from the registry."""
+        return self.registry.get_weekly_summary()
+
+    def get_registry_stats(self) -> dict:
+        """Get current registry statistics."""
+        return self.registry.get_stats().to_dict()
+
+    def get_growth_data(self, days: int = 30) -> list[dict]:
+        """Get architecture discovery growth data."""
+        return self.registry.get_growth_data(days)
 
     def get_progress(self) -> dict[str, Any]:
         """Get current processing progress."""

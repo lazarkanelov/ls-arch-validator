@@ -6,7 +6,7 @@ import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from src.models import Architecture, ArchitectureSourceType, TemplateSource
 from src.miner.converter import CloudFormationConverter, ConversionError
@@ -22,6 +22,9 @@ from src.miner.sources import (
 from src.utils.cache import ArchitectureCache
 from src.utils.logging import get_logger
 
+if TYPE_CHECKING:
+    from src.registry import ArchitectureRegistry
+
 logger = get_logger("miner")
 
 
@@ -35,6 +38,9 @@ class MiningResult:
         self.templates_found: int = 0
         self.templates_normalized: int = 0
         self.diagrams_parsed: int = 0
+        # Incremental mining stats
+        self.new_architectures: int = 0
+        self.skipped_known: int = 0
 
     @property
     def success(self) -> bool:
@@ -50,6 +56,8 @@ class MiningResult:
             "templates_found": self.templates_found,
             "templates_normalized": self.templates_normalized,
             "diagrams_parsed": self.diagrams_parsed,
+            "new_architectures": self.new_architectures,
+            "skipped_known": self.skipped_known,
         }
 
 
@@ -59,6 +67,8 @@ async def mine_all(
     include_diagrams: bool = True,
     max_per_source: Optional[int] = None,
     skip_cache: bool = False,
+    registry: Optional["ArchitectureRegistry"] = None,
+    incremental: bool = False,
 ) -> MiningResult:
     """
     Mine templates from all configured sources.
@@ -69,6 +79,8 @@ async def mine_all(
         include_diagrams: Whether to include diagram sources
         max_per_source: Maximum templates per source
         skip_cache: Force re-mining even if cached
+        registry: Architecture registry for incremental mining
+        incremental: Only process NEW architectures (skip already-known)
 
     Returns:
         MiningResult with all architectures
@@ -85,6 +97,7 @@ async def mine_all(
         "mining_started",
         sources=source_list,
         max_per_source=max_per_source,
+        incremental=incremental,
     )
 
     # Initialize components
@@ -113,6 +126,15 @@ async def mine_all(
             # Process extracted templates
             for template in extraction.templates:
                 try:
+                    # Incremental mode: skip already-known architectures
+                    if incremental and registry and registry.exists(template.template_id):
+                        logger.debug(
+                            "skipping_known_architecture",
+                            template_id=template.template_id,
+                        )
+                        result.skipped_known += 1
+                        continue
+
                     # Determine processing path
                     if source_name in DIAGRAM_SOURCES:
                         # Process as diagram
@@ -126,6 +148,16 @@ async def mine_all(
                         if arch:
                             result.architectures.append(arch)
                             result.diagrams_parsed += 1
+                            result.new_architectures += 1
+                            # Register with registry
+                            if registry:
+                                services = _extract_services(arch.main_tf)
+                                registry.register(
+                                    arch_id=arch.id,
+                                    source_name=arch.source_name,
+                                    source_url=arch.source_url,
+                                    services=services,
+                                )
                     else:
                         # Process as template
                         arch = await _process_template(
@@ -138,6 +170,16 @@ async def mine_all(
                         if arch:
                             result.architectures.append(arch)
                             result.templates_normalized += 1
+                            result.new_architectures += 1
+                            # Register with registry
+                            if registry:
+                                services = _extract_services(arch.main_tf)
+                                registry.register(
+                                    arch_id=arch.id,
+                                    source_name=arch.source_name,
+                                    source_url=arch.source_url,
+                                    services=services,
+                                )
 
                 except Exception as e:
                     error_msg = f"Error processing {template.template_id}: {e}"
@@ -389,6 +431,53 @@ def _architecture_from_cache(cached: dict, template: TemplateSource) -> Architec
         outputs_tf=cached.get("outputs_tf"),
         metadata=metadata,
     )
+
+
+def _extract_services(terraform_code: str) -> list[str]:
+    """Extract AWS service names from Terraform code."""
+    import re
+
+    # Common AWS service resource prefixes
+    service_patterns = {
+        "aws_lambda": "Lambda",
+        "aws_dynamodb": "DynamoDB",
+        "aws_s3": "S3",
+        "aws_sqs": "SQS",
+        "aws_sns": "SNS",
+        "aws_api_gateway": "API Gateway",
+        "aws_apigatewayv2": "API Gateway v2",
+        "aws_ecs": "ECS",
+        "aws_ecr": "ECR",
+        "aws_rds": "RDS",
+        "aws_ec2": "EC2",
+        "aws_iam": "IAM",
+        "aws_cloudwatch": "CloudWatch",
+        "aws_kinesis": "Kinesis",
+        "aws_step_functions": "Step Functions",
+        "aws_sfn": "Step Functions",
+        "aws_cognito": "Cognito",
+        "aws_secretsmanager": "Secrets Manager",
+        "aws_ssm": "SSM",
+        "aws_kms": "KMS",
+        "aws_elasticsearch": "Elasticsearch",
+        "aws_opensearch": "OpenSearch",
+        "aws_elasticache": "ElastiCache",
+        "aws_rekognition": "Rekognition",
+        "aws_textract": "Textract",
+        "aws_comprehend": "Comprehend",
+        "aws_sagemaker": "SageMaker",
+        "aws_lex": "Lex",
+        "aws_polly": "Polly",
+        "aws_transcribe": "Transcribe",
+        "aws_translate": "Translate",
+    }
+
+    services = set()
+    for pattern, service_name in service_patterns.items():
+        if re.search(rf'resource\s+"{pattern}', terraform_code):
+            services.add(service_name)
+
+    return sorted(list(services))
 
 
 def _update_source_state(cache_dir: Path, sources: list[str]) -> None:

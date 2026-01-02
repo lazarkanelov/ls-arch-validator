@@ -615,6 +615,7 @@ def _run_with_fsm(
     dashboard_url: str,
     localstack_version: str,
     max_per_source: int,
+    incremental: bool = False,
 ) -> None:
     """Run pipeline using FSM-based processor."""
     import asyncio
@@ -626,7 +627,11 @@ def _run_with_fsm(
     from src.utils.cache import AppCache, ArchitectureCache
     from src.models import Architecture, ArchitectureMetadata, ArchitectureSourceType
 
-    ctx.logger.info("fsm_pipeline_started", skip_cache=skip_cache)
+    ctx.logger.info(
+        "fsm_pipeline_started",
+        skip_cache=skip_cache,
+        incremental=incremental,
+    )
 
     try:
         # Configure processor
@@ -638,6 +643,7 @@ def _run_with_fsm(
             skip_generation=skip_generation,
             skip_cache=skip_cache,
             localstack_version=localstack_version,
+            incremental=incremental,
         )
 
         # Run processor
@@ -697,8 +703,23 @@ def _run_with_fsm(
             app_cache=app_cache,
         )
 
+        # Save registry data for dashboard (cumulative tracking)
+        import json as json_module
+        registry_data_file = ctx.output_dir / "data" / "registry.json"
+        registry_data_file.parent.mkdir(parents=True, exist_ok=True)
+        registry_data_file.write_text(json_module.dumps({
+            "stats": processor.get_registry_stats(),
+            "weekly_summary": processor.get_weekly_summary(),
+            "growth_data": processor.get_growth_data(days=30),
+            "updated_at": datetime.utcnow().isoformat(),
+        }, indent=2, default=str))
+
+        ctx.logger.info("registry_data_saved", path=str(registry_data_file))
+
         # Output results
         stats = processor.machine.stats
+        registry_stats = processor.get_registry_stats()
+
         output_json({
             "status": "success" if stats.errors == 0 else "partial",
             "run_id": validation_run.id,
@@ -722,6 +743,12 @@ def _run_with_fsm(
                 ),
             },
             "fsm_summary": processor.machine.progress_summary(),
+            "registry": {
+                "total_architectures": registry_stats.get("total_architectures", 0),
+                "tested_architectures": registry_stats.get("tested_architectures", 0),
+                "new_this_week": registry_stats.get("new_this_week", 0),
+                "services_coverage": registry_stats.get("services_coverage", {}),
+            },
         })
 
     except Exception as e:
@@ -798,6 +825,12 @@ def _run_with_fsm(
     default=False,
     help="Force fresh mining and generation (ignore cache)",
 )
+@click.option(
+    "--incremental",
+    is_flag=True,
+    default=False,
+    help="Incremental mode: only discover and test NEW architectures (skip already-known)",
+)
 @pass_context
 def run(
     ctx: Context,
@@ -812,6 +845,7 @@ def run(
     max_per_source: int,
     use_fsm: bool,
     force_fresh: bool,
+    incremental: bool,
 ) -> None:
     """Run full pipeline (mine -> generate -> validate -> report)."""
     import asyncio
@@ -854,6 +888,7 @@ def run(
             dashboard_url=dashboard_url,
             localstack_version=localstack_version,
             max_per_source=max_per_source,
+            incremental=incremental,
         )
         return
 
