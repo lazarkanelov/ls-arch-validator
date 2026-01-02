@@ -1,0 +1,20 @@
+{
+  "runs": [
+    {
+      "id": "run-20260102-141745",
+      "date": "2026-01-02",
+      "total": 0,
+      "passed": 0,
+      "partial": 0,
+      "failed": 0,
+      "pass_rate": 0.0,
+      "duration_seconds": -276.516932,
+      "duration_formatted": ""
+    }
+  ],
+  "trend": {
+    "labels": [],
+    "pass_rates": [],
+    "totals": []
+  }
+}

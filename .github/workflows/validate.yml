@@ -151,7 +151,26 @@ jobs:
           fi
 
           # Run the pipeline
+          echo "=== Pipeline starting ==="
+          echo "Current directory: $(pwd)"
+          echo "Templates dir check:"
+          ls -la templates/ 2>/dev/null || echo "templates/ not found in cwd"
+          ls -la src/../templates/ 2>/dev/null || echo "src/../templates/ not found"
+
           ls-arch-validator run $ARGS | tee run_output.json
+
+          echo "=== Pipeline completed ==="
+          echo "Checking docs directory:"
+          ls -la docs/ 2>/dev/null || echo "docs/ not found"
+          echo "Checking docs/data/:"
+          ls -la docs/data/ 2>/dev/null || echo "docs/data/ not found"
+          echo "Checking docs/index.html:"
+          if [ -f docs/index.html ]; then
+            echo "docs/index.html exists, size: $(wc -c < docs/index.html) bytes"
+            head -c 200 docs/index.html
+          else
+            echo "docs/index.html DOES NOT EXIST"
+          fi
 
           # Extract status for workflow outcome
           STATUS=$(cat run_output.json | jq -r '.status')
