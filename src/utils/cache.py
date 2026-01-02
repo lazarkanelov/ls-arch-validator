@@ -8,14 +8,14 @@ import os
 from pathlib import Path
 from typing import Any, Optional
 
-from src.config.settings import CACHE_VERSION
 from src.utils.atomic import atomic_write_json, atomic_write_text
 from src.utils.logging import get_logger
 
 logger = get_logger("cache")
 
 # Current cache format version - increment when format changes
-CURRENT_CACHE_VERSION = CACHE_VERSION
+# Keep in sync with config/defaults.yaml cache_version
+CURRENT_CACHE_VERSION = "2.0"
 
 
 def get_cache_key(content: str, version: str = "1.0") -> str:
