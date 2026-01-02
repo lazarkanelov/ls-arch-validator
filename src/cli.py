@@ -709,18 +709,28 @@ def _run_with_fsm(
 
         app_cache = AppCache(ctx.cache_dir)
 
-        generator = SiteGenerator(
-            templates_dir=templates_dir,
-            output_dir=ctx.output_dir,
-            base_url="",
-        )
+        try:
+            generator = SiteGenerator(
+                templates_dir=templates_dir,
+                output_dir=ctx.output_dir,
+                base_url="",
+            )
 
-        generator.generate(
-            run=validation_run,
-            data_dir=ctx.output_dir / "data",
-            architectures=architectures if architectures else None,
-            app_cache=app_cache,
-        )
+            generator.generate(
+                run=validation_run,
+                data_dir=ctx.output_dir / "data",
+                architectures=architectures if architectures else None,
+                app_cache=app_cache,
+            )
+        except Exception as e:
+            ctx.logger.error("dashboard_generation_failed", error=str(e))
+            # Create minimal fallback index.html
+            index_path = ctx.output_dir / "index.html"
+            index_path.write_text(f"""<!DOCTYPE html>
+<html><head><title>Dashboard Error</title>
+<style>body{{font-family:system-ui;background:#0f172a;color:#e2e8f0;padding:2rem;text-align:center;}}
+h1{{color:#f87171;}}pre{{background:#1e293b;padding:1rem;border-radius:0.5rem;text-align:left;overflow:auto;}}</style></head>
+<body><h1>Dashboard Generation Failed</h1><pre>{e}</pre></body></html>""")
 
         # Save registry data for dashboard (cumulative tracking)
         import json as json_module
