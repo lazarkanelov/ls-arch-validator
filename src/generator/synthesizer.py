@@ -45,6 +45,16 @@ CODE_GENERATION_TEMPERATURE = 0.3
 # Best practice: Minimum tokens for prompt caching (1024 required)
 MIN_CACHE_TOKENS = 1024
 
+# Rate limit aware settings
+# Tier 1 limits: 8,000 OTPM (output tokens per minute) for Sonnet 4.x
+# Set max_tokens below the rate limit to avoid immediate 429s
+# Most code responses are 1000-3000 tokens, 4096 is a safe upper bound
+MAX_OUTPUT_TOKENS = 4096
+
+# Minimum delay between API calls to stay under rate limits
+# At 4096 max tokens, we can do ~2 requests per minute under 8,000 OTPM
+MIN_REQUEST_DELAY_SECONDS = 5.0
+
 
 @dataclass
 class SynthesisResult:
@@ -258,6 +268,10 @@ class CodeSynthesizer:
                     tokens=result.tokens_used,
                 )
 
+                # Rate limit protection: delay between API calls
+                # Tier 1 has 8,000 OTPM, so we need ~30s between 4K token requests
+                await asyncio.sleep(MIN_REQUEST_DELAY_SECONDS)
+
             except Exception as e:
                 error_msg = f"Synthesis failed for {probe_type.value}: {e}"
                 result = SynthesisResult(
@@ -364,7 +378,7 @@ class CodeSynthesizer:
                 # The system prompt is cached and reused across requests
                 response = await client.messages.create(
                     model=self.model,
-                    max_tokens=8192,
+                    max_tokens=MAX_OUTPUT_TOKENS,  # Stay under OTPM rate limit
                     temperature=CODE_GENERATION_TEMPERATURE,  # Lower for deterministic code
                     system=[
                         {
@@ -557,7 +571,7 @@ class CodeSynthesizer:
             # Best practice: prompt caching + temperature control
             response = await client.messages.create(
                 model=self.model,
-                max_tokens=4096,
+                max_tokens=MAX_OUTPUT_TOKENS,  # Stay under OTPM rate limit
                 temperature=CODE_GENERATION_TEMPERATURE,
                 system=[
                     {
@@ -618,7 +632,7 @@ class CodeSynthesizer:
                 # Best practice: prompt caching + temperature control
                 response = await client.messages.create(
                     model=self.model,
-                    max_tokens=8192,
+                    max_tokens=MAX_OUTPUT_TOKENS,  # Stay under OTPM rate limit
                     temperature=CODE_GENERATION_TEMPERATURE,
                     system=[
                         {
