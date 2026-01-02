@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from src.models import Architecture, ArchitectureSourceType, TemplateSource
-from src.miner.builtin import get_builtin_architectures
 from src.miner.converter import CloudFormationConverter, ConversionError
 from src.miner.diagram_parser import DiagramParser
 from src.miner.normalizer import NormalizationResult, TemplateNormalizer
@@ -101,33 +100,8 @@ async def mine_all(
         incremental=incremental,
     )
 
-    # ALWAYS include built-in architectures first (guaranteed baseline)
-    builtin_archs = get_builtin_architectures()
-    for arch in builtin_archs:
-        # In incremental mode, skip already-known built-ins
-        if incremental and registry and registry.exists(arch.id):
-            logger.debug("skipping_known_builtin", arch_id=arch.id)
-            result.skipped_known += 1
-            continue
-
-        result.architectures.append(arch)
-        result.new_architectures += 1
-
-        # Register with registry
-        if registry:
-            services = arch.metadata.aws_services if arch.metadata else []
-            registry.register(
-                arch_id=arch.id,
-                source_name=arch.source_name,
-                source_url=arch.source_url,
-                services=services,
-            )
-
-    logger.info(
-        "builtin_architectures_added",
-        count=len([a for a in builtin_archs if a in result.architectures]),
-        skipped=result.skipped_known,
-    )
+    # Note: Builtin architectures removed - always scrape real-world sources
+    # unless incremental mode is enabled (which skips already-known architectures)
 
     # Initialize components
     arch_cache = ArchitectureCache(cache_dir)
