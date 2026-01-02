@@ -48,19 +48,18 @@ MIN_CACHE_TOKENS = 1024
 # Rate limit aware settings for Tier 1
 # Tier 1 limits: 8,000 OTPM (output tokens per minute) for Sonnet 4.x
 #
-# IMPORTANT: With 8,000 OTPM, we can only afford ~2 requests per minute
-# if each request uses ~4000 output tokens.
+# IMPORTANT: With 8,000 OTPM, we can only afford limited requests per minute.
 #
 # Strategy:
-# - Use max_tokens=4096 (most responses are 1000-3000 anyway)
-# - Wait 35 seconds between requests (safe margin under 2 req/min)
+# - Use max_tokens=8192 (some responses need more than 4096)
+# - Wait 65 seconds between requests to stay under rate limit
 # - Disable SDK retries to avoid wasting rate limit on auto-retries
-MAX_OUTPUT_TOKENS = 4096
+MAX_OUTPUT_TOKENS = 8192
 
-# 35 second delay ensures we stay under 8,000 OTPM with 4096 max tokens
-# Formula: 60s / (8000 OTPM / 4096 max_tokens) ≈ 30s minimum
+# 65 second delay ensures we stay under 8,000 OTPM with 8192 max tokens
+# Formula: 60s / (8000 OTPM / 8192 max_tokens) ≈ 61s minimum
 # Adding buffer for safety
-MIN_REQUEST_DELAY_SECONDS = 35.0
+MIN_REQUEST_DELAY_SECONDS = 65.0
 
 
 @dataclass
@@ -760,6 +759,12 @@ class CodeSynthesizer:
             logger.info("parse_strategy_5_any_blocks", file_count=len(files))
             return self._build_result(files, {})
 
+        # Strategy 6: Truncated responses (no closing backticks due to max_tokens)
+        files = self._extract_truncated_files(content)
+        if files:
+            logger.info("parse_strategy_6_truncated", file_count=len(files))
+            return self._build_result(files, {})
+
         logger.warning(
             "all_parse_strategies_failed",
             content_length=len(content),
@@ -827,6 +832,35 @@ class CodeSynthesizer:
             filename = match.group(1).strip()
             code = match.group(2).strip()
             if filename and code:
+                files[filename] = code
+
+        return files
+
+    def _extract_truncated_files(self, content: str) -> dict[str, str]:
+        """
+        Extract files from truncated responses (no closing backticks).
+
+        Handles cases where the response was cut off at max_tokens before
+        the code block could be closed with ```.
+
+        Args:
+            content: Response text with potentially truncated code blocks
+
+        Returns:
+            Dict of filename to code content
+        """
+        files = {}
+
+        # Pattern: FILE header followed by code block start, but no closing
+        # Match: ### FILE: path/file.py\n```python\ncode...
+        pattern = r"#{1,4}\s*FILE:\s*[`'\"]?([^\s`'\"]+)[`'\"]?\s*\n```(?:python|py)?\s*\n(.*?)(?=(?:#{1,4}\s*FILE:)|$)"
+        for match in re.finditer(pattern, content, re.DOTALL | re.IGNORECASE):
+            filename = match.group(1).strip()
+            code = match.group(2).strip()
+            # Remove trailing ``` if present (in case some blocks are complete)
+            if code.endswith("```"):
+                code = code[:-3].strip()
+            if filename and code and len(code) > 50:  # Ensure meaningful code
                 files[filename] = code
 
         return files

@@ -742,24 +742,33 @@ class ArchitectureProcessor:
         from src.models import RunStatistics
 
         # Add error results for architectures that failed during processing
+        from src.models import ArchitectureSourceType, LogBundle
+
         for arch_state in self.machine._states.values():
             if arch_state.state == ArchState.ERROR:
+                # Get the architecture to determine source_type
+                arch = self._architectures.get(arch_state.arch_id)
+                source_type = arch.source_type if arch else ArchitectureSourceType.TEMPLATE
+
                 error_result = ArchitectureResult(
                     architecture_id=arch_state.arch_id,
+                    source_type=source_type,
                     status=ResultStatus.FAILED,
-                    passed_tests=[],
-                    failed_tests=[],
-                    error_summary=arch_state.context.error_message or "Processing failed",
+                    logs=LogBundle(stderr=arch_state.context.error_message or "Processing failed"),
+                    suggested_issue_title=f"Processing failed: {arch_state.arch_id}",
                 )
                 self._results.append(error_result)
             elif arch_state.state == ArchState.SKIPPED:
                 # Also include skipped architectures
+                arch = self._architectures.get(arch_state.arch_id)
+                source_type = arch.source_type if arch else ArchitectureSourceType.TEMPLATE
+
                 skip_result = ArchitectureResult(
                     architecture_id=arch_state.arch_id,
+                    source_type=source_type,
                     status=ResultStatus.FAILED,
-                    passed_tests=[],
-                    failed_tests=[],
-                    error_summary=arch_state.context.error_message or "Skipped",
+                    logs=LogBundle(stderr=arch_state.context.error_message or "Skipped"),
+                    suggested_issue_title=f"Skipped: {arch_state.arch_id}",
                 )
                 self._results.append(skip_result)
 
