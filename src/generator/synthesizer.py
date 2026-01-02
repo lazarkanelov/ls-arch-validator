@@ -45,15 +45,22 @@ CODE_GENERATION_TEMPERATURE = 0.3
 # Best practice: Minimum tokens for prompt caching (1024 required)
 MIN_CACHE_TOKENS = 1024
 
-# Rate limit aware settings
+# Rate limit aware settings for Tier 1
 # Tier 1 limits: 8,000 OTPM (output tokens per minute) for Sonnet 4.x
-# Set max_tokens below the rate limit to avoid immediate 429s
-# Most code responses are 1000-3000 tokens, 4096 is a safe upper bound
+#
+# IMPORTANT: With 8,000 OTPM, we can only afford ~2 requests per minute
+# if each request uses ~4000 output tokens.
+#
+# Strategy:
+# - Use max_tokens=4096 (most responses are 1000-3000 anyway)
+# - Wait 35 seconds between requests (safe margin under 2 req/min)
+# - Disable SDK retries to avoid wasting rate limit on auto-retries
 MAX_OUTPUT_TOKENS = 4096
 
-# Minimum delay between API calls to stay under rate limits
-# At 4096 max tokens, we can do ~2 requests per minute under 8,000 OTPM
-MIN_REQUEST_DELAY_SECONDS = 5.0
+# 35 second delay ensures we stay under 8,000 OTPM with 4096 max tokens
+# Formula: 60s / (8000 OTPM / 4096 max_tokens) ≈ 30s minimum
+# Adding buffer for safety
+MIN_REQUEST_DELAY_SECONDS = 35.0
 
 
 @dataclass
@@ -122,17 +129,17 @@ class CodeSynthesizer:
         self._client = None
 
     async def _get_client(self):
-        """Get or create Anthropic client with conservative rate limit settings."""
+        """Get or create Anthropic client optimized for Tier 1 rate limits."""
         if self._client is None:
-            import anthropic
-
             if not self.api_key:
                 raise ValueError("ANTHROPIC_API_KEY not set")
 
-            # Configure client with conservative retry settings
+            # IMPORTANT: Disable SDK auto-retries for rate limits
+            # The SDK's quick retries (0.3s, 0.8s, 1.6s...) waste rate limit budget
+            # We handle retries ourselves with proper retry-after header delays
             self._client = anthropic.AsyncAnthropic(
                 api_key=self.api_key,
-                max_retries=5,  # More retries for rate limits
+                max_retries=0,  # Disable SDK retries - we handle them manually
                 timeout=120.0,  # 2 minute timeout per request
             )
 
@@ -268,9 +275,8 @@ class CodeSynthesizer:
                     tokens=result.tokens_used,
                 )
 
-                # Rate limit protection: delay between API calls
-                # Tier 1 has 8,000 OTPM, so we need ~30s between 4K token requests
-                await asyncio.sleep(MIN_REQUEST_DELAY_SECONDS)
+                # Note: Rate limit delay is applied BEFORE each API call in _generate_probe_code
+                # This ensures we wait before the next request, not after
 
             except Exception as e:
                 error_msg = f"Synthesis failed for {probe_type.value}: {e}"
@@ -372,6 +378,12 @@ class CodeSynthesizer:
         for attempt in range(max_retries):
             try:
                 client = await self._get_client()
+
+                # Rate limit protection: Wait before making request
+                # This prevents burst patterns that trigger 429s
+                if attempt == 0:
+                    logger.debug("rate_limit_delay_before_request", delay=MIN_REQUEST_DELAY_SECONDS)
+                    await asyncio.sleep(MIN_REQUEST_DELAY_SECONDS)
 
                 # Best practice: Use prompt caching for system prompt
                 # This reduces cost by up to 90% and latency by 85%
