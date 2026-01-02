@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
@@ -354,11 +354,22 @@ class SiteGenerator:
         """
         template = self.env.get_template("index.html")
 
+        # Calculate report period (week containing the run)
+        now = datetime.utcnow()
+        week_start = now - timedelta(days=now.weekday())  # Monday
+        week_end = week_start + timedelta(days=6)  # Sunday
+        report_period = {
+            "start": week_start.strftime("%B %d, %Y"),
+            "end": week_end.strftime("%B %d, %Y"),
+        }
+
         # Prepare context
         context = {
             "base_url": self.base_url,
             "version": __version__,
             "last_updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "latest_run_id": data.get("run_id", ""),
+            "report_period": report_period,
             **data,
         }
 
@@ -736,11 +747,22 @@ class SiteGenerator:
             else:
                 passing.append(item)
 
+        # Calculate report period (week containing the run)
+        now = datetime.utcnow()
+        week_start = now - timedelta(days=now.weekday())  # Monday
+        week_end = week_start + timedelta(days=6)  # Sunday
+        report_period = {
+            "start": week_start.strftime("%B %d, %Y"),
+            "end": week_end.strftime("%B %d, %Y"),
+        }
+
         context = {
             "base_url": self.base_url,
             "version": __version__,
             "last_updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
             "run_id": index_data.get("latest_run", ""),
+            "latest_run_id": index_data.get("latest_run", ""),
+            "report_period": report_period,
             "statistics": index_data.get("statistics", {}),
             "failures": failures,
             "passing": passing,

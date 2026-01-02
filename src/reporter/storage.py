@@ -183,6 +183,7 @@ class ObjectStore:
         error_summary: Optional[str] = None,
         infrastructure_error: Optional[str] = None,
         test_results: Optional[list[dict]] = None,
+        pytest_output: Optional[str] = None,
         logs_url: Optional[str] = None,
     ) -> Path:
         """Store per-architecture test result.
@@ -194,6 +195,7 @@ class ObjectStore:
             error_summary: Brief error description
             infrastructure_error: Infrastructure-level error
             test_results: List of individual test results
+            pytest_output: Full pytest console output for debugging
             logs_url: URL to detailed logs
 
         Returns:
@@ -206,6 +208,7 @@ class ObjectStore:
             "error_summary": error_summary,
             "infrastructure_error": infrastructure_error,
             "test_results": test_results or [],
+            "pytest_output": pytest_output,
             "logs_url": logs_url,
         }
 
