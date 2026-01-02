@@ -661,6 +661,19 @@ def _run_with_fsm(
         if not templates_dir.exists():
             templates_dir = Path("templates")
 
+        ctx.logger.info(
+            "templates_path_check",
+            primary=str(Path(__file__).parent.parent / "templates"),
+            primary_exists=(Path(__file__).parent.parent / "templates").exists(),
+            fallback=str(Path("templates")),
+            fallback_exists=Path("templates").exists(),
+            using=str(templates_dir),
+        )
+
+        # Ensure output directory exists early
+        ctx.output_dir.mkdir(parents=True, exist_ok=True)
+        (ctx.output_dir / "data").mkdir(parents=True, exist_ok=True)
+
         # Load architectures for dashboard - from processor first, then cache
         arch_cache = ArchitectureCache(ctx.cache_dir)
         architectures: dict[str, Architecture] = {}
@@ -680,27 +693,47 @@ def _run_with_fsm(
             if arch_id in architectures:
                 continue  # Already have from processor
 
-            cached = arch_cache.load_architecture(arch_id)
-            if cached:
-                metadata = None
-                meta_dict = cached.get("metadata", {})
-                if meta_dict:
-                    metadata = ArchitectureMetadata.from_dict(meta_dict)
+            try:
+                cached = arch_cache.load_architecture(arch_id)
+                if cached:
+                    metadata = None
+                    meta_dict = cached.get("metadata", {})
+                    if meta_dict:
+                        metadata = ArchitectureMetadata.from_dict(meta_dict)
 
-                content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
+                    content_hash = meta_dict.get("content_hash", "") if meta_dict else ""
 
-                arch = Architecture(
-                    id=arch_id,
-                    source_type=ArchitectureSourceType(cached.get("source_type", "template")),
-                    source_name=cached.get("source_name", "cached"),
-                    source_url=cached.get("source_url", ""),
-                    main_tf=cached.get("main_tf", ""),
-                    variables_tf=cached.get("variables_tf"),
-                    outputs_tf=cached.get("outputs_tf"),
-                    metadata=metadata,
-                    content_hash=content_hash,
+                    # Safely get source_type with fallback
+                    source_type_str = cached.get("source_type", "template")
+                    try:
+                        source_type = ArchitectureSourceType(source_type_str)
+                    except ValueError:
+                        ctx.logger.warning(
+                            "invalid_source_type",
+                            arch_id=arch_id,
+                            source_type=source_type_str,
+                        )
+                        source_type = ArchitectureSourceType.TEMPLATE
+
+                    arch = Architecture(
+                        id=arch_id,
+                        source_type=source_type,
+                        source_name=cached.get("source_name", "cached"),
+                        source_url=cached.get("source_url", ""),
+                        main_tf=cached.get("main_tf", ""),
+                        variables_tf=cached.get("variables_tf"),
+                        outputs_tf=cached.get("outputs_tf"),
+                        metadata=metadata,
+                        content_hash=content_hash,
+                    )
+                    architectures[arch_id] = arch
+            except Exception as arch_err:
+                ctx.logger.warning(
+                    "architecture_load_error",
+                    arch_id=arch_id,
+                    error=str(arch_err),
                 )
-                architectures[arch_id] = arch
+                continue
 
         ctx.logger.info(
             "total_architectures_for_dashboard",
