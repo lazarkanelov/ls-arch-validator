@@ -1,0 +1,37 @@
+{
+  "runs": [
+    {
+      "id": "run-20260103-035356",
+      "date": "2026-01-03",
+      "total": 35,
+      "passed": 0,
+      "partial": 0,
+      "failed": 35,
+      "pass_rate": 0.0,
+      "duration_seconds": -13219.355348,
+      "duration_formatted": ""
+    },
+    {
+      "id": "run-20260102-141745",
+      "date": "2026-01-02",
+      "total": 0,
+      "passed": 0,
+      "partial": 0,
+      "failed": 0,
+      "pass_rate": 0.0,
+      "duration_seconds": -276.516932,
+      "duration_formatted": ""
+    }
+  ],
+  "trend": {
+    "labels": [
+      "Jan 02"
+    ],
+    "pass_rates": [
+      0.0
+    ],
+    "totals": [
+      0
+    ]
+  }
+}

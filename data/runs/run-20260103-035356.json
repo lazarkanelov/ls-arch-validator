@@ -1,0 +1,687 @@
+{
+  "id": "run-20260103-035356",
+  "started_at": "2026-01-03T03:53:56.694478",
+  "completed_at": "2026-01-03T00:13:37.339130",
+  "status": "completed",
+  "trigger": "scheduled",
+  "parallelism": 4,
+  "localstack_version": "latest",
+  "statistics": {
+    "total_architectures": 35,
+    "passed": 0,
+    "partial": 0,
+    "failed": 35,
+    "skipped": 0,
+    "pass_rate": 0.0
+  },
+  "timing": null,
+  "results": [
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-linux-bastion_linux-bastion-entrypoint-existing-vpc.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-linux-bastion_linux-bastion-entrypoint-existing-vpc.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-linux-bastion_linux-bastion-entrypoint-new-vpc.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-linux-bastion_linux-bastion-entrypoint-new-vpc.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-aurora-mysql_aurora_mysql-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-aurora-mysql_aurora_mysql-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-aurora-postgresql_aurora_postgres-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-aurora-postgresql_aurora_postgres-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-rds_rds-postgres-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-rds_rds-postgres-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-rds_rds-oracle-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-rds_rds-oracle-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-rds_rds-mariadb-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-rds_rds-mariadb-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-rds_rds-mysql-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-rds_rds-mysql-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-rds_rds-sqlserver-main.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-rds_rds-sqlserver-main.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "quickstart-amazon-redshift_redshift-master.template",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: quickstart-amazon-redshift_redshift-master.template"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-vpc",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-vpc"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-ec2-instance",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-ec2-instance"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-autoscaling",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-autoscaling"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-alb",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-alb"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-elb",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-elb"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-s3-bucket",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-s3-bucket"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-efs",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-efs"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-lambda",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-lambda"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-apigateway-v2",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-apigateway-v2"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "terraform-terraform-aws-modules-step-functions",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: terraform-terraform-aws-modules-step-functions"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-aws-waf-security-automations-aws-waf-security-automations-firehose-athena",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-aws-waf-security-automations-aws-waf-security-automations-firehose-athena"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-aws-waf-security-automations-aws-waf-security-automations",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-aws-waf-security-automations-aws-waf-security-automations"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-aws-waf-security-automations-aws-waf-security-automations-webacl",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-aws-waf-security-automations-aws-waf-security-automations-webacl"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-document-understanding-solution-document-understanding-solution",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-document-understanding-solution-document-understanding-solution"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-real-time-analytics-spark-streaming-emr-studio-service-catalog-setup",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-real-time-analytics-spark-streaming-emr-studio-service-catalog-setup"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-real-time-analytics-spark-streaming-emr-studio-setup",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-real-time-analytics-spark-streaming-emr-studio-setup"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-real-time-analytics-spark-streaming-emr-studio-iam-setup",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-real-time-analytics-spark-streaming-emr-studio-iam-setup"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-real-time-analytics-spark-streaming-emr-studio-transform-lambda",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-real-time-analytics-spark-streaming-emr-studio-transform-lambda"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-real-time-analytics-spark-streaming-emr-studio-network-setup",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "Synthesis failed: ['Failed to generate api_parity probe code']",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-real-time-analytics-spark-streaming-emr-studio-network-setup"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "solution-real-time-analytics-spark-streaming-emr-cluster-template-for-service-catalog",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "'ContainerManager' object has no attribute 'start_localstack'",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: solution-real-time-analytics-spark-streaming-emr-cluster-template-for-service-catalog"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "serverless-aws-node-rekognition-analysis-s3-image",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "'ContainerManager' object has no attribute 'start_localstack'",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: serverless-aws-node-rekognition-analysis-s3-image"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "serverless-aws-node-express-api",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "'ContainerManager' object has no attribute 'start_localstack'",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: serverless-aws-node-express-api"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "serverless-aws-python-scheduled-cron",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "'ContainerManager' object has no attribute 'start_localstack'",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: serverless-aws-python-scheduled-cron"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "serverless-aws-python-http-api",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "'ContainerManager' object has no attribute 'start_localstack'",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: serverless-aws-python-http-api"
+    },
+    {
+      "id": null,
+      "run_id": null,
+      "architecture_id": "serverless-aws-node-env-variables",
+      "source_type": "template",
+      "status": "failed",
+      "services": [],
+      "infrastructure": null,
+      "tests": null,
+      "logs": {
+        "terraform_log": "",
+        "localstack_log": "",
+        "app_log": "'ContainerManager' object has no attribute 'start_localstack'",
+        "test_output": ""
+      },
+      "duration_seconds": 0.0,
+      "issue_number": null,
+      "suggested_issue_title": "Processing failed: serverless-aws-node-env-variables"
+    }
+  ],
+  "token_usage": 0,
+  "token_budget": 500000
+}
